@@ -1,3 +1,4 @@
 [
-    "fft-ocean"
+    "fft_ocean",
+    "terrain_gen"
 ]
