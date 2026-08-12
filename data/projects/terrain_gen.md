@@ -8,7 +8,7 @@ link: Source → | https://github.com/0vva0va/Procedural_Terrain_Generator
 
 # FBM Terrain Generation with Noise Derivatives
 
-Terrain generation is a staple project and it quite useful since its used in so many scenarios. At this point using fractal brownian motion is commonplace. However, from [this](https://iquilezles.org/articles/morenoise/) wonderful article by Inigo Quilez, we can read a bit about the noise derivatives. 
+Terrain generation is a staple project and it quite useful since its used in so many scenarios. At this point using fractal brownian motion is commonplace. However, from [this](https://iquilezles.org/articles/morenoise/) wonderful article by Inigo Quilez, we can read a bit about the noise derivatives.  
 
 The noise derivatives can be found using this piece of code
 
@@ -38,7 +38,7 @@ vec4 noised(in vec3 x) {
     float k6 =  a - b - e + f;
     float k7 = -a + b + c - d + e - f - g + h;
 
-    return vec4(-1.0 + 2.0 *( k0 + k1 * u.x + k2 * u.y + k3 * u.z + k4 * u.x * u.y + k5 * u.y * u.z + k6 * u.z * u.x + k7 * u.x * u.y * u.z),
+    return vec4(-1.0 + 2.0 * (k0 + k1 * u.x + k2 * u.y + k3 * u.z + k4 * u.x * u.y + k5 * u.y * u.z + k6 * u.z * u.x + k7 * u.x * u.y * u.z),
                  2.0 * du * vec3(k1 + k4 * u.y + k6 * u.z + k7 * u.y * u.z,
                                  k2 + k5 * u.z + k4 * u.x + k7 * u.z * u.x,
                                  k3 + k6 * u.x + k5 * u.y + k7 * u.x * u.y));

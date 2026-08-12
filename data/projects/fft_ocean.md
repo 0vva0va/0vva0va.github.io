@@ -12,7 +12,7 @@ Simulating the ocean accurately can prove a fairly difficult task, especially wh
 ![Sum of Sines](media/fft_ocean/sum_of_sines.png)
 
 or Gerstner waves.
-![Gerstner Waves](media/fft_ocean/Trochoidal_wave.svg)
+![Gerstner Waves](media/fft_ocean/gerstner_waves.svg)
 
 Instead of these, you can model the surface as a dynamic wave field generated from a Fourier-domain spectrum. This means the water can be basically as close to physically accurate as possible and still perfrom quite well due to the fast Fourier transforms.
 
