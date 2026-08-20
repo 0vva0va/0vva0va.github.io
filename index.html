@@ -166,6 +166,33 @@
                 background: rgba(0, 0, 0, 0.65);
             }
 
+            /* ── Background Audio Toggle ── */
+            .audio-toggle {
+                position: fixed;
+                right: 20px;
+                bottom: 20px;
+                z-index: 50;
+                background: rgba(0, 0, 0, 0.55);
+                color: var(--muted);
+                border: 1px solid var(--dim);
+                border-radius: 20px;
+                padding: 8px 14px;
+                font-family: inherit;
+                font-size: 11px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                cursor: pointer;
+                transition: color 0.2s ease, border-color 0.2s ease,
+                    opacity 0.3s ease;
+            }
+            .audio-toggle:hover {
+                color: var(--text);
+                border-color: var(--faint);
+            }
+            .audio-toggle.muted {
+                color: var(--faint);
+            }
+
             /* ── Main Layout ── */
             main {
                 position: relative;
@@ -294,6 +321,22 @@
                 border-bottom-color: var(--text);
             }
 
+            /* ── Entry List Rows (shared by games/articles/writing) ──
+               Each row is a flex line: text on the left, an optional
+               thumbnail (image or muted looping video) on the right. */
+            .game-item,
+            .article-item,
+            .writing-item {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 16px;
+            }
+            .entry-main {
+                flex: 1;
+                min-width: 0;
+            }
+
             /* ── Games List ── */
             .games-section h2 {
                 font-size: clamp(24px, 3.8vw, 34px);
@@ -375,12 +418,12 @@
             }
             .entry-thumb {
                 display: block;
-                width: 100%;
-                max-width: 320px;
-                max-height: 160px;
+                flex-shrink: 0;
+                width: 96px;
+                height: 96px;
                 object-fit: cover;
-                margin-bottom: 10px;
                 border: 1px solid var(--dim);
+                background: var(--dim);
             }
 
             /* ── Paper Sheet Overlay Styles (Dynamic Size & Flat Slab Scrollbar) ── */
@@ -684,6 +727,10 @@
                     padding: 24px 20px;
                     max-height: calc(100vh - 60px);
                 }
+                .entry-thumb {
+                    width: 64px;
+                    height: 64px;
+                }
             }
         </style>
     </head>
@@ -696,6 +743,15 @@
         <canvas id="grain-overlay"></canvas>
         <div id="bg-canvas-container"></div>
         <div id="bg-dimmer"></div>
+        <button
+            id="audio-toggle"
+            class="audio-toggle hidden"
+            type="button"
+            aria-label="Mute background audio"
+            onclick="toggleAudioMute()"
+        >
+            <span id="audio-toggle-label">♪ sound</span>
+        </button>
 
         <main>
             <!-- Landing Page View -->
@@ -823,6 +879,129 @@
             import * as THREE from "three";
             import { marked } from "marked";
             marked.setOptions({ breaks: true });
+
+            /* ── Markdown Video Support ──
+               Markdown has no native video syntax, so entry bodies can
+               embed a video the same way they embed an image:
+                 ![Caption](media/clip.mp4)
+               After marked renders the image tag, any <img> whose src ends
+               in a common video extension is swapped for a <video controls
+               playsinline> element. The alt text (if any) is kept as a
+               fallback message for browsers that can't play the file. */
+            const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i;
+
+            /* ── Entry Thumbnails ──
+               `thumbnail:` in an entry's frontmatter can point at either an
+               image or a video file — video thumbnails autoplay muted and
+               loop silently, like a GIF, with no controls. */
+            function renderThumb(thumbnail) {
+                if (!thumbnail) return "";
+                if (VIDEO_EXT_RE.test(thumbnail)) {
+                    return `<video class="entry-thumb" src="${thumbnail}" autoplay muted loop playsinline preload="metadata"></video>`;
+                }
+                return `<img class="entry-thumb" src="${thumbnail}" alt="" loading="lazy">`;
+            }
+
+            function renderMarkdown(raw) {
+                let html = marked.parse(raw || "");
+                html = html.replace(
+                    /<img\s+([^>]*?)>/gi,
+                    (fullMatch, attrs) => {
+                        const srcMatch = attrs.match(/src="([^"]*)"/i);
+                        if (!srcMatch || !VIDEO_EXT_RE.test(srcMatch[1]))
+                            return fullMatch;
+                        const altMatch = attrs.match(/alt="([^"]*)"/i);
+                        const alt = altMatch ? altMatch[1] : "";
+                        return `<video controls playsinline preload="metadata" src="${srcMatch[1]}">${alt || "Your browser does not support the video tag."}</video>`;
+                    },
+                );
+                return html;
+            }
+
+            /* ── Background Audio (per-entry, fades in/out, loops, mutable) ──
+               Entries can opt into a looping background track via an
+               `audio:` frontmatter field (e.g. `audio: media/theme.mp3`).
+               It fades in when a detail view with an audio track opens,
+               loops for as long as that detail is open, fades out when the
+               user navigates away, and can be muted via the floating
+               toggle in the corner. */
+            const AUDIO_FADE_MS = 1200;
+            const AUDIO_TARGET_VOLUME = 0.55;
+
+            const audioToggleBtn = document.getElementById("audio-toggle");
+            const audioToggleLabel = document.getElementById(
+                "audio-toggle-label",
+            );
+
+            let bgAudio = null;
+            let bgAudioFadeRAF = null;
+
+            function fadeAudioVolume(audio, from, to, duration, onDone) {
+                if (bgAudioFadeRAF) cancelAnimationFrame(bgAudioFadeRAF);
+                const start = performance.now();
+                function step(now) {
+                    const t = Math.min((now - start) / duration, 1);
+                    audio.volume = from + (to - from) * t;
+                    if (t < 1) {
+                        bgAudioFadeRAF = requestAnimationFrame(step);
+                    } else {
+                        bgAudioFadeRAF = null;
+                        if (onDone) onDone();
+                    }
+                }
+                bgAudioFadeRAF = requestAnimationFrame(step);
+            }
+
+            function updateAudioToggleUI() {
+                if (!bgAudio) return;
+                audioToggleBtn.classList.toggle("muted", bgAudio.muted);
+                audioToggleLabel.textContent = bgAudio.muted
+                    ? "♪ muted"
+                    : "♪ sound";
+            }
+
+            function playEntryAudio(src) {
+                stopEntryAudio(true);
+                const audio = new Audio(src);
+                audio.loop = true;
+                audio.volume = 0;
+                bgAudio = audio;
+                audio.play().catch(() => {
+                    // Autoplay may be blocked until the user interacts with
+                    // the page; the toggle button still reflects state and
+                    // playback will begin once permitted.
+                });
+                fadeAudioVolume(audio, 0, AUDIO_TARGET_VOLUME, AUDIO_FADE_MS);
+                audioToggleBtn.classList.remove("hidden");
+                updateAudioToggleUI();
+            }
+
+            function stopEntryAudio(immediate) {
+                if (!bgAudio) {
+                    audioToggleBtn.classList.add("hidden");
+                    return;
+                }
+                const audio = bgAudio;
+                bgAudio = null;
+                audioToggleBtn.classList.add("hidden");
+                if (immediate) {
+                    audio.pause();
+                    return;
+                }
+                fadeAudioVolume(
+                    audio,
+                    audio.volume,
+                    0,
+                    AUDIO_FADE_MS,
+                    () => audio.pause(),
+                );
+            }
+
+            window.toggleAudioMute = function () {
+                if (!bgAudio) return;
+                bgAudio.muted = !bgAudio.muted;
+                updateAudioToggleUI();
+            };
 
             const bgDimmer = document.getElementById("bg-dimmer");
 
@@ -1084,10 +1263,12 @@
                     const li = document.createElement("li");
                     li.className = "game-item";
                     li.innerHTML = `
-                        ${g.thumbnail ? `<img class="entry-thumb" src="${g.thumbnail}" alt="" loading="lazy">` : ""}
-                        <a onclick="showGameDetail('${id}')">${g.name}</a>
-                        <div class="game-meta">${g.year} — ${g.tech.join(", ")}</div>
-                        <p class="game-excerpt">${g.shortDesc}</p>
+                        <div class="entry-main">
+                            <a onclick="showGameDetail('${id}')">${g.name}</a>
+                            <div class="game-meta">${g.year} — ${g.tech.join(", ")}</div>
+                            <p class="game-excerpt">${g.shortDesc}</p>
+                        </div>
+                        ${renderThumb(g.thumbnail)}
                     `;
                     gamesListUl.appendChild(li);
                 });
@@ -1114,10 +1295,12 @@
                     const li = document.createElement("li");
                     li.className = "article-item";
                     li.innerHTML = `
-                        ${p.thumbnail ? `<img class="entry-thumb" src="${p.thumbnail}" alt="" loading="lazy">` : ""}
-                        <a onclick="showArticleDetail('${id}')">${p.name}</a>
-                        <div class="article-meta">${p.year} — ${p.tech.join(", ")}</div>
-                        <p class="article-excerpt">${p.shortDesc}</p>
+                        <div class="entry-main">
+                            <a onclick="showArticleDetail('${id}')">${p.name}</a>
+                            <div class="article-meta">${p.year} — ${p.tech.join(", ")}</div>
+                            <p class="article-excerpt">${p.shortDesc}</p>
+                        </div>
+                        ${renderThumb(p.thumbnail)}
                     `;
                     articlesListUl.appendChild(li);
                 });
@@ -1171,10 +1354,12 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                     const li = document.createElement("li");
                     li.className = "writing-item";
                     li.innerHTML = `
-          ${w.thumbnail ? `<img class="entry-thumb" src="${w.thumbnail}" alt="" loading="lazy">` : ""}
-          <a onclick="showWritingDetail('${id}')">${w.title}</a>
-          <div class="writing-meta">${w.meta}</div>
-          <p class="writing-excerpt">${w.excerpt || ""}</p>
+          <div class="entry-main">
+              <a onclick="showWritingDetail('${id}')">${w.title}</a>
+              <div class="writing-meta">${w.meta}</div>
+              <p class="writing-excerpt">${w.excerpt || ""}</p>
+          </div>
+          ${renderThumb(w.thumbnail)}
         `;
                     writingListUl.appendChild(li);
                 });
@@ -1221,7 +1406,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 if (!g) return;
                 document.getElementById("gd-title").textContent = g.name;
                 document.getElementById("gd-year").textContent = g.year;
-                document.getElementById("gd-desc").innerHTML = marked.parse(
+                document.getElementById("gd-desc").innerHTML = renderMarkdown(
                     g.body,
                 );
                 document.getElementById("gd-tech").innerHTML = g.tech
@@ -1237,12 +1422,15 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 document.getElementById("games-top-bar").classList.add("hidden");
                 gameDetail.classList.remove("hidden");
                 gameDetail.scrollTop = 0;
+                if (g.audio) playEntryAudio(g.audio);
+                else stopEntryAudio();
                 history.pushState(null, "", `#game/${id}`);
             };
 
             window.showGamesList = function () {
                 gameDetail.classList.add("hidden");
                 gamesList.classList.remove("hidden");
+                stopEntryAudio();
                 const topBar = document.getElementById("games-top-bar");
                 if (topBar) topBar.classList.remove("hidden");
                 if (views.games.classList.contains("active")) {
@@ -1256,7 +1444,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 if (!p) return;
                 document.getElementById("ad-title").textContent = p.name;
                 document.getElementById("ad-year").textContent = p.year;
-                document.getElementById("ad-desc").innerHTML = marked.parse(
+                document.getElementById("ad-desc").innerHTML = renderMarkdown(
                     p.body,
                 );
                 document.getElementById("ad-tech").innerHTML = p.tech
@@ -1272,12 +1460,15 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 document.getElementById("articles-top-bar").classList.add("hidden");
                 articleDetail.classList.remove("hidden");
                 articleDetail.scrollTop = 0;
+                if (p.audio) playEntryAudio(p.audio);
+                else stopEntryAudio();
                 history.pushState(null, "", `#article/${id}`);
             };
 
             window.showArticlesList = function () {
                 articleDetail.classList.add("hidden");
                 articlesList.classList.remove("hidden");
+                stopEntryAudio();
                 const topBar = document.getElementById("articles-top-bar");
                 if (topBar) topBar.classList.remove("hidden");
                 if (views.articles.classList.contains("active")) {
@@ -1291,7 +1482,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 if (!w) return;
                 document.getElementById("wd-title").textContent = w.title;
                 document.getElementById("wd-meta").textContent = w.meta;
-                document.getElementById("wd-body").innerHTML = marked.parse(
+                document.getElementById("wd-body").innerHTML = renderMarkdown(
                     w.body,
                 );
                 document.getElementById("wd-tags").innerHTML = w.tags
@@ -1301,12 +1492,15 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 document.getElementById("writing-top-bar").classList.add("hidden");
                 writingDetail.classList.remove("hidden");
                 writingDetail.scrollTop = 0;
+                if (w.audio) playEntryAudio(w.audio);
+                else stopEntryAudio();
                 history.pushState(null, "", `#writing/${id}`);
             };
 
             window.showWritingList = function () {
                 writingDetail.classList.add("hidden");
                 writingList.classList.remove("hidden");
+                stopEntryAudio();
                 const topBar = document.getElementById("writing-top-bar");
                 if (topBar) topBar.classList.remove("hidden");
                 if (views.writing.classList.contains("active")) {
@@ -1348,12 +1542,30 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             //   year: 2026
             //   shortDesc: One-line summary.
             //   thumbnail: media/my-article/thumb.jpg
+            //   audio: media/my-article/theme.mp3
             //   tech: Rust, Tokio, gRPC
             //   link: Source → | https://github.com/you/my-article
             //   link: Demo → | https://demo.example.com
             //   ---
             //
             //   The rest of the file is plain Markdown.
+            //
+            //   `audio` is optional — a looping background track that
+            //   fades in when this entry's detail view opens and fades
+            //   out when the user leaves it. A mute toggle appears in the
+            //   bottom-right corner while it plays.
+            //
+            //   `thumbnail` is optional and shows on the right side of the
+            //   entry in its list — it can be an image OR a video file
+            //   (mp4, webm, ogg, mov, m4v). Video thumbnails autoplay
+            //   muted and loop silently, like a GIF.
+            //
+            //   Video isn't a native Markdown thing, but it works the same
+            //   way an image does — just point a normal image link at a
+            //   video file and it renders as a real <video controls>
+            //   player instead of an <img>:
+            //     ![Gameplay clip](media/my-article/clip.mp4)
+            //   Supported extensions: mp4, webm, ogg, mov, m4v.
             //
             // data/<kind>/index.json lists which slugs to load and in what
             // order, e.g. ["my-article", "another-article"].
