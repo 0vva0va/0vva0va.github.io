@@ -9,12 +9,41 @@
         <link rel="preconnect" href="https://unpkg.com" crossorigin />
         <title>Mitch J :: Developer</title>
         <style>
+            /* ── Custom Fonts ──
+               Drop your font files into a local `fonts/` folder (same
+               level as this HTML file) and update the src paths below.
+               Supported formats: .woff2 (preferred), .woff, .ttf, .otf.
+               Add one @font-face block per weight/style you have. If you
+               only have Regular, just delete the Bold block and rely on
+               the browser's synthetic bold, or swap it for the same file
+               to avoid faux-bold rendering. */
+            @font-face {
+                font-family: "CustomMono";
+                src: url("fonts/DepartureMono-Regular.woff2") format("woff2");
+                font-weight: 400;
+                font-style: normal;
+                font-display: swap;
+            }
+            @font-face {
+                font-family: "CustomMono";
+                src: url("fonts/DepartureMono-Regular.woff2") format("woff2");
+                font-weight: 700;
+                font-style: normal;
+                font-display: swap;
+            }
+
             :root {
                 --bg: #000000;
                 --text: #ffffff;
                 --muted: #b8b8b8;
                 --dim: #333333;
                 --faint: #787878;
+
+                /* Custom font first, falling back to the original
+                   monospace stack if it fails to load. Change the first
+                   name to match whatever `font-family` you used above. */
+                --font: "CustomMono", "SFMono-Regular", Consolas,
+                    "Liberation Mono", Menlo, Courier, monospace;
             }
 
             * {
@@ -36,9 +65,7 @@
             body {
                 background: var(--bg);
                 color: var(--text);
-                font-family:
-                    "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
-                    Courier, monospace;
+                font-family: var(--font);
                 font-size: 15px;
                 line-height: 1.6;
                 -webkit-font-smoothing: antialiased;
@@ -593,7 +620,7 @@
     </head>
     <body class="home-active">
         <noscript>
-            <p style="padding: 24px; font-family: monospace">
+            <p style="padding: 24px; font-family: 'CustomMono', monospace">
                 This site needs JavaScript enabled to run.
             </p>
         </noscript>
@@ -634,10 +661,6 @@
                     <p>
                         Aspiring game developer and graphics programmer.
                         Focusing on clean, minimal and elegant solutions.
-                    </p>
-                    <p>
-                        My goal is to create or help create games that are truly special,
-                        that are loved by people, wherever they may be.
                     </p>
                     <p>
                         <a href="mailto:mitjohno@gmail.com">mitjohno@gmail.com</a> —
