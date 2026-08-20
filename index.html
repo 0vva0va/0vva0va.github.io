@@ -112,7 +112,8 @@
                     animation: none;
                 }
                 .retro-btn,
-                .project-item,
+                .game-item,
+                .article-item,
                 .writing-item,
                 .back-link,
                 .btn-arrow,
@@ -293,39 +294,79 @@
                 border-bottom-color: var(--text);
             }
 
-            /* ── Projects List ── */
-            .projects-section h2 {
+            /* ── Games List ── */
+            .games-section h2 {
                 font-size: clamp(24px, 3.8vw, 34px);
                 font-weight: 400;
                 margin-bottom: 20px;
                 letter-spacing: -0.02em;
             }
-            .projects-list {
+            .games-list {
                 list-style: none;
             }
-            .project-item {
+            .game-item {
                 border-bottom: 1px solid var(--dim);
                 padding: 16px 0;
                 transition: padding-left 0.2s ease;
             }
-            .project-item:hover {
+            .game-item:hover {
                 padding-left: 8px;
             }
-            .project-item a {
+            .game-item a {
                 color: var(--text);
                 text-decoration: none;
                 font-size: 15px;
                 display: block;
                 margin-bottom: 4px;
             }
-            .project-item a:hover {
+            .game-item a:hover {
                 text-decoration: underline;
             }
-            .project-meta {
+            .game-meta {
                 color: var(--faint);
                 font-size: 12px;
             }
-            .project-excerpt {
+            .game-excerpt {
+                color: var(--muted);
+                font-size: 13px;
+                margin-top: 6px;
+                max-width: 500px;
+                line-height: 1.55;
+            }
+
+            /* ── Articles List ── */
+            .articles-section h2 {
+                font-size: clamp(24px, 3.8vw, 34px);
+                font-weight: 400;
+                margin-bottom: 20px;
+                letter-spacing: -0.02em;
+            }
+            .articles-list {
+                list-style: none;
+            }
+            .article-item {
+                border-bottom: 1px solid var(--dim);
+                padding: 16px 0;
+                transition: padding-left 0.2s ease;
+            }
+            .article-item:hover {
+                padding-left: 8px;
+            }
+            .article-item a {
+                color: var(--text);
+                text-decoration: none;
+                font-size: 15px;
+                display: block;
+                margin-bottom: 4px;
+            }
+            .article-item a:hover {
+                text-decoration: underline;
+            }
+            .article-meta {
+                color: var(--faint);
+                font-size: 12px;
+            }
+            .article-excerpt {
                 color: var(--muted);
                 font-size: 13px;
                 margin-top: 6px;
@@ -389,36 +430,43 @@
             .paper-sheet h2 {
                 color: #f5f2eb;
             }
-            .paper-sheet .project-detail-year,
+            .paper-sheet .game-detail-year,
+            .paper-sheet .article-detail-year,
             .paper-sheet .writing-detail-meta {
                 color: #a5a199;
             }
-            .paper-sheet .project-detail-line,
+            .paper-sheet .game-detail-line,
+            .paper-sheet .article-detail-line,
             .paper-sheet .writing-detail-line {
                 background: #2e2e36;
             }
-            .paper-sheet .project-detail-desc,
+            .paper-sheet .game-detail-desc,
+            .paper-sheet .article-detail-desc,
             .paper-sheet .writing-detail-body {
                 color: #dedad2;
             }
-            .paper-sheet .project-detail-desc h3,
+            .paper-sheet .game-detail-desc h3,
+            .paper-sheet .article-detail-desc h3,
             .paper-sheet .writing-detail-body h3 {
                 color: #f5f2eb;
                 font-size: 16px;
                 font-weight: 500;
                 margin: 24px 0 10px 0;
             }
-            .paper-sheet .project-detail-tech span,
+            .paper-sheet .game-detail-tech span,
+            .paper-sheet .article-detail-tech span,
             .paper-sheet .writing-detail-tags span {
                 border-color: #3b3b45;
                 color: #b8b4ac;
                 background: #222226;
             }
-            .paper-sheet .project-detail-links a {
+            .paper-sheet .game-detail-links a,
+            .paper-sheet .article-detail-links a {
                 color: #f5f2eb;
                 border-bottom-color: #777782;
             }
-            .paper-sheet .project-detail-links a:hover {
+            .paper-sheet .game-detail-links a:hover,
+            .paper-sheet .article-detail-links a:hover {
                 border-bottom-color: #f5f2eb;
             }
             .paper-sheet .back-link {
@@ -430,7 +478,8 @@
             }
 
             /* ── Detail Standard Styling ── */
-            .project-detail h2,
+            .game-detail h2,
+            .article-detail h2,
             .writing-detail h2 {
                 font-size: clamp(26px, 4.5vw, 40px);
                 font-weight: 400;
@@ -438,18 +487,21 @@
                 letter-spacing: -0.02em;
                 margin-bottom: 6px;
             }
-            .project-detail-year,
+            .game-detail-year,
+            .article-detail-year,
             .writing-detail-meta {
                 font-size: 14px;
                 margin-bottom: 20px;
             }
-            .project-detail-line,
+            .game-detail-line,
+            .article-detail-line,
             .writing-detail-line {
                 width: 100%;
                 height: 1px;
                 margin-bottom: 24px;
             }
-            .project-detail-desc,
+            .game-detail-desc,
+            .article-detail-desc,
             .writing-detail-body {
                 max-width: 740px;
                 line-height: 1.7;
@@ -459,54 +511,65 @@
             .writing-detail-body p {
                 margin-bottom: 1.2em;
             }
-            .project-detail-desc p,
+            .game-detail-desc p,
+            .article-detail-desc p,
             .writing-detail-body p {
                 margin-bottom: 1.2em;
             }
-            .project-detail-desc h3,
+            .game-detail-desc h3,
+            .article-detail-desc h3,
             .writing-detail-body h3 {
                 font-size: 16px;
                 font-weight: 500;
                 margin: 24px 0 10px 0;
             }
-            .project-detail-desc ul,
-            .project-detail-desc ol,
+            .game-detail-desc ul,
+            .game-detail-desc ol,
+            .article-detail-desc ul,
+            .article-detail-desc ol,
             .writing-detail-body ul,
             .writing-detail-body ol {
                 margin: 0 0 1.2em 1.4em;
             }
-            .project-detail-desc li,
+            .game-detail-desc li,
+            .article-detail-desc li,
             .writing-detail-body li {
                 margin-bottom: 0.4em;
             }
-            .project-detail-desc blockquote,
+            .game-detail-desc blockquote,
+            .article-detail-desc blockquote,
             .writing-detail-body blockquote {
                 border-left: 2px solid var(--dim);
                 padding-left: 14px;
                 margin: 0 0 1.2em 0;
                 color: var(--faint);
             }
-            .project-detail-desc code,
+            .game-detail-desc code,
+            .article-detail-desc code,
             .writing-detail-body code {
                 font-family: inherit;
                 background: var(--dim);
                 padding: 2px 5px;
                 font-size: 0.9em;
             }
-            .project-detail-desc pre,
+            .game-detail-desc pre,
+            .article-detail-desc pre,
             .writing-detail-body pre {
                 background: var(--dim);
                 padding: 12px 14px;
                 overflow-x: auto;
                 margin-bottom: 1.2em;
             }
-            .project-detail-desc pre code,
+            .game-detail-desc pre code,
+            .article-detail-desc pre code,
             .writing-detail-body pre code {
                 background: none;
                 padding: 0;
             }
-            .project-detail-desc img,
-            .project-detail-desc video,
+            .game-detail-desc img,
+            .game-detail-desc video,
+            .article-detail-desc img,
+            .article-detail-desc video,
             .writing-detail-body img,
             .writing-detail-body video {
                 max-width: 100%;
@@ -515,25 +578,30 @@
                 margin: 1.2em auto;
                 border: 1px solid var(--dim);
             }
-            .project-detail-desc figure,
+            .game-detail-desc figure,
+            .article-detail-desc figure,
             .writing-detail-body figure {
                 margin: 1.2em 0;
             }
-            .project-detail-desc figcaption,
+            .game-detail-desc figcaption,
+            .article-detail-desc figcaption,
             .writing-detail-body figcaption {
                 font-size: 12px;
                 color: var(--faint);
                 margin-top: 6px;
             }
-            .project-detail-desc a,
+            .game-detail-desc a,
+            .article-detail-desc a,
             .writing-detail-body a {
                 color: inherit;
             }
-            .project-detail-tech,
+            .game-detail-tech,
+            .article-detail-tech,
             .writing-detail-tags {
                 margin-bottom: 24px;
             }
-            .project-detail-tech span,
+            .game-detail-tech span,
+            .article-detail-tech span,
             .writing-detail-tags span {
                 display: inline-block;
                 border: 1px solid var(--dim);
@@ -542,7 +610,8 @@
                 margin-bottom: 6px;
                 font-size: 12px;
             }
-            .project-detail-links a {
+            .game-detail-links a,
+            .article-detail-links a {
                 display: inline-block;
                 text-decoration: none;
                 padding-bottom: 2px;
@@ -639,12 +708,16 @@
                             <span>01. ABOUT</span>
                             <span class="btn-arrow">→</span>
                         </button>
-                        <button class="retro-btn" onclick="navigateTo('projects')">
-                            <span>02. PROJECTS</span>
+                        <button class="retro-btn" onclick="navigateTo('games')">
+                            <span>02. GAMES</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                        <button class="retro-btn" onclick="navigateTo('articles')">
+                            <span>03. ARTICLES</span>
                             <span class="btn-arrow">→</span>
                         </button>
                         <button class="retro-btn" onclick="navigateTo('writing')">
-                            <span>03. WRITING</span>
+                            <span>04. WRITING</span>
                             <span class="btn-arrow">→</span>
                         </button>
                     </nav>
@@ -671,25 +744,47 @@
                 </section>
             </div>
 
-            <!-- Projects View -->
-            <div id="projects-view" class="view">
-                <div class="sub-top-bar" id="projects-top-bar">
+            <!-- Games View -->
+            <div id="games-view" class="view">
+                <div class="sub-top-bar" id="games-top-bar">
                     <a class="back-link" tabindex="0" role="button" onclick="navigateTo('home')">← home</a>
                 </div>
-                <section class="projects-section" id="projects-list">
-                    <h2>Projects</h2>
-                    <ul class="projects-list" id="projects-list-ul"></ul>
+                <section class="games-section" id="games-list">
+                    <h2>Games</h2>
+                    <ul class="games-list" id="games-list-ul"></ul>
                 </section>
-                <div id="project-detail" class="project-detail paper-sheet hidden">
-                    <a class="back-link" tabindex="0" role="button" onclick="showProjectsList()"
-                        >← Projects</a
+                <div id="game-detail" class="game-detail paper-sheet hidden">
+                    <a class="back-link" tabindex="0" role="button" onclick="showGamesList()"
+                        >← Games</a
                     >
-                    <h2 id="pd-title"></h2>
-                    <div class="project-detail-year" id="pd-year"></div>
-                    <div class="project-detail-line"></div>
-                    <div class="project-detail-desc" id="pd-desc"></div>
-                    <div class="project-detail-tech" id="pd-tech"></div>
-                    <div class="project-detail-links" id="pd-links"></div>
+                    <h2 id="gd-title"></h2>
+                    <div class="game-detail-year" id="gd-year"></div>
+                    <div class="game-detail-line"></div>
+                    <div class="game-detail-desc" id="gd-desc"></div>
+                    <div class="game-detail-tech" id="gd-tech"></div>
+                    <div class="game-detail-links" id="gd-links"></div>
+                </div>
+            </div>
+
+            <!-- Articles View -->
+            <div id="articles-view" class="view">
+                <div class="sub-top-bar" id="articles-top-bar">
+                    <a class="back-link" tabindex="0" role="button" onclick="navigateTo('home')">← home</a>
+                </div>
+                <section class="articles-section" id="articles-list">
+                    <h2>Articles</h2>
+                    <ul class="articles-list" id="articles-list-ul"></ul>
+                </section>
+                <div id="article-detail" class="article-detail paper-sheet hidden">
+                    <a class="back-link" tabindex="0" role="button" onclick="showArticlesList()"
+                        >← Articles</a
+                    >
+                    <h2 id="ad-title"></h2>
+                    <div class="article-detail-year" id="ad-year"></div>
+                    <div class="article-detail-line"></div>
+                    <div class="article-detail-desc" id="ad-desc"></div>
+                    <div class="article-detail-tech" id="ad-tech"></div>
+                    <div class="article-detail-links" id="ad-links"></div>
                 </div>
             </div>
 
@@ -968,101 +1063,63 @@
                 });
             });
 
-            /* ── Project Data ──
-               Default/fallback data, used if data/projects.json can't be
-               fetched (e.g. opening this file directly without a local
-               server). On GitHub Pages (or any local server), the JSON file
-               is loaded instead — edit that file to add/update projects
-               without touching this script. */
-            const defaultProjects = {
-                "distributed-cache": {
-                    name: "Distributed Cache",
-                    year: "2025",
-                    shortDesc:
-                        "In-memory key-value store with consistent hashing and TTL support.",
-                    body:
-                        "A high-performance distributed caching layer built for low-latency workloads. Implements consistent hashing for key distribution across nodes, with automatic failover and TTL-based expiration. Handles 100k+ RPS per node with sub-millisecond p99 latency.",
-                    tech: ["Rust", "Tokio", "gRPC", "Consistent Hashing"],
-                    links: [
-                        {
-                            label: "Source →",
-                            url: "https://github.com/username/distributed-cache",
-                        },
-                    ],
-                },
-                "static-site-generator": {
-                    name: "Static Site Generator",
-                    year: "2024",
-                    shortDesc:
-                        "Zero-dependency build tool that converts Markdown to optimized HTML.",
-                    body:
-                        "A zero-dependency static site generator written in Go. Parses Markdown with front matter, applies reusable templates, and emits minified HTML with automatic asset hashing. Builds a 500-page site in under 100ms.",
-                    tech: ["Go", "Markdown", "HTML"],
-                    links: [
-                        {
-                            label: "Source →",
-                            url: "https://github.com/username/ssg",
-                        },
-                    ],
-                },
-                "terminal-emulator": {
-                    name: "Terminal Emulator",
-                    year: "2024",
-                    shortDesc:
-                        "Web-based terminal with VT100 emulation and WebSocket session support.",
-                    body:
-                        "A browser-based terminal emulator implementing VT100 and a subset of xterm escape sequences. Connects to remote shells via WebSocket with flow control and binary message support. Renders via a custom canvas-based grid for consistent performance.",
-                    tech: ["TypeScript", "Canvas API", "WebSocket", "VT100"],
-                    links: [
-                        {
-                            label: "Source →",
-                            url: "https://github.com/username/terminal",
-                        },
-                        {
-                            label: "Demo →",
-                            url: "https://terminal-demo.example.com",
-                        },
-                    ],
-                },
-                "log-analyzer": {
-                    name: "Log Analyzer",
-                    year: "2023",
-                    shortDesc:
-                        "High-throughput stream processor for structured log aggregation and filtering.",
-                    body:
-                        "A streaming log processor that ingests structured logs from multiple sources, applies real-time filtering and aggregation, and outputs metrics to Prometheus. Uses a custom columnar storage format for fast time-range queries.",
-                    tech: [
-                        "C++",
-                        "Stream Processing",
-                        "Prometheus",
-                        "Columnar Storage",
-                    ],
-                    links: [
-                        {
-                            label: "Source →",
-                            url: "https://github.com/username/log-analyzer",
-                        },
-                    ],
-                },
-            };
-            let projects = defaultProjects;
+            /* ── Game Data ──
+               No hardcoded fallback entries — this section is driven
+               entirely by the markdown setup. Add entries under
+               data/games/ (a slug per .md file, listed in
+               data/games/index.json) and they'll load in automatically
+               when this site is served over http:// (e.g. GitHub Pages or
+               `python3 -m http.server`). See loadMarkdownEntries() below
+               for the exact format. */
+            const defaultGames = {};
+            let games = defaultGames;
 
-            const projectsList = document.getElementById("projects-list");
-            const projectsListUl = document.getElementById("projects-list-ul");
-            const projectDetail = document.getElementById("project-detail");
+            const gamesList = document.getElementById("games-list");
+            const gamesListUl = document.getElementById("games-list-ul");
+            const gameDetail = document.getElementById("game-detail");
 
-            function buildProjectsList() {
-                projectsListUl.innerHTML = "";
-                Object.entries(projects).forEach(([id, p]) => {
+            function buildGamesList() {
+                gamesListUl.innerHTML = "";
+                Object.entries(games).forEach(([id, g]) => {
                     const li = document.createElement("li");
-                    li.className = "project-item";
+                    li.className = "game-item";
+                    li.innerHTML = `
+                        ${g.thumbnail ? `<img class="entry-thumb" src="${g.thumbnail}" alt="" loading="lazy">` : ""}
+                        <a onclick="showGameDetail('${id}')">${g.name}</a>
+                        <div class="game-meta">${g.year} — ${g.tech.join(", ")}</div>
+                        <p class="game-excerpt">${g.shortDesc}</p>
+                    `;
+                    gamesListUl.appendChild(li);
+                });
+            }
+
+            /* ── Article Data ──
+               No hardcoded fallback entries — this section is driven
+               entirely by the markdown setup. Add entries under
+               data/articles/ (a slug per .md file, listed in
+               data/articles/index.json) and they'll load in automatically
+               when this site is served over http:// (e.g. GitHub Pages or
+               `python3 -m http.server`). See loadMarkdownEntries() below
+               for the exact format. */
+            const defaultArticles = {};
+            let articles = defaultArticles;
+
+            const articlesList = document.getElementById("articles-list");
+            const articlesListUl = document.getElementById("articles-list-ul");
+            const articleDetail = document.getElementById("article-detail");
+
+            function buildArticlesList() {
+                articlesListUl.innerHTML = "";
+                Object.entries(articles).forEach(([id, p]) => {
+                    const li = document.createElement("li");
+                    li.className = "article-item";
                     li.innerHTML = `
                         ${p.thumbnail ? `<img class="entry-thumb" src="${p.thumbnail}" alt="" loading="lazy">` : ""}
-                        <a onclick="showProjectDetail('${id}')">${p.name}</a>
-                        <div class="project-meta">${p.year} — ${p.tech.join(", ")}</div>
-                        <p class="project-excerpt">${p.shortDesc}</p>
+                        <a onclick="showArticleDetail('${id}')">${p.name}</a>
+                        <div class="article-meta">${p.year} — ${p.tech.join(", ")}</div>
+                        <p class="article-excerpt">${p.shortDesc}</p>
                     `;
-                    projectsListUl.appendChild(li);
+                    articlesListUl.appendChild(li);
                 });
             }
 
@@ -1127,7 +1184,8 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             const views = {
                 home: document.getElementById("home-view"),
                 about: document.getElementById("about-view"),
-                projects: document.getElementById("projects-view"),
+                games: document.getElementById("games-view"),
+                articles: document.getElementById("articles-view"),
                 writing: document.getElementById("writing-view"),
             };
 
@@ -1137,7 +1195,8 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 );
                 views[viewName].classList.add("active");
 
-                if (viewName !== "projects") showProjectsList();
+                if (viewName !== "games") showGamesList();
+                if (viewName !== "articles") showArticlesList();
                 if (viewName !== "writing") showWritingList();
 
                 if (viewName === "home") {
@@ -1156,38 +1215,73 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 );
             };
 
-            /* ── Project Detail ── */
-            window.showProjectDetail = function (id) {
-                const p = projects[id];
-                if (!p) return;
-                document.getElementById("pd-title").textContent = p.name;
-                document.getElementById("pd-year").textContent = p.year;
-                document.getElementById("pd-desc").innerHTML = marked.parse(
-                    p.body,
+            /* ── Game Detail ── */
+            window.showGameDetail = function (id) {
+                const g = games[id];
+                if (!g) return;
+                document.getElementById("gd-title").textContent = g.name;
+                document.getElementById("gd-year").textContent = g.year;
+                document.getElementById("gd-desc").innerHTML = marked.parse(
+                    g.body,
                 );
-                document.getElementById("pd-tech").innerHTML = p.tech
+                document.getElementById("gd-tech").innerHTML = g.tech
                     .map((t) => `<span>${t}</span>`)
                     .join("");
-                document.getElementById("pd-links").innerHTML = p.links
+                document.getElementById("gd-links").innerHTML = g.links
                     .map(
                         (l) =>
                             `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`,
                     )
                     .join("");
-                projectsList.classList.add("hidden");
-                document.getElementById("projects-top-bar").classList.add("hidden");
-                projectDetail.classList.remove("hidden");
-                projectDetail.scrollTop = 0;
-                history.pushState(null, "", `#project/${id}`);
+                gamesList.classList.add("hidden");
+                document.getElementById("games-top-bar").classList.add("hidden");
+                gameDetail.classList.remove("hidden");
+                gameDetail.scrollTop = 0;
+                history.pushState(null, "", `#game/${id}`);
             };
 
-            window.showProjectsList = function () {
-                projectDetail.classList.add("hidden");
-                projectsList.classList.remove("hidden");
-                const topBar = document.getElementById("projects-top-bar");
+            window.showGamesList = function () {
+                gameDetail.classList.add("hidden");
+                gamesList.classList.remove("hidden");
+                const topBar = document.getElementById("games-top-bar");
                 if (topBar) topBar.classList.remove("hidden");
-                if (views.projects.classList.contains("active")) {
-                    history.pushState(null, "", "#projects");
+                if (views.games.classList.contains("active")) {
+                    history.pushState(null, "", "#games");
+                }
+            };
+
+            /* ── Article Detail ── */
+            window.showArticleDetail = function (id) {
+                const p = articles[id];
+                if (!p) return;
+                document.getElementById("ad-title").textContent = p.name;
+                document.getElementById("ad-year").textContent = p.year;
+                document.getElementById("ad-desc").innerHTML = marked.parse(
+                    p.body,
+                );
+                document.getElementById("ad-tech").innerHTML = p.tech
+                    .map((t) => `<span>${t}</span>`)
+                    .join("");
+                document.getElementById("ad-links").innerHTML = p.links
+                    .map(
+                        (l) =>
+                            `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`,
+                    )
+                    .join("");
+                articlesList.classList.add("hidden");
+                document.getElementById("articles-top-bar").classList.add("hidden");
+                articleDetail.classList.remove("hidden");
+                articleDetail.scrollTop = 0;
+                history.pushState(null, "", `#article/${id}`);
+            };
+
+            window.showArticlesList = function () {
+                articleDetail.classList.add("hidden");
+                articlesList.classList.remove("hidden");
+                const topBar = document.getElementById("articles-top-bar");
+                if (topBar) topBar.classList.remove("hidden");
+                if (views.articles.classList.contains("active")) {
+                    history.pushState(null, "", "#articles");
                 }
             };
 
@@ -1225,10 +1319,14 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 const hash = window.location.hash;
                 if (!hash || hash === "#") {
                     navigateTo("home");
-                } else if (hash.startsWith("#project/")) {
-                    const id = hash.replace("#project/", "");
-                    navigateTo("projects");
-                    showProjectDetail(id);
+                } else if (hash.startsWith("#game/")) {
+                    const id = hash.replace("#game/", "");
+                    navigateTo("games");
+                    showGameDetail(id);
+                } else if (hash.startsWith("#article/")) {
+                    const id = hash.replace("#article/", "");
+                    navigateTo("articles");
+                    showArticleDetail(id);
                 } else if (hash.startsWith("#writing/")) {
                     const id = hash.replace("#writing/", "");
                     navigateTo("writing");
@@ -1241,24 +1339,24 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
 
             // ── Markdown entry loading ──
             //
-            // Each project/writing entry lives in its own .md file under
+            // Each game/article/writing entry lives in its own .md file under
             // data/<kind>/<slug>.md, with a small frontmatter block for
             // metadata followed by the Markdown body:
             //
             //   ---
-            //   name: My Project
+            //   name: My Article
             //   year: 2026
             //   shortDesc: One-line summary.
-            //   thumbnail: media/my-project/thumb.jpg
+            //   thumbnail: media/my-article/thumb.jpg
             //   tech: Rust, Tokio, gRPC
-            //   link: Source → | https://github.com/you/my-project
+            //   link: Source → | https://github.com/you/my-article
             //   link: Demo → | https://demo.example.com
             //   ---
             //
             //   The rest of the file is plain Markdown.
             //
             // data/<kind>/index.json lists which slugs to load and in what
-            // order, e.g. ["my-project", "another-project"].
+            // order, e.g. ["my-article", "another-article"].
 
             function parseFrontmatter(raw) {
                 const match = raw.match(
@@ -1295,7 +1393,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 return { meta, body: body.trim() };
             }
 
-            // Loads every entry for a given kind ("projects" or "writing").
+            // Loads every entry for a given kind ("games", "articles", or "writing").
             // Returns null (signalling "use the built-in defaults") if the
             // index/manifest can't be fetched at all — e.g. running via
             // file:// with no local server.
@@ -1331,24 +1429,31 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             }
 
             async function loadContentData() {
-                const loadedProjects = await loadMarkdownEntries("projects");
-                if (loadedProjects) projects = loadedProjects;
+                const loadedGames = await loadMarkdownEntries("games");
+                if (loadedGames) games = loadedGames;
+                const loadedArticles = await loadMarkdownEntries("articles");
+                if (loadedArticles) articles = loadedArticles;
                 const loadedWritings = await loadMarkdownEntries("writing");
                 if (loadedWritings) writings = loadedWritings;
             }
 
             (async function init() {
                 await loadContentData();
-                buildProjectsList();
+                buildGamesList();
+                buildArticlesList();
                 buildWritingList();
 
                 const initialHash = window.location.hash;
                 if (!initialHash || initialHash === "#") {
                     navigateTo("home");
-                } else if (initialHash.startsWith("#project/")) {
-                    const id = initialHash.replace("#project/", "");
-                    navigateTo("projects");
-                    showProjectDetail(id);
+                } else if (initialHash.startsWith("#game/")) {
+                    const id = initialHash.replace("#game/", "");
+                    navigateTo("games");
+                    showGameDetail(id);
+                } else if (initialHash.startsWith("#article/")) {
+                    const id = initialHash.replace("#article/", "");
+                    navigateTo("articles");
+                    showArticleDetail(id);
                 } else if (initialHash.startsWith("#writing/")) {
                     const id = initialHash.replace("#writing/", "");
                     navigateTo("writing");
