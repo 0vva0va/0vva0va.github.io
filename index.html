@@ -424,6 +424,10 @@
                 object-fit: cover;
                 border: 1px solid var(--dim);
                 background: var(--dim);
+                /* Purely decorative — never intercept clicks meant for the
+                   entry title (some browsers add hover affordances like a
+                   picture-in-picture button on <video> elements). */
+                pointer-events: none;
             }
 
             /* ── Paper Sheet Overlay Styles (Dynamic Size & Flat Slab Scrollbar) ── */
@@ -902,6 +906,19 @@
                 return `<img class="entry-thumb" src="${thumbnail}" alt="" loading="lazy">`;
             }
 
+            // Browsers don't always honor the `muted` attribute for
+            // autoplay when a <video> is inserted via innerHTML — setting
+            // the `.muted` property directly and re-triggering `.play()`
+            // is the reliable way to get it playing.
+            function activateThumbVideos(container) {
+                container.querySelectorAll("video.entry-thumb").forEach(
+                    (video) => {
+                        video.muted = true;
+                        video.play().catch(() => {});
+                    },
+                );
+            }
+
             function renderMarkdown(raw) {
                 let html = marked.parse(raw || "");
                 html = html.replace(
@@ -1272,6 +1289,7 @@
                     `;
                     gamesListUl.appendChild(li);
                 });
+                activateThumbVideos(gamesListUl);
             }
 
             /* ── Article Data ──
@@ -1304,6 +1322,7 @@
                     `;
                     articlesListUl.appendChild(li);
                 });
+                activateThumbVideos(articlesListUl);
             }
 
             /* ── Writing Data ──
@@ -1363,6 +1382,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
         `;
                     writingListUl.appendChild(li);
                 });
+                activateThumbVideos(writingListUl);
             }
 
             /* ── Navigation Logic ── */
