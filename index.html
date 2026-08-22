@@ -508,12 +508,14 @@
                 background: #222226;
             }
             .paper-sheet .game-detail-links a,
-            .paper-sheet .article-detail-links a {
+            .paper-sheet .article-detail-links a,
+            .paper-sheet .writing-detail-links a {
                 color: #f5f2eb;
                 border-bottom-color: #777782;
             }
             .paper-sheet .game-detail-links a:hover,
-            .paper-sheet .article-detail-links a:hover {
+            .paper-sheet .article-detail-links a:hover,
+            .paper-sheet .writing-detail-links a:hover {
                 border-bottom-color: #f5f2eb;
             }
             .paper-sheet .back-link {
@@ -658,7 +660,8 @@
                 font-size: 12px;
             }
             .game-detail-links a,
-            .article-detail-links a {
+            .article-detail-links a,
+            .writing-detail-links a {
                 display: inline-block;
                 text-decoration: none;
                 padding-bottom: 2px;
@@ -866,6 +869,7 @@
                     <div class="writing-detail-line"></div>
                     <div class="writing-detail-body" id="wd-body"></div>
                     <div class="writing-detail-tags" id="wd-tags"></div>
+                    <div class="writing-detail-links" id="wd-links"></div>
                 </div>
             </div>
         </main>
@@ -880,9 +884,17 @@
         </script>
 
         <script type="module">
-            import * as THREE from "three";
             import { marked } from "marked";
             marked.setOptions({ breaks: true });
+            // Three.js (used only for the decorative background shader
+            // below) is loaded lazily via dynamic import instead of a
+            // top-level static import. A static `import * as THREE`
+            // here would make the whole module — nav, list rendering,
+            // markdown loading, everything — wait for that (large)
+            // library to finish downloading and parsing before any of it
+            // could run. Loading it lazily means the actual site content
+            // becomes interactive immediately; the background fades in
+            // separately, whenever it's ready.
 
             /* ── Markdown Video Support ──
                Markdown has no native video syntax, so entry bodies can
@@ -901,20 +913,85 @@
             function renderThumb(thumbnail) {
                 if (!thumbnail) return "";
                 if (VIDEO_EXT_RE.test(thumbnail)) {
-                    return `<video class="entry-thumb" src="${thumbnail}" autoplay muted loop playsinline preload="metadata"></video>`;
+                    // No `src` yet — activateThumbVideos() below sets it
+                    // (via IntersectionObserver) once the thumbnail is
+                    // actually about to enter the viewport, so thumbnails
+                    // in inactive sections never download or play until
+                    // they're needed. Keeps first load fast no matter how
+                    // many video thumbnails a section has.
+                    return `<video class="entry-thumb" data-src="${thumbnail}" muted loop playsinline preload="none"></video>`;
                 }
                 return `<img class="entry-thumb" src="${thumbnail}" alt="" loading="lazy">`;
             }
 
-            // Browsers don't always honor the `muted` attribute for
-            // autoplay when a <video> is inserted via innerHTML — setting
-            // the `.muted` property directly and re-triggering `.play()`
-            // is the reliable way to get it playing.
+            // `tech`, `tags`, and `links` are all optional on every entry —
+            // these helpers render an empty string when the field is
+            // missing instead of throwing, and the callers below hide the
+            // wrapping element entirely so no empty gap is left behind.
+            function renderTagSpans(list) {
+                return (list || []).map((t) => `<span>${t}</span>`).join("");
+            }
+            function renderLinks(list) {
+                return (list || [])
+                    .map(
+                        (l) =>
+                            `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`,
+                    )
+                    .join("");
+            }
+            function renderListMeta(year, tech) {
+                const parts = [];
+                if (year) parts.push(year);
+                if (tech && tech.length) parts.push(tech.join(", "));
+                return parts.join(" — ");
+            }
+            function setOptionalSection(el, html) {
+                el.innerHTML = html;
+                el.classList.toggle("hidden", !html);
+            }
+
+            // Video thumbnails are lazy: nothing downloads until the
+            // element is about to enter the viewport (rootMargin gives it
+            // a head start so it's already playing by the time it's
+            // visible). Also pauses again once scrolled away, so a section
+            // with many thumbnails never has more than a few actually
+            // downloading/decoding at once. Entries in an inactive
+            // (display:none) view never intersect at all, so switching
+            // sections doesn't cost anything until you actually scroll.
+            const thumbVideoObserver =
+                "IntersectionObserver" in window
+                    ? new IntersectionObserver(
+                          (entries) => {
+                              entries.forEach((entry) => {
+                                  const video = entry.target;
+                                  if (entry.isIntersecting) {
+                                      if (!video.src && video.dataset.src) {
+                                          video.src = video.dataset.src;
+                                      }
+                                      video.play().catch(() => {});
+                                  } else {
+                                      video.pause();
+                                  }
+                              });
+                          },
+                          { rootMargin: "200px" },
+                      )
+                    : null;
+
             function activateThumbVideos(container) {
                 container.querySelectorAll("video.entry-thumb").forEach(
                     (video) => {
                         video.muted = true;
-                        video.play().catch(() => {});
+                        if (thumbVideoObserver) {
+                            thumbVideoObserver.observe(video);
+                        } else {
+                            // No IntersectionObserver support — just load
+                            // and play immediately.
+                            if (!video.src && video.dataset.src) {
+                                video.src = video.dataset.src;
+                            }
+                            video.play().catch(() => {});
+                        }
                     },
                 );
             }
@@ -1096,13 +1173,37 @@
             document.addEventListener("click", initAudio, { once: true });
             document.addEventListener("keydown", initAudio, { once: true });
 
-            /* ── Dithered Background Shader ── */
-            const container = document.getElementById("bg-canvas-container");
-            const scene = new THREE.Scene();
-            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-            const geometry = new THREE.PlaneGeometry(2, 2);
+            // Runs the (lazily-imported) three.js background once the
+            // browser has a spare moment, so it never competes with more
+            // important work — nav wiring, content fetches, first paint —
+            // for CPU or network priority.
+            function whenIdle(fn) {
+                if ("requestIdleCallback" in window) {
+                    requestIdleCallback(fn, { timeout: 2000 });
+                } else {
+                    setTimeout(fn, 200);
+                }
+            }
 
-            const vertexShader = `void main() { gl_Position = vec4(position, 1.0); }`;
+            whenIdle(async function initBackgroundShader() {
+                const THREE = await import("three");
+
+                /* ── Dithered Background Shader ── */
+                const container = document.getElementById(
+                    "bg-canvas-container",
+                );
+                const scene = new THREE.Scene();
+                const camera = new THREE.OrthographicCamera(
+                    -1,
+                    1,
+                    1,
+                    -1,
+                    0,
+                    1,
+                );
+                const geometry = new THREE.PlaneGeometry(2, 2);
+
+                const vertexShader = `void main() { gl_Position = vec4(position, 1.0); }`;
 
             const fragmentShader = `
       uniform float u_time;
@@ -1258,6 +1359,7 @@
                     if (prefersReducedMotion) renderer.render(scene, camera);
                 });
             });
+            });
 
             /* ── Game Data ──
                No hardcoded fallback entries — this section is driven
@@ -1282,8 +1384,8 @@
                     li.innerHTML = `
                         <div class="entry-main">
                             <a onclick="showGameDetail('${id}')">${g.name}</a>
-                            <div class="game-meta">${g.year} — ${g.tech.join(", ")}</div>
-                            <p class="game-excerpt">${g.shortDesc}</p>
+                            <div class="game-meta">${renderListMeta(g.year, g.tech)}</div>
+                            <p class="game-excerpt">${g.shortDesc || ""}</p>
                         </div>
                         ${renderThumb(g.thumbnail)}
                     `;
@@ -1315,8 +1417,8 @@
                     li.innerHTML = `
                         <div class="entry-main">
                             <a onclick="showArticleDetail('${id}')">${p.name}</a>
-                            <div class="article-meta">${p.year} — ${p.tech.join(", ")}</div>
-                            <p class="article-excerpt">${p.shortDesc}</p>
+                            <div class="article-meta">${renderListMeta(p.year, p.tech)}</div>
+                            <p class="article-excerpt">${p.shortDesc || ""}</p>
                         </div>
                         ${renderThumb(p.thumbnail)}
                     `;
@@ -1425,19 +1527,18 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 const g = games[id];
                 if (!g) return;
                 document.getElementById("gd-title").textContent = g.name;
-                document.getElementById("gd-year").textContent = g.year;
+                document.getElementById("gd-year").textContent = g.year || "";
                 document.getElementById("gd-desc").innerHTML = renderMarkdown(
                     g.body,
                 );
-                document.getElementById("gd-tech").innerHTML = g.tech
-                    .map((t) => `<span>${t}</span>`)
-                    .join("");
-                document.getElementById("gd-links").innerHTML = g.links
-                    .map(
-                        (l) =>
-                            `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`,
-                    )
-                    .join("");
+                setOptionalSection(
+                    document.getElementById("gd-tech"),
+                    renderTagSpans(g.tech),
+                );
+                setOptionalSection(
+                    document.getElementById("gd-links"),
+                    renderLinks(g.links),
+                );
                 gamesList.classList.add("hidden");
                 document.getElementById("games-top-bar").classList.add("hidden");
                 gameDetail.classList.remove("hidden");
@@ -1463,19 +1564,18 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 const p = articles[id];
                 if (!p) return;
                 document.getElementById("ad-title").textContent = p.name;
-                document.getElementById("ad-year").textContent = p.year;
+                document.getElementById("ad-year").textContent = p.year || "";
                 document.getElementById("ad-desc").innerHTML = renderMarkdown(
                     p.body,
                 );
-                document.getElementById("ad-tech").innerHTML = p.tech
-                    .map((t) => `<span>${t}</span>`)
-                    .join("");
-                document.getElementById("ad-links").innerHTML = p.links
-                    .map(
-                        (l) =>
-                            `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`,
-                    )
-                    .join("");
+                setOptionalSection(
+                    document.getElementById("ad-tech"),
+                    renderTagSpans(p.tech),
+                );
+                setOptionalSection(
+                    document.getElementById("ad-links"),
+                    renderLinks(p.links),
+                );
                 articlesList.classList.add("hidden");
                 document.getElementById("articles-top-bar").classList.add("hidden");
                 articleDetail.classList.remove("hidden");
@@ -1501,13 +1601,18 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 const w = writings[id];
                 if (!w) return;
                 document.getElementById("wd-title").textContent = w.title;
-                document.getElementById("wd-meta").textContent = w.meta;
+                document.getElementById("wd-meta").textContent = w.meta || "";
                 document.getElementById("wd-body").innerHTML = renderMarkdown(
                     w.body,
                 );
-                document.getElementById("wd-tags").innerHTML = w.tags
-                    .map((t) => `<span>${t}</span>`)
-                    .join("");
+                setOptionalSection(
+                    document.getElementById("wd-tags"),
+                    renderTagSpans(w.tags),
+                );
+                setOptionalSection(
+                    document.getElementById("wd-links"),
+                    renderLinks(w.links),
+                );
                 writingList.classList.add("hidden");
                 document.getElementById("writing-top-bar").classList.add("hidden");
                 writingDetail.classList.remove("hidden");
@@ -1587,14 +1692,54 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             //     ![Gameplay clip](media/my-article/clip.mp4)
             //   Supported extensions: mp4, webm, ogg, mov, m4v.
             //
+            //   All of `link`, `tech`, `thumbnail`, and `audio` are
+            //   optional — leave any of them out and that part of the
+            //   entry (links row, tag pills, thumbnail, background audio)
+            //   just doesn't render, no errors.
+            //
+            //   Field names aren't case-sensitive (Name:, name:, and
+            //   NAME: all work), and `name`/`title` and
+            //   `shortDesc`/`excerpt` are interchangeable — use whichever
+            //   reads naturally, on any entry type.
+            //
             // data/<kind>/index.json lists which slugs to load and in what
             // order, e.g. ["my-article", "another-article"].
 
+            // Known frontmatter fields, keyed by lowercase so the parser
+            // below is forgiving about capitalization (Name:, name:, and
+            // NAME: all end up on the exact property the rest of the code
+            // expects). `name`/`title` and `shortDesc`/`excerpt` are also
+            // cross-aliased further down so either works on any entry —
+            // Games/Articles read `name`+`shortDesc`, Writing reads
+            // `title`+`excerpt`, but you shouldn't have to remember which.
+            const FRONTMATTER_FIELD_ALIASES = {
+                name: "name",
+                title: "title",
+                year: "year",
+                meta: "meta",
+                shortdesc: "shortDesc",
+                excerpt: "excerpt",
+                thumbnail: "thumbnail",
+                audio: "audio",
+                tech: "tech",
+                tags: "tags",
+            };
+
             function parseFrontmatter(raw) {
-                const match = raw.match(
+                // Be forgiving of common file-saving quirks — a leading
+                // byte-order mark, Windows CRLF line endings, or stray
+                // blank lines before the opening `---` — any of which
+                // would otherwise make the whole frontmatter block fail
+                // to match and silently produce an entry with no
+                // metadata at all.
+                const cleaned = raw
+                    .replace(/^\uFEFF/, "")
+                    .replace(/\r\n/g, "\n")
+                    .trim();
+                const match = cleaned.match(
                     /^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/,
                 );
-                if (!match) return { meta: {}, body: raw.trim() };
+                if (!match) return { meta: {}, body: cleaned };
                 const [, fmBlock, body] = match;
                 const meta = {};
                 const links = [];
@@ -1609,7 +1754,12 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                         return;
                     }
                     const kv = line.match(/^([a-zA-Z]+):\s?(.*)$/);
-                    if (kv) meta[kv[1].trim()] = kv[2].trim();
+                    if (!kv) return;
+                    const rawKey = kv[1].trim();
+                    const key =
+                        FRONTMATTER_FIELD_ALIASES[rawKey.toLowerCase()] ||
+                        rawKey;
+                    meta[key] = kv[2].trim();
                 });
                 if (links.length) meta.links = links;
                 if (meta.tech)
@@ -1622,6 +1772,14 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                         .split(",")
                         .map((s) => s.trim())
                         .filter(Boolean);
+                // Games/Articles use `name`+`shortDesc`, Writing uses
+                // `title`+`excerpt` — accept either on any entry.
+                if (meta.name && !meta.title) meta.title = meta.name;
+                if (meta.title && !meta.name) meta.name = meta.title;
+                if (meta.shortDesc && !meta.excerpt)
+                    meta.excerpt = meta.shortDesc;
+                if (meta.excerpt && !meta.shortDesc)
+                    meta.shortDesc = meta.excerpt;
                 return { meta, body: body.trim() };
             }
 
@@ -1642,30 +1800,62 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                     return null;
                 }
 
+                // Fetch every entry in parallel rather than one at a time —
+                // much faster once there are more than a couple of files —
+                // then assemble the result back in the original index.json
+                // order regardless of which fetch finished first.
+                const entries = await Promise.all(
+                    slugs.map(async (slug) => {
+                        try {
+                            const res = await fetch(`data/${kind}/${slug}.md`);
+                            if (!res.ok) return null;
+                            const raw = await res.text();
+                            const { meta, body } = parseFrontmatter(raw);
+                            if (!meta.name && !meta.title) {
+                                // Missing/misnamed title field — fall back
+                                // to a readable version of the filename
+                                // instead of showing "undefined", and warn
+                                // so it's easy to track down in devtools.
+                                const fallback = slug
+                                    .replace(/[-_]+/g, " ")
+                                    .replace(/\b\w/g, (c) => c.toUpperCase());
+                                meta.name = fallback;
+                                meta.title = fallback;
+                                console.warn(
+                                    `data/${kind}/${slug}.md has no "name"/"title" field in its frontmatter — using "${fallback}" as a fallback. Check the block between the two "---" lines for a typo.`,
+                                );
+                            }
+                            return [slug, { ...meta, body }];
+                        } catch (e) {
+                            console.warn(
+                                `Skipping data/${kind}/${slug}.md — couldn't load or parse it.`,
+                                e,
+                            );
+                            return null;
+                        }
+                    }),
+                );
+
                 const result = {};
-                for (const slug of slugs) {
-                    try {
-                        const res = await fetch(`data/${kind}/${slug}.md`);
-                        if (!res.ok) continue;
-                        const raw = await res.text();
-                        const { meta, body } = parseFrontmatter(raw);
-                        result[slug] = { ...meta, body };
-                    } catch (e) {
-                        console.warn(
-                            `Skipping data/${kind}/${slug}.md — couldn't load or parse it.`,
-                            e,
-                        );
-                    }
+                for (const entry of entries) {
+                    if (entry) result[entry[0]] = entry[1];
                 }
                 return result;
             }
 
             async function loadContentData() {
-                const loadedGames = await loadMarkdownEntries("games");
+                // Fetch all three content types in parallel instead of one
+                // after another — same number of requests, but the total
+                // wait is however long the slowest one takes rather than
+                // the sum of all three.
+                const [loadedGames, loadedArticles, loadedWritings] =
+                    await Promise.all([
+                        loadMarkdownEntries("games"),
+                        loadMarkdownEntries("articles"),
+                        loadMarkdownEntries("writing"),
+                    ]);
                 if (loadedGames) games = loadedGames;
-                const loadedArticles = await loadMarkdownEntries("articles");
                 if (loadedArticles) articles = loadedArticles;
-                const loadedWritings = await loadMarkdownEntries("writing");
                 if (loadedWritings) writings = loadedWritings;
             }
 
