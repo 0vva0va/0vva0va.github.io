@@ -915,13 +915,14 @@
                 if (VIDEO_EXT_RE.test(thumbnail)) {
                     // No `src` yet — activateThumbVideos() below sets it
                     // (via IntersectionObserver) once the thumbnail is
-                    // actually about to enter the viewport, so thumbnails
-                    // in inactive sections never download or play until
-                    // they're needed. Keeps first load fast no matter how
-                    // many video thumbnails a section has.
-                    return `<video class="entry-thumb" data-src="${thumbnail}" muted loop playsinline preload="none"></video>`;
+                    // getting close to the viewport, so thumbnails in
+                    // inactive sections never download or play until
+                    // they're needed. `disablePictureInPicture` keeps
+                    // Chrome/Edge's hover PiP button from ever appearing
+                    // on a thumbnail that's not meant to be interactive.
+                    return `<video class="entry-thumb" data-src="${thumbnail}" muted loop playsinline preload="none" disablePictureInPicture disableRemotePlayback></video>`;
                 }
-                return `<img class="entry-thumb" src="${thumbnail}" alt="" loading="lazy">`;
+                return `<img class="entry-thumb" src="${thumbnail}" alt="" loading="lazy" fetchpriority="low">`;
             }
 
             // `tech`, `tags`, and `links` are all optional on every entry —
@@ -951,13 +952,26 @@
             }
 
             // Video thumbnails are lazy: nothing downloads until the
-            // element is about to enter the viewport (rootMargin gives it
-            // a head start so it's already playing by the time it's
-            // visible). Also pauses again once scrolled away, so a section
-            // with many thumbnails never has more than a few actually
-            // downloading/decoding at once. Entries in an inactive
-            // (display:none) view never intersect at all, so switching
-            // sections doesn't cost anything until you actually scroll.
+            // element is getting close to the viewport. rootMargin gives
+            // it a generous head start (roughly a full screen's worth) so
+            // the video has already been buffering for a while — and is
+            // usually already playing smoothly — by the time it's
+            // actually visible, instead of starting a cold fetch right as
+            // it scrolls into view. `fetchpriority` and `preload="auto"`
+            // are only applied at that point too, so the browser treats
+            // it as urgent exactly when it matters. Also pauses again
+            // once scrolled away, so a section with many thumbnails never
+            // has more than a few actually downloading/decoding at once.
+            // Entries in an inactive (display:none) view never intersect
+            // at all, so switching sections doesn't cost anything until
+            // you actually scroll near a thumbnail.
+            function loadThumbVideo(video) {
+                if (video.src || !video.dataset.src) return;
+                video.preload = "auto";
+                video.setAttribute("fetchpriority", "high");
+                video.src = video.dataset.src;
+            }
+
             const thumbVideoObserver =
                 "IntersectionObserver" in window
                     ? new IntersectionObserver(
@@ -965,16 +979,14 @@
                               entries.forEach((entry) => {
                                   const video = entry.target;
                                   if (entry.isIntersecting) {
-                                      if (!video.src && video.dataset.src) {
-                                          video.src = video.dataset.src;
-                                      }
+                                      loadThumbVideo(video);
                                       video.play().catch(() => {});
                                   } else {
                                       video.pause();
                                   }
                               });
                           },
-                          { rootMargin: "200px" },
+                          { rootMargin: "600px 0px" },
                       )
                     : null;
 
@@ -987,9 +999,7 @@
                         } else {
                             // No IntersectionObserver support — just load
                             // and play immediately.
-                            if (!video.src && video.dataset.src) {
-                                video.src = video.dataset.src;
-                            }
+                            loadThumbVideo(video);
                             video.play().catch(() => {});
                         }
                     },
@@ -1096,6 +1106,17 @@
                 bgAudio.muted = !bgAudio.muted;
                 updateAudioToggleUI();
             };
+
+            // Videos embedded in an entry's Markdown body (via
+            // renderMarkdown) live inside the detail container, which is
+            // only ever hidden with `display:none` when you navigate
+            // away — that doesn't stop playback on its own, so a playing
+            // video would otherwise keep its audio going in the
+            // background. Called whenever a detail view is closed.
+            function pauseVideosIn(container) {
+                if (!container) return;
+                container.querySelectorAll("video").forEach((v) => v.pause());
+            }
 
             const bgDimmer = document.getElementById("bg-dimmer");
 
@@ -1526,6 +1547,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             window.showGameDetail = function (id) {
                 const g = games[id];
                 if (!g) return;
+                pauseVideosIn(gameDetail);
                 document.getElementById("gd-title").textContent = g.name;
                 document.getElementById("gd-year").textContent = g.year || "";
                 document.getElementById("gd-desc").innerHTML = renderMarkdown(
@@ -1549,6 +1571,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             };
 
             window.showGamesList = function () {
+                pauseVideosIn(gameDetail);
                 gameDetail.classList.add("hidden");
                 gamesList.classList.remove("hidden");
                 stopEntryAudio();
@@ -1563,6 +1586,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             window.showArticleDetail = function (id) {
                 const p = articles[id];
                 if (!p) return;
+                pauseVideosIn(articleDetail);
                 document.getElementById("ad-title").textContent = p.name;
                 document.getElementById("ad-year").textContent = p.year || "";
                 document.getElementById("ad-desc").innerHTML = renderMarkdown(
@@ -1586,6 +1610,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             };
 
             window.showArticlesList = function () {
+                pauseVideosIn(articleDetail);
                 articleDetail.classList.add("hidden");
                 articlesList.classList.remove("hidden");
                 stopEntryAudio();
@@ -1600,6 +1625,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             window.showWritingDetail = function (id) {
                 const w = writings[id];
                 if (!w) return;
+                pauseVideosIn(writingDetail);
                 document.getElementById("wd-title").textContent = w.title;
                 document.getElementById("wd-meta").textContent = w.meta || "";
                 document.getElementById("wd-body").innerHTML = renderMarkdown(
@@ -1623,6 +1649,7 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             };
 
             window.showWritingList = function () {
+                pauseVideosIn(writingDetail);
                 writingDetail.classList.add("hidden");
                 writingList.classList.remove("hidden");
                 stopEntryAudio();
@@ -1683,7 +1710,15 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             //   `thumbnail` is optional and shows on the right side of the
             //   entry in its list — it can be an image OR a video file
             //   (mp4, webm, ogg, mov, m4v). Video thumbnails autoplay
-            //   muted and loop silently, like a GIF.
+            //   muted and loop silently, like a GIF. They're loaded lazily
+            //   and prioritized as they scroll near view, but the single
+            //   biggest thing you can do for load speed is the source
+            //   file itself: since it only ever displays at 96×96px,
+            //   there's no reason to ship a full-size video. Downscale it
+            //   (a few hundred px on the long edge is plenty), keep clips
+            //   short, and if using ffmpeg, encode with
+            //   `-movflags +faststart` so the browser can start playing
+            //   before the whole file has downloaded.
             //
             //   Video isn't a native Markdown thing, but it works the same
             //   way an image does — just point a normal image link at a
