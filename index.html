@@ -884,8 +884,41 @@
         </script>
 
         <script type="module">
-            import { marked } from "marked";
-            marked.setOptions({ breaks: true });
+            // `marked` (Markdown → HTML) is loaded dynamically rather than
+            // via a static top-level `import`, with a fallback CDN if the
+            // first one fails. A static import here would mean a single
+            // failed request (unpkg having a bad moment, an ad-blocker,
+            // a flaky connection) throws before ANY of this module runs —
+            // taking down navigation and everything else with it, not
+            // just markdown rendering. Loading it this way means the rest
+            // of the site (nav, list rendering, thumbnails, audio) is
+            // completely unaffected even if this fails outright; entry
+            // bodies just fall back to plain text in that case.
+            let marked = null;
+            const MARKED_SOURCES = [
+                "https://unpkg.com/marked@11.1.1/lib/marked.esm.js",
+                "https://cdn.jsdelivr.net/npm/marked@11.1.1/lib/marked.esm.js",
+            ];
+            (async function loadMarked() {
+                for (const url of MARKED_SOURCES) {
+                    try {
+                        const mod = await import(url);
+                        if (mod && mod.marked) {
+                            marked = mod.marked;
+                            marked.setOptions({ breaks: true });
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn(
+                            `Couldn't load the Markdown renderer from ${url}, trying the next source.`,
+                            e,
+                        );
+                    }
+                }
+                console.warn(
+                    "Markdown rendering is unavailable (every source failed to load) — entry bodies will show as plain text instead of formatted Markdown.",
+                );
+            })();
             // Three.js (used only for the decorative background shader
             // below) is loaded lazily via dynamic import instead of a
             // top-level static import. A static `import * as THREE`
@@ -1006,7 +1039,29 @@
                 );
             }
 
+            // A minimal plain-text fallback for when the Markdown
+            // renderer couldn't be loaded from any source — turns blank
+            // lines into paragraph breaks and escapes HTML so raw
+            // Markdown syntax at least displays safely as text instead of
+            // the body silently being empty.
+            function escapeHtml(s) {
+                return s
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+            }
+            function renderPlainTextFallback(raw) {
+                return (raw || "")
+                    .split(/\n{2,}/)
+                    .map(
+                        (para) =>
+                            `<p>${escapeHtml(para).replace(/\n/g, "<br>")}</p>`,
+                    )
+                    .join("");
+            }
+
             function renderMarkdown(raw) {
+                if (!marked) return renderPlainTextFallback(raw);
                 let html = marked.parse(raw || "");
                 html = html.replace(
                     /<img\s+([^>]*?)>/gi,
@@ -1207,7 +1262,28 @@
             }
 
             whenIdle(async function initBackgroundShader() {
-                const THREE = await import("three");
+                const THREE_SOURCES = [
+                    "three",
+                    "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                ];
+                let THREE = null;
+                for (const src of THREE_SOURCES) {
+                    try {
+                        THREE = await import(src);
+                        break;
+                    } catch (e) {
+                        console.warn(
+                            `Couldn't load three.js from ${src}, trying the next source.`,
+                            e,
+                        );
+                    }
+                }
+                if (!THREE) {
+                    console.warn(
+                        "Background shader unavailable (three.js failed to load from every source) — the rest of the site is unaffected.",
+                    );
+                    return;
+                }
 
                 /* ── Dithered Background Shader ── */
                 const container = document.getElementById(
