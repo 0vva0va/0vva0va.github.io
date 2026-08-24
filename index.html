@@ -9,27 +9,23 @@
         <link rel="preconnect" href="https://unpkg.com" crossorigin />
         <title>Mitch J :: Developer</title>
         <style>
-            /* ── Custom Fonts ──
-               Drop your font files into a local `fonts/` folder (same
-               level as this HTML file) and update the src paths below.
-               Supported formats: .woff2 (preferred), .woff, .ttf, .otf.
-               Add one @font-face block per weight/style you have. If you
-               only have Regular, just delete the Bold block and rely on
-               the browser's synthetic bold, or swap it for the same file
-               to avoid faux-bold rendering. */
             @font-face {
                 font-family: "CustomMono";
-                src: url("fonts/DepartureMono-Regular.woff2") format("woff2");
+                src: url("fonts/GeistPixel.woff2") format("woff2-variations"),
+                     url("fonts/GeistPixel.woff2") format("woff2");
                 font-weight: 400;
                 font-style: normal;
                 font-display: swap;
+                font-variation-settings: "CIRCLE" 1;
             }
             @font-face {
                 font-family: "CustomMono";
-                src: url("fonts/DepartureMono-Regular.woff2") format("woff2");
+                src: url("fonts/GeistPixel.woff2") format("woff2-variations"),
+                     url("fonts/GeistPixel.woff2") format("woff");
                 font-weight: 700;
                 font-style: normal;
                 font-display: swap;
+                font-variation-settings: "CIRCLE" 1;
             }
 
             :root {
@@ -77,10 +73,6 @@
                 overflow: hidden;
             }
 
-            /* The viewport scrollbar is painted on the documentElement
-               (<html>), not <body> — even though body's overflow is what
-               gets propagated to the viewport. Targeting body here is a
-               no-op in Chrome/Safari/Edge, so we style html instead. */
             html::-webkit-scrollbar {
                 width: 8px;
             }
@@ -884,16 +876,6 @@
         </script>
 
         <script type="module">
-            // `marked` (Markdown → HTML) is loaded dynamically rather than
-            // via a static top-level `import`, with a fallback CDN if the
-            // first one fails. A static import here would mean a single
-            // failed request (unpkg having a bad moment, an ad-blocker,
-            // a flaky connection) throws before ANY of this module runs —
-            // taking down navigation and everything else with it, not
-            // just markdown rendering. Loading it this way means the rest
-            // of the site (nav, list rendering, thumbnails, audio) is
-            // completely unaffected even if this fails outright; entry
-            // bodies just fall back to plain text in that case.
             let marked = null;
             const MARKED_SOURCES = [
                 "https://unpkg.com/marked@11.1.1/lib/marked.esm.js",
@@ -919,49 +901,17 @@
                     "Markdown rendering is unavailable (every source failed to load) — entry bodies will show as plain text instead of formatted Markdown.",
                 );
             })();
-            // Three.js (used only for the decorative background shader
-            // below) is loaded lazily via dynamic import instead of a
-            // top-level static import. A static `import * as THREE`
-            // here would make the whole module — nav, list rendering,
-            // markdown loading, everything — wait for that (large)
-            // library to finish downloading and parsing before any of it
-            // could run. Loading it lazily means the actual site content
-            // becomes interactive immediately; the background fades in
-            // separately, whenever it's ready.
 
-            /* ── Markdown Video Support ──
-               Markdown has no native video syntax, so entry bodies can
-               embed a video the same way they embed an image:
-                 ![Caption](media/clip.mp4)
-               After marked renders the image tag, any <img> whose src ends
-               in a common video extension is swapped for a <video controls
-               playsinline> element. The alt text (if any) is kept as a
-               fallback message for browsers that can't play the file. */
             const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i;
 
-            /* ── Entry Thumbnails ──
-               `thumbnail:` in an entry's frontmatter can point at either an
-               image or a video file — video thumbnails autoplay muted and
-               loop silently, like a GIF, with no controls. */
             function renderThumb(thumbnail) {
                 if (!thumbnail) return "";
                 if (VIDEO_EXT_RE.test(thumbnail)) {
-                    // No `src` yet — activateThumbVideos() below sets it
-                    // (via IntersectionObserver) once the thumbnail is
-                    // getting close to the viewport, so thumbnails in
-                    // inactive sections never download or play until
-                    // they're needed. `disablePictureInPicture` keeps
-                    // Chrome/Edge's hover PiP button from ever appearing
-                    // on a thumbnail that's not meant to be interactive.
                     return `<video class="entry-thumb" data-src="${thumbnail}" muted loop playsinline preload="none" disablePictureInPicture disableRemotePlayback></video>`;
                 }
                 return `<img class="entry-thumb" src="${thumbnail}" alt="" loading="lazy" fetchpriority="low">`;
             }
 
-            // `tech`, `tags`, and `links` are all optional on every entry —
-            // these helpers render an empty string when the field is
-            // missing instead of throwing, and the callers below hide the
-            // wrapping element entirely so no empty gap is left behind.
             function renderTagSpans(list) {
                 return (list || []).map((t) => `<span>${t}</span>`).join("");
             }
@@ -984,20 +934,6 @@
                 el.classList.toggle("hidden", !html);
             }
 
-            // Video thumbnails are lazy: nothing downloads until the
-            // element is getting close to the viewport. rootMargin gives
-            // it a generous head start (roughly a full screen's worth) so
-            // the video has already been buffering for a while — and is
-            // usually already playing smoothly — by the time it's
-            // actually visible, instead of starting a cold fetch right as
-            // it scrolls into view. `fetchpriority` and `preload="auto"`
-            // are only applied at that point too, so the browser treats
-            // it as urgent exactly when it matters. Also pauses again
-            // once scrolled away, so a section with many thumbnails never
-            // has more than a few actually downloading/decoding at once.
-            // Entries in an inactive (display:none) view never intersect
-            // at all, so switching sections doesn't cost anything until
-            // you actually scroll near a thumbnail.
             function loadThumbVideo(video) {
                 if (video.src || !video.dataset.src) return;
                 video.preload = "auto";
@@ -1039,11 +975,6 @@
                 );
             }
 
-            // A minimal plain-text fallback for when the Markdown
-            // renderer couldn't be loaded from any source — turns blank
-            // lines into paragraph breaks and escapes HTML so raw
-            // Markdown syntax at least displays safely as text instead of
-            // the body silently being empty.
             function escapeHtml(s) {
                 return s
                     .replace(/&/g, "&amp;")
@@ -1077,13 +1008,6 @@
                 return html;
             }
 
-            /* ── Background Audio (per-entry, fades in/out, loops, mutable) ──
-               Entries can opt into a looping background track via an
-               `audio:` frontmatter field (e.g. `audio: media/theme.mp3`).
-               It fades in when a detail view with an audio track opens,
-               loops for as long as that detail is open, fades out when the
-               user navigates away, and can be muted via the floating
-               toggle in the corner. */
             const AUDIO_FADE_MS = 1200;
             const AUDIO_TARGET_VOLUME = 0.55;
 
@@ -1162,12 +1086,6 @@
                 updateAudioToggleUI();
             };
 
-            // Videos embedded in an entry's Markdown body (via
-            // renderMarkdown) live inside the detail container, which is
-            // only ever hidden with `display:none` when you navigate
-            // away — that doesn't stop playback on its own, so a playing
-            // video would otherwise keep its audio going in the
-            // background. Called whenever a detail view is closed.
             function pauseVideosIn(container) {
                 if (!container) return;
                 container.querySelectorAll("video").forEach((v) => v.pause());
@@ -1193,11 +1111,6 @@
             const grainCanvas = document.getElementById("grain-overlay");
             const gCtx = grainCanvas.getContext("2d");
 
-            // Static grain: rendered once at full device-pixel resolution
-            // (and again on resize), never animated. Using devicePixelRatio
-            // keeps each grain speck mapped to a physical pixel — finer and
-            // crisper on high-DPI screens — with no per-frame cost since it
-            // only ever renders on load/resize.
             const grainDPR = Math.min(window.devicePixelRatio || 1, 3);
 
             function resizeGrain() {
@@ -1458,14 +1371,6 @@
             });
             });
 
-            /* ── Game Data ──
-               No hardcoded fallback entries — this section is driven
-               entirely by the markdown setup. Add entries under
-               data/games/ (a slug per .md file, listed in
-               data/games/index.json) and they'll load in automatically
-               when this site is served over http:// (e.g. GitHub Pages or
-               `python3 -m http.server`). See loadMarkdownEntries() below
-               for the exact format. */
             const defaultGames = {};
             let games = defaultGames;
 
@@ -1524,40 +1429,13 @@
                 activateThumbVideos(articlesListUl);
             }
 
-            /* ── Writing Data ──
-               Default/fallback data, used if data/writing.json can't be
-               fetched. Edit that file to add/update posts without touching
-               this script. */
             const defaultWritings = {
-                "zero-dependencies": {
-                    title: "Designing for Zero Dependencies",
-                    meta: "2026 — 12 min read",
-                    body: `Every dependency you add to a project is a liability. Not just in terms of security or maintenance burden, but in cognitive overhead. When you import a library, you are signing up to understand its API, its quirks, its upgrade path, and its transitive dependencies.
-
-This essay explores the philosophy of building software with zero external dependencies. We look at real-world examples where stripping away libraries led to faster builds, smaller binaries, and more predictable behavior.
-
-The key insight is that most of what we need is already there — in the standard library, in the operating system, or in the browser. The hard part is resisting the temptation to reach for a package manager.
-
-### 1. The Supply Chain Trap
-
-Modern software development has normalized pulling in thousands of third-party packages for trivial tasks. Micro-packages introduce attack vectors, audit headaches, and version drift. When you restrict your codebase to standard libraries, your build stays deterministic. You no longer spend hours fixing broken transitive dependencies after a clean install on CI/CD pipelines.
-
-### 2. Performance & Binary Size
-
-Third-party libraries are designed to be generic. They handle edge cases you will never encounter, carry legacy support you will never need, and drag along utility functions that bloat your bundle size. By writing domain-specific implementations tailored precisely to your application's data structures, you often achieve 10x memory savings and drastically reduced execution time.
-
-### 3. Maintainability & Longevity
-
-Code written against standard APIs written 10 years ago still compiles and runs without modification today. Code written against third-party frameworks from 5 years ago is often completely obsolete or requires a ground-up refactor. If longevity matters for your platform, minimizing external churn is the single most effective architectural decision you can make.
-
-### 4. Where to Draw the Line
-
-Zero dependencies is a guiding north star, not a dogmatic jail. Complex domain problems like TLS termination, cryptography primitives, or OS-level device drivers deserve well-audited open-source libraries. But for application logic, UI rendering, string manipulation, and HTTP routing, standard tools are almost always sufficient.
-
-In conclusion, before installing a new package, ask yourself: *Can I write this utility function myself in 10 minutes?* Nine times out of ten, the answer is yes.`,
-                    tags: ["Engineering", "Architecture", "Minimalism"],
-                    excerpt:
-                        "Why removing dependencies often leads to better software.",
+                "placeholder": {
+                    title:   "placeholder",
+                    meta:    "placeholder",
+                    body:     ``,
+                    tags:   ["placeholder"],
+                    excerpt: "placeholder",
                 },
             };
             let writings = defaultWritings;
@@ -1759,70 +1637,6 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 }
             });
 
-            // ── Markdown entry loading ──
-            //
-            // Each game/article/writing entry lives in its own .md file under
-            // data/<kind>/<slug>.md, with a small frontmatter block for
-            // metadata followed by the Markdown body:
-            //
-            //   ---
-            //   name: My Article
-            //   year: 2026
-            //   shortDesc: One-line summary.
-            //   thumbnail: media/my-article/thumb.jpg
-            //   audio: media/my-article/theme.mp3
-            //   tech: Rust, Tokio, gRPC
-            //   link: Source → | https://github.com/you/my-article
-            //   link: Demo → | https://demo.example.com
-            //   ---
-            //
-            //   The rest of the file is plain Markdown.
-            //
-            //   `audio` is optional — a looping background track that
-            //   fades in when this entry's detail view opens and fades
-            //   out when the user leaves it. A mute toggle appears in the
-            //   bottom-right corner while it plays.
-            //
-            //   `thumbnail` is optional and shows on the right side of the
-            //   entry in its list — it can be an image OR a video file
-            //   (mp4, webm, ogg, mov, m4v). Video thumbnails autoplay
-            //   muted and loop silently, like a GIF. They're loaded lazily
-            //   and prioritized as they scroll near view, but the single
-            //   biggest thing you can do for load speed is the source
-            //   file itself: since it only ever displays at 96×96px,
-            //   there's no reason to ship a full-size video. Downscale it
-            //   (a few hundred px on the long edge is plenty), keep clips
-            //   short, and if using ffmpeg, encode with
-            //   `-movflags +faststart` so the browser can start playing
-            //   before the whole file has downloaded.
-            //
-            //   Video isn't a native Markdown thing, but it works the same
-            //   way an image does — just point a normal image link at a
-            //   video file and it renders as a real <video controls>
-            //   player instead of an <img>:
-            //     ![Gameplay clip](media/my-article/clip.mp4)
-            //   Supported extensions: mp4, webm, ogg, mov, m4v.
-            //
-            //   All of `link`, `tech`, `thumbnail`, and `audio` are
-            //   optional — leave any of them out and that part of the
-            //   entry (links row, tag pills, thumbnail, background audio)
-            //   just doesn't render, no errors.
-            //
-            //   Field names aren't case-sensitive (Name:, name:, and
-            //   NAME: all work), and `name`/`title` and
-            //   `shortDesc`/`excerpt` are interchangeable — use whichever
-            //   reads naturally, on any entry type.
-            //
-            // data/<kind>/index.json lists which slugs to load and in what
-            // order, e.g. ["my-article", "another-article"].
-
-            // Known frontmatter fields, keyed by lowercase so the parser
-            // below is forgiving about capitalization (Name:, name:, and
-            // NAME: all end up on the exact property the rest of the code
-            // expects). `name`/`title` and `shortDesc`/`excerpt` are also
-            // cross-aliased further down so either works on any entry —
-            // Games/Articles read `name`+`shortDesc`, Writing reads
-            // `title`+`excerpt`, but you shouldn't have to remember which.
             const FRONTMATTER_FIELD_ALIASES = {
                 name: "name",
                 title: "title",
@@ -1837,12 +1651,6 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             };
 
             function parseFrontmatter(raw) {
-                // Be forgiving of common file-saving quirks — a leading
-                // byte-order mark, Windows CRLF line endings, or stray
-                // blank lines before the opening `---` — any of which
-                // would otherwise make the whole frontmatter block fail
-                // to match and silently produce an entry with no
-                // metadata at all.
                 const cleaned = raw
                     .replace(/^\uFEFF/, "")
                     .replace(/\r\n/g, "\n")
@@ -1894,10 +1702,6 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                 return { meta, body: body.trim() };
             }
 
-            // Loads every entry for a given kind ("games", "articles", or "writing").
-            // Returns null (signalling "use the built-in defaults") if the
-            // index/manifest can't be fetched at all — e.g. running via
-            // file:// with no local server.
             async function loadMarkdownEntries(kind) {
                 let slugs;
                 try {
@@ -1911,10 +1715,6 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                     return null;
                 }
 
-                // Fetch every entry in parallel rather than one at a time —
-                // much faster once there are more than a couple of files —
-                // then assemble the result back in the original index.json
-                // order regardless of which fetch finished first.
                 const entries = await Promise.all(
                     slugs.map(async (slug) => {
                         try {
@@ -1923,10 +1723,6 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
                             const raw = await res.text();
                             const { meta, body } = parseFrontmatter(raw);
                             if (!meta.name && !meta.title) {
-                                // Missing/misnamed title field — fall back
-                                // to a readable version of the filename
-                                // instead of showing "undefined", and warn
-                                // so it's easy to track down in devtools.
                                 const fallback = slug
                                     .replace(/[-_]+/g, " ")
                                     .replace(/\b\w/g, (c) => c.toUpperCase());
@@ -1955,10 +1751,6 @@ In conclusion, before installing a new package, ask yourself: *Can I write this 
             }
 
             async function loadContentData() {
-                // Fetch all three content types in parallel instead of one
-                // after another — same number of requests, but the total
-                // wait is however long the slowest one takes rather than
-                // the sum of all three.
                 const [loadedGames, loadedArticles, loadedWritings] =
                     await Promise.all([
                         loadMarkdownEntries("games"),
