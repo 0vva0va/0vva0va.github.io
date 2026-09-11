@@ -1,1793 +1,2226 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="color-scheme" content="dark" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="Systems & interfaces — portfolio and writing." />
-        <link rel="preconnect" href="https://unpkg.com" crossorigin />
-        <title>Mitch J :: Developer</title>
-        <style>
-            @font-face {
-                font-family: "CustomMono";
-                src: url("fonts/GeistPixel.woff2") format("woff2-variations"),
-                     url("fonts/GeistPixel.woff2") format("woff2");
-                font-weight: 400;
-                font-style: normal;
-                font-display: swap;
-                font-variation-settings: "CIRCLE" 1;
-            }
-            @font-face {
-                font-family: "CustomMono";
-                src: url("fonts/GeistPixel.woff2") format("woff2-variations"),
-                     url("fonts/GeistPixel.woff2") format("woff");
-                font-weight: 700;
-                font-style: normal;
-                font-display: swap;
-                font-variation-settings: "CIRCLE" 1;
-            }
-
-            :root {
-                --bg: #000000;
-                --text: #ffffff;
-                --muted: #b8b8b8;
-                --dim: #333333;
-                --faint: #787878;
-
-                /* Custom font first, falling back to the original
-                   monospace stack if it fails to load. Change the first
-                   name to match whatever `font-family` you used above. */
-                --font: "CustomMono", "SFMono-Regular", Consolas,
-                    "Liberation Mono", Menlo, Courier, monospace;
-            }
-
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-            ::selection {
-                background: var(--faint);
-                color: var(--bg);
-            }
-
-            html {
-                scroll-behavior: auto;
-                scrollbar-width: thin;
-                scrollbar-color: var(--dim) var(--bg);
-            }
-
-            body {
-                background: var(--bg);
-                color: var(--text);
-                font-family: var(--font);
-                font-size: 15px;
-                line-height: 1.6;
-                -webkit-font-smoothing: antialiased;
-                -moz-osx-font-smoothing: grayscale;
-                overflow-x: hidden;
-            }
-
-            body.home-active {
-                overflow: hidden;
-            }
-
-            html::-webkit-scrollbar {
-                width: 8px;
-            }
-            html::-webkit-scrollbar-track {
-                background: var(--bg);
-            }
-            html::-webkit-scrollbar-thumb {
-                background: var(--dim);
-                border: 2px solid var(--bg);
-                border-radius: 4px;
-            }
-            html::-webkit-scrollbar-thumb:hover {
-                background: var(--faint);
-            }
-
-            a, button, [onclick], .back-link {
-                cursor: pointer;
-            }
-
-            a:focus-visible,
-            button:focus-visible,
-            [onclick]:focus-visible {
-                outline: 1px dashed var(--faint);
-                outline-offset: 3px;
-            }
-
-            @media (prefers-reduced-motion: reduce) {
-                .view {
-                    animation: none;
-                }
-                .retro-btn,
-                .game-item,
-                .article-item,
-                .writing-item,
-                .back-link,
-                .btn-arrow,
-                #bg-dimmer {
-                    transition: none !important;
-                }
-            }
-
-            /* ── Grain Overlay ── */
-            #grain-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 9999;
-                pointer-events: none;
-                opacity: 0.04;
-            }
-
-            /* ── Background Canvas ── */
-            #bg-canvas-container {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: -2;
-                pointer-events: none;
-            }
-            #bg-canvas-container canvas {
-                display: block;
-                width: 100%;
-                height: 100%;
-            }
-
-            /* ── Background Dimmer ── */
-            #bg-dimmer {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: -1;
-                background: rgba(0, 0, 0, 0);
-                transition: background 0.6s ease;
-                pointer-events: none;
-            }
-            #bg-dimmer.dim {
-                background: rgba(0, 0, 0, 0.65);
-            }
-
-            /* ── Background Audio Toggle ── */
-            .audio-toggle {
-                position: fixed;
-                right: 20px;
-                bottom: 20px;
-                z-index: 50;
-                background: rgba(0, 0, 0, 0.55);
-                color: var(--muted);
-                border: 1px solid var(--dim);
-                border-radius: 20px;
-                padding: 8px 14px;
-                font-family: inherit;
-                font-size: 11px;
-                letter-spacing: 0.08em;
-                text-transform: uppercase;
-                cursor: pointer;
-                transition: color 0.2s ease, border-color 0.2s ease,
-                    opacity 0.3s ease;
-            }
-            .audio-toggle:hover {
-                color: var(--text);
-                border-color: var(--faint);
-            }
-            .audio-toggle.muted {
-                color: var(--faint);
-            }
-
-            /* ── Main Layout ── */
-            main {
-                position: relative;
-                z-index: 1;
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 32px 24px;
-                min-height: 100vh;
-            }
-
-            .view {
-                display: none;
-                animation: fadeIn 0.25s ease;
-            }
-            .view.active {
-                display: block;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(6px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            /* ── Integrated Landing Page ── */
-            #home-view {
-                min-height: calc(100vh - 64px);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-            }
-            #home-view:not(.active) {
-                display: none !important;
-                pointer-events: none !important;
-            }
-
-            .home-hero {
-                width: 100%;
-                max-width: 440px;
-                background: transparent;
-                text-align: left;
-            }
-            .home-title {
-                font-size: clamp(28px, 5.5vw, 40px);
-                font-weight: 400;
-                letter-spacing: 0.15em;
-                text-transform: uppercase;
-                margin-bottom: 6px;
-                color: var(--text);
-            }
-            .home-subtitle {
-                font-size: 13px;
-                color: var(--faint);
-                letter-spacing: 0.1em;
-                margin-bottom: 40px;
-            }
-            .home-nav {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                width: 100%;
-            }
-            .retro-btn {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                width: 100%;
-                background: transparent;
-                color: var(--muted);
-                border: none;
-                border-bottom: 1px dashed var(--dim);
-                font-family: inherit;
-                font-size: 14px;
-                letter-spacing: 0.12em;
-                padding: 14px 4px;
-                text-transform: uppercase;
-                text-decoration: none;
-                transition: all 0.2s ease;
-            }
-            .retro-btn:hover {
-                color: var(--text);
-                border-bottom-style: solid;
-                border-bottom-color: var(--text);
-                padding-left: 12px;
-            }
-            .retro-btn .btn-arrow {
-                opacity: 0.4;
-                transition: transform 0.2s ease, opacity 0.2s ease;
-            }
-            .retro-btn:hover .btn-arrow {
-                opacity: 1;
-                transform: translateX(4px);
-            }
-
-            /* ── Sub-view Top Header Links ── */
-            .sub-top-bar {
-                margin-bottom: 24px;
-            }
-
-            /* ── About ── */
-            .about-section h2 {
-                font-size: clamp(24px, 3.8vw, 34px);
-                font-weight: 400;
-                margin-bottom: 24px;
-                letter-spacing: -0.02em;
-            }
-            .about-section p {
-                color: var(--muted);
-                max-width: 540px;
-                margin-bottom: 1.2em;
-                line-height: 1.65;
-                font-size: 14px;
-            }
-            .about-section a {
-                color: var(--text);
-                text-decoration: none;
-                border-bottom: 1px solid var(--faint);
-                transition: border-color 0.2s ease;
-            }
-            .about-section a:hover {
-                border-bottom-color: var(--text);
-            }
-
-            /* ── Entry List Rows (shared by games/articles/writing) ──
-               Each row is a flex line: text on the left, an optional
-               thumbnail (image or muted looping video) on the right. */
-            .game-item,
-            .article-item,
-            .writing-item {
-                display: flex;
-                align-items: flex-start;
-                justify-content: space-between;
-                gap: 16px;
-            }
-            .entry-main {
-                flex: 1;
-                min-width: 0;
-            }
-
-            /* ── Games List ── */
-            .games-section h2 {
-                font-size: clamp(24px, 3.8vw, 34px);
-                font-weight: 400;
-                margin-bottom: 20px;
-                letter-spacing: -0.02em;
-            }
-            .games-list {
-                list-style: none;
-            }
-            .game-item {
-                border-bottom: 1px solid var(--dim);
-                padding: 16px 0;
-                transition: padding-left 0.2s ease;
-            }
-            .game-item:hover {
-                padding-left: 8px;
-            }
-            .game-item a {
-                color: var(--text);
-                text-decoration: none;
-                font-size: 15px;
-                display: block;
-                margin-bottom: 4px;
-            }
-            .game-item a:hover {
-                text-decoration: underline;
-            }
-            .game-meta {
-                color: var(--faint);
-                font-size: 12px;
-            }
-            .game-excerpt {
-                color: var(--muted);
-                font-size: 13px;
-                margin-top: 6px;
-                max-width: 500px;
-                line-height: 1.55;
-            }
-
-            /* ── Articles List ── */
-            .articles-section h2 {
-                font-size: clamp(24px, 3.8vw, 34px);
-                font-weight: 400;
-                margin-bottom: 20px;
-                letter-spacing: -0.02em;
-            }
-            .articles-list {
-                list-style: none;
-            }
-            .article-item {
-                border-bottom: 1px solid var(--dim);
-                padding: 16px 0;
-                transition: padding-left 0.2s ease;
-            }
-            .article-item:hover {
-                padding-left: 8px;
-            }
-            .article-item a {
-                color: var(--text);
-                text-decoration: none;
-                font-size: 15px;
-                display: block;
-                margin-bottom: 4px;
-            }
-            .article-item a:hover {
-                text-decoration: underline;
-            }
-            .article-meta {
-                color: var(--faint);
-                font-size: 12px;
-            }
-            .article-excerpt {
-                color: var(--muted);
-                font-size: 13px;
-                margin-top: 6px;
-                max-width: 500px;
-                line-height: 1.55;
-            }
-            .entry-thumb {
-                display: block;
-                flex-shrink: 0;
-                width: 96px;
-                height: 96px;
-                object-fit: cover;
-                border: 1px solid var(--dim);
-                background: var(--dim);
-                /* Purely decorative — never intercept clicks meant for the
-                   entry title (some browsers add hover affordances like a
-                   picture-in-picture button on <video> elements). */
-                pointer-events: none;
-            }
-
-            /* ── Paper Sheet Overlay Styles (Dynamic Size & Flat Slab Scrollbar) ── */
-            .paper-sheet {
-                background: #18181c;
-                color: #dedad2;
-                padding: 36px 36px 36px 40px;
-                border-radius: 4px;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                box-shadow:
-                    0 20px 40px rgba(0, 0, 0, 0.75),
-                    0 4px 12px rgba(0, 0, 0, 0.5),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-                margin-top: 8px;
-                
-                /* Fits text naturally up to max height limit */
-                height: auto;
-                max-height: calc(100vh - 80px);
-                overflow-y: auto;
-
-                /* Firefox Thin Scrollbar */
-                scrollbar-width: thin;
-                scrollbar-color: #484856 #111114;
-            }
-
-            /* WebKit Custom Scrollbar (Hide arrows & flat slab thumb) */
-            .paper-sheet::-webkit-scrollbar {
-                width: 7px;
-            }
-            .paper-sheet::-webkit-scrollbar-button {
-                display: none;
-                height: 0;
-                width: 0;
-            }
-            .paper-sheet::-webkit-scrollbar-track {
-                background: #111114;
-                border-radius: 0;
-            }
-            .paper-sheet::-webkit-scrollbar-thumb {
-                background: #484856;
-                border-radius: 0;
-            }
-            .paper-sheet::-webkit-scrollbar-thumb:hover {
-                background: #6e6e80;
-            }
-
-            .paper-sheet h2 {
-                color: #f5f2eb;
-            }
-            .paper-sheet .game-detail-year,
-            .paper-sheet .article-detail-year,
-            .paper-sheet .writing-detail-meta {
-                color: #a5a199;
-            }
-            .paper-sheet .game-detail-line,
-            .paper-sheet .article-detail-line,
-            .paper-sheet .writing-detail-line {
-                background: #2e2e36;
-            }
-            .paper-sheet .game-detail-desc,
-            .paper-sheet .article-detail-desc,
-            .paper-sheet .writing-detail-body {
-                color: #dedad2;
-            }
-            .paper-sheet .game-detail-desc h3,
-            .paper-sheet .article-detail-desc h3,
-            .paper-sheet .writing-detail-body h3 {
-                color: #f5f2eb;
-                font-size: 16px;
-                font-weight: 500;
-                margin: 24px 0 10px 0;
-            }
-            .paper-sheet .game-detail-tech span,
-            .paper-sheet .article-detail-tech span,
-            .paper-sheet .writing-detail-tags span {
-                border-color: #3b3b45;
-                color: #b8b4ac;
-                background: #222226;
-            }
-            .paper-sheet .game-detail-links a,
-            .paper-sheet .article-detail-links a,
-            .paper-sheet .writing-detail-links a {
-                color: #f5f2eb;
-                border-bottom-color: #777782;
-            }
-            .paper-sheet .game-detail-links a:hover,
-            .paper-sheet .article-detail-links a:hover,
-            .paper-sheet .writing-detail-links a:hover {
-                border-bottom-color: #f5f2eb;
-            }
-            .paper-sheet .back-link {
-                color: #a5a199;
-                margin-bottom: 16px;
-            }
-            .paper-sheet .back-link:hover {
-                color: #f5f2eb;
-            }
-
-            /* ── Detail Standard Styling ── */
-            .game-detail h2,
-            .article-detail h2,
-            .writing-detail h2 {
-                font-size: clamp(26px, 4.5vw, 40px);
-                font-weight: 400;
-                line-height: 1.2;
-                letter-spacing: -0.02em;
-                margin-bottom: 6px;
-            }
-            .game-detail-year,
-            .article-detail-year,
-            .writing-detail-meta {
-                font-size: 14px;
-                margin-bottom: 20px;
-            }
-            .game-detail-line,
-            .article-detail-line,
-            .writing-detail-line {
-                width: 100%;
-                height: 1px;
-                margin-bottom: 24px;
-            }
-            .game-detail-desc,
-            .article-detail-desc,
-            .writing-detail-body {
-                max-width: 740px;
-                line-height: 1.7;
-                margin-bottom: 24px;
-                font-size: 14px;
-            }
-            .writing-detail-body p {
-                margin-bottom: 1.2em;
-            }
-            .game-detail-desc p,
-            .article-detail-desc p,
-            .writing-detail-body p {
-                margin-bottom: 1.2em;
-            }
-            .game-detail-desc h3,
-            .article-detail-desc h3,
-            .writing-detail-body h3 {
-                font-size: 16px;
-                font-weight: 500;
-                margin: 24px 0 10px 0;
-            }
-            .game-detail-desc ul,
-            .game-detail-desc ol,
-            .article-detail-desc ul,
-            .article-detail-desc ol,
-            .writing-detail-body ul,
-            .writing-detail-body ol {
-                margin: 0 0 1.2em 1.4em;
-            }
-            .game-detail-desc li,
-            .article-detail-desc li,
-            .writing-detail-body li {
-                margin-bottom: 0.4em;
-            }
-            .game-detail-desc blockquote,
-            .article-detail-desc blockquote,
-            .writing-detail-body blockquote {
-                border-left: 2px solid var(--dim);
-                padding-left: 14px;
-                margin: 0 0 1.2em 0;
-                color: var(--faint);
-            }
-            .game-detail-desc code,
-            .article-detail-desc code,
-            .writing-detail-body code {
-                font-family: inherit;
-                background: var(--dim);
-                padding: 2px 5px;
-                font-size: 0.9em;
-            }
-            .game-detail-desc pre,
-            .article-detail-desc pre,
-            .writing-detail-body pre {
-                background: var(--dim);
-                padding: 12px 14px;
-                overflow-x: auto;
-                margin-bottom: 1.2em;
-            }
-            .game-detail-desc pre code,
-            .article-detail-desc pre code,
-            .writing-detail-body pre code {
-                background: none;
-                padding: 0;
-            }
-            .game-detail-desc img,
-            .game-detail-desc video,
-            .article-detail-desc img,
-            .article-detail-desc video,
-            .writing-detail-body img,
-            .writing-detail-body video {
-                max-width: 100%;
-                height: auto;
-                display: block;
-                margin: 1.2em auto;
-                border: 1px solid var(--dim);
-            }
-            .game-detail-desc figure,
-            .article-detail-desc figure,
-            .writing-detail-body figure {
-                margin: 1.2em 0;
-            }
-            .game-detail-desc figcaption,
-            .article-detail-desc figcaption,
-            .writing-detail-body figcaption {
-                font-size: 12px;
-                color: var(--faint);
-                margin-top: 6px;
-            }
-            .game-detail-desc a,
-            .article-detail-desc a,
-            .writing-detail-body a {
-                color: inherit;
-            }
-            .game-detail-tech,
-            .article-detail-tech,
-            .writing-detail-tags {
-                margin-bottom: 24px;
-            }
-            .game-detail-tech span,
-            .article-detail-tech span,
-            .writing-detail-tags span {
-                display: inline-block;
-                border: 1px solid var(--dim);
-                padding: 4px 9px;
-                margin-right: 6px;
-                margin-bottom: 6px;
-                font-size: 12px;
-            }
-            .game-detail-links a,
-            .article-detail-links a,
-            .writing-detail-links a {
-                display: inline-block;
-                text-decoration: none;
-                padding-bottom: 2px;
-                margin-right: 20px;
-                font-size: 14px;
-                transition: border-color 0.2s ease;
-            }
-            .back-link {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                text-decoration: none;
-                font-size: 13px;
-                color: var(--muted);
-                transition: color 0.2s ease;
-            }
-            .back-link:hover {
-                color: var(--text);
-            }
-
-            /* ── Writing List ── */
-            .writing-section h2 {
-                font-size: clamp(24px, 3.8vw, 34px);
-                font-weight: 400;
-                margin-bottom: 20px;
-                letter-spacing: -0.02em;
-            }
-            .writing-list {
-                list-style: none;
-            }
-            .writing-item {
-                border-bottom: 1px solid var(--dim);
-                padding: 16px 0;
-                transition: padding-left 0.2s ease;
-            }
-            .writing-item:hover {
-                padding-left: 8px;
-            }
-            .writing-item a {
-                color: var(--text);
-                text-decoration: none;
-                font-size: 15px;
-                display: block;
-                margin-bottom: 4px;
-            }
-            .writing-item a:hover {
-                text-decoration: underline;
-            }
-            .writing-meta {
-                color: var(--faint);
-                font-size: 12px;
-            }
-            .writing-excerpt {
-                color: var(--muted);
-                font-size: 13px;
-                margin-top: 6px;
-                max-width: 500px;
-                line-height: 1.55;
-            }
-
-            .hidden {
-                display: none !important;
-            }
-
-            @media (max-width: 600px) {
-                main {
-                    padding: 20px 16px;
-                }
-                .paper-sheet {
-                    padding: 24px 20px;
-                    max-height: calc(100vh - 60px);
-                }
-                .entry-thumb {
-                    width: 64px;
-                    height: 64px;
-                }
-            }
-        </style>
-    </head>
-    <body class="home-active">
-        <noscript>
-            <p style="padding: 24px; font-family: 'CustomMono', monospace">
-                This site needs JavaScript enabled to run.
-            </p>
-        </noscript>
-        <canvas id="grain-overlay"></canvas>
-        <div id="bg-canvas-container"></div>
-        <div id="bg-dimmer"></div>
-        <button
-            id="audio-toggle"
-            class="audio-toggle hidden"
-            type="button"
-            aria-label="Mute background audio"
-            onclick="toggleAudioMute()"
-        >
-            <span id="audio-toggle-label">♪ sound</span>
-        </button>
-
-        <main>
-            <!-- Landing Page View -->
-            <div id="home-view" class="view active">
-                <div class="home-hero">
-                    <h1 class="home-title">Mitchell J</h1>
-                    <p class="home-subtitle">Developer</p>
-                    <nav class="home-nav">
-                        <button class="retro-btn" onclick="navigateTo('about')">
-                            <span>01. ABOUT</span>
-                            <span class="btn-arrow">→</span>
-                        </button>
-                        <button class="retro-btn" onclick="navigateTo('games')">
-                            <span>02. GAMES</span>
-                            <span class="btn-arrow">→</span>
-                        </button>
-                        <button class="retro-btn" onclick="navigateTo('articles')">
-                            <span>03. ARTICLES</span>
-                            <span class="btn-arrow">→</span>
-                        </button>
-                        <button class="retro-btn" onclick="navigateTo('writing')">
-                            <span>04. WRITING</span>
-                            <span class="btn-arrow">→</span>
-                        </button>
-                    </nav>
-                </div>
-            </div>
-
-            <!-- About View -->
-            <div id="about-view" class="view">
-                <div class="sub-top-bar">
-                    <a class="back-link" tabindex="0" role="button" onclick="navigateTo('home')">← home</a>
-                </div>
-                <section class="about-section">
-                    <h2>About</h2>
-                    <p>
-                        Aspiring game developer and graphics programmer.
-                        Focusing on clean, minimal and elegant solutions.
-                    </p>
-                    <p>
-                        <a href="mailto:mitjohno@gmail.com">mitjohno@gmail.com</a> —
-                        <a href="https://github.com/0vva0va"
-                            >GitHub</a
-                        >
-                    </p>
-                </section>
-            </div>
-
-            <!-- Games View -->
-            <div id="games-view" class="view">
-                <div class="sub-top-bar" id="games-top-bar">
-                    <a class="back-link" tabindex="0" role="button" onclick="navigateTo('home')">← home</a>
-                </div>
-                <section class="games-section" id="games-list">
-                    <h2>Games</h2>
-                    <ul class="games-list" id="games-list-ul"></ul>
-                </section>
-                <div id="game-detail" class="game-detail paper-sheet hidden">
-                    <a class="back-link" tabindex="0" role="button" onclick="showGamesList()"
-                        >← Games</a
-                    >
-                    <h2 id="gd-title"></h2>
-                    <div class="game-detail-year" id="gd-year"></div>
-                    <div class="game-detail-line"></div>
-                    <div class="game-detail-desc" id="gd-desc"></div>
-                    <div class="game-detail-tech" id="gd-tech"></div>
-                    <div class="game-detail-links" id="gd-links"></div>
-                </div>
-            </div>
-
-            <!-- Articles View -->
-            <div id="articles-view" class="view">
-                <div class="sub-top-bar" id="articles-top-bar">
-                    <a class="back-link" tabindex="0" role="button" onclick="navigateTo('home')">← home</a>
-                </div>
-                <section class="articles-section" id="articles-list">
-                    <h2>Articles</h2>
-                    <ul class="articles-list" id="articles-list-ul"></ul>
-                </section>
-                <div id="article-detail" class="article-detail paper-sheet hidden">
-                    <a class="back-link" tabindex="0" role="button" onclick="showArticlesList()"
-                        >← Articles</a
-                    >
-                    <h2 id="ad-title"></h2>
-                    <div class="article-detail-year" id="ad-year"></div>
-                    <div class="article-detail-line"></div>
-                    <div class="article-detail-desc" id="ad-desc"></div>
-                    <div class="article-detail-tech" id="ad-tech"></div>
-                    <div class="article-detail-links" id="ad-links"></div>
-                </div>
-            </div>
-
-            <!-- Writing View -->
-            <div id="writing-view" class="view">
-                <div class="sub-top-bar" id="writing-top-bar">
-                    <a class="back-link" tabindex="0" role="button" onclick="navigateTo('home')">← home</a>
-                </div>
-                <section class="writing-section" id="writing-list">
-                    <h2>Writing</h2>
-                    <ul class="writing-list" id="writing-list-ul"></ul>
-                </section>
-                <div id="writing-detail" class="writing-detail paper-sheet hidden">
-                    <a class="back-link" tabindex="0" role="button" onclick="showWritingList()"
-                        >← All Writing</a
-                    >
-                    <h2 id="wd-title"></h2>
-                    <div class="writing-detail-meta" id="wd-meta"></div>
-                    <div class="writing-detail-line"></div>
-                    <div class="writing-detail-body" id="wd-body"></div>
-                    <div class="writing-detail-tags" id="wd-tags"></div>
-                    <div class="writing-detail-links" id="wd-links"></div>
-                </div>
-            </div>
-        </main>
-
-        <script type="importmap">
-            {
-                "imports": {
-                    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                    "marked": "https://unpkg.com/marked@11.1.1/lib/marked.esm.js"
-                }
-            }
-        </script>
-
-        <script type="module">
-            let marked = null;
-            const MARKED_SOURCES = [
-                "https://unpkg.com/marked@11.1.1/lib/marked.esm.js",
-                "https://cdn.jsdelivr.net/npm/marked@11.1.1/lib/marked.esm.js",
-            ];
-            (async function loadMarked() {
-                for (const url of MARKED_SOURCES) {
-                    try {
-                        const mod = await import(url);
-                        if (mod && mod.marked) {
-                            marked = mod.marked;
-                            marked.setOptions({ breaks: true });
-                            return;
-                        }
-                    } catch (e) {
-                        console.warn(
-                            `Couldn't load the Markdown renderer from ${url}, trying the next source.`,
-                            e,
-                        );
-                    }
-                }
-                console.warn(
-                    "Markdown rendering is unavailable (every source failed to load) — entry bodies will show as plain text instead of formatted Markdown.",
-                );
-            })();
-
-            const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i;
-
-            function renderThumb(thumbnail) {
-                if (!thumbnail) return "";
-                if (VIDEO_EXT_RE.test(thumbnail)) {
-                    return `<video class="entry-thumb" data-src="${thumbnail}" muted loop playsinline preload="none" disablePictureInPicture disableRemotePlayback></video>`;
-                }
-                return `<img class="entry-thumb" src="${thumbnail}" alt="" loading="lazy" fetchpriority="low">`;
-            }
-
-            function renderTagSpans(list) {
-                return (list || []).map((t) => `<span>${t}</span>`).join("");
-            }
-            function renderLinks(list) {
-                return (list || [])
-                    .map(
-                        (l) =>
-                            `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`,
-                    )
-                    .join("");
-            }
-            function renderListMeta(year, tech) {
-                const parts = [];
-                if (year) parts.push(year);
-                if (tech && tech.length) parts.push(tech.join(", "));
-                return parts.join(" — ");
-            }
-            function setOptionalSection(el, html) {
-                el.innerHTML = html;
-                el.classList.toggle("hidden", !html);
-            }
-
-            function loadThumbVideo(video) {
-                if (video.src || !video.dataset.src) return;
-                video.preload = "auto";
-                video.setAttribute("fetchpriority", "high");
-                video.src = video.dataset.src;
-            }
-
-            const thumbVideoObserver =
-                "IntersectionObserver" in window
-                    ? new IntersectionObserver(
-                          (entries) => {
-                              entries.forEach((entry) => {
-                                  const video = entry.target;
-                                  if (entry.isIntersecting) {
-                                      loadThumbVideo(video);
-                                      video.play().catch(() => {});
-                                  } else {
-                                      video.pause();
-                                  }
-                              });
-                          },
-                          { rootMargin: "600px 0px" },
-                      )
-                    : null;
-
-            function activateThumbVideos(container) {
-                container.querySelectorAll("video.entry-thumb").forEach(
-                    (video) => {
-                        video.muted = true;
-                        if (thumbVideoObserver) {
-                            thumbVideoObserver.observe(video);
-                        } else {
-                            // No IntersectionObserver support — just load
-                            // and play immediately.
-                            loadThumbVideo(video);
-                            video.play().catch(() => {});
-                        }
-                    },
-                );
-            }
-
-            function escapeHtml(s) {
-                return s
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;");
-            }
-            function renderPlainTextFallback(raw) {
-                return (raw || "")
-                    .split(/\n{2,}/)
-                    .map(
-                        (para) =>
-                            `<p>${escapeHtml(para).replace(/\n/g, "<br>")}</p>`,
-                    )
-                    .join("");
-            }
-
-            function renderMarkdown(raw) {
-                if (!marked) return renderPlainTextFallback(raw);
-                let html = marked.parse(raw || "");
-                html = html.replace(
-                    /<img\s+([^>]*?)>/gi,
-                    (fullMatch, attrs) => {
-                        const srcMatch = attrs.match(/src="([^"]*)"/i);
-                        if (!srcMatch || !VIDEO_EXT_RE.test(srcMatch[1]))
-                            return fullMatch;
-                        const altMatch = attrs.match(/alt="([^"]*)"/i);
-                        const alt = altMatch ? altMatch[1] : "";
-                        return `<video controls onloadstart="this.volume = 0.15" playsinline preload="metadata" src="${srcMatch[1]}">${alt || "Your browser does not support the video tag."}</video>`;
-                    },
-                );
-                return html;
-            }
-
-            const AUDIO_FADE_MS = 1200;
-            const AUDIO_TARGET_VOLUME = 0.55;
-
-            const audioToggleBtn = document.getElementById("audio-toggle");
-            const audioToggleLabel = document.getElementById(
-                "audio-toggle-label",
-            );
-
-            let bgAudio = null;
-            let bgAudioFadeRAF = null;
-
-            function fadeAudioVolume(audio, from, to, duration, onDone) {
-                if (bgAudioFadeRAF) cancelAnimationFrame(bgAudioFadeRAF);
-                const start = performance.now();
-                function step(now) {
-                    const t = Math.min((now - start) / duration, 1);
-                    audio.volume = from + (to - from) * t;
-                    if (t < 1) {
-                        bgAudioFadeRAF = requestAnimationFrame(step);
-                    } else {
-                        bgAudioFadeRAF = null;
-                        if (onDone) onDone();
-                    }
-                }
-                bgAudioFadeRAF = requestAnimationFrame(step);
-            }
-
-            function updateAudioToggleUI() {
-                if (!bgAudio) return;
-                audioToggleBtn.classList.toggle("muted", bgAudio.muted);
-                audioToggleLabel.textContent = bgAudio.muted
-                    ? "♪ muted"
-                    : "♪ sound";
-            }
-
-            function playEntryAudio(src) {
-                stopEntryAudio(true);
-                const audio = new Audio(src);
-                audio.loop = true;
-                audio.volume = 0;
-                bgAudio = audio;
-                audio.play().catch(() => {
-                    // Autoplay may be blocked until the user interacts with
-                    // the page; the toggle button still reflects state and
-                    // playback will begin once permitted.
-                });
-                fadeAudioVolume(audio, 0, AUDIO_TARGET_VOLUME, AUDIO_FADE_MS);
-                audioToggleBtn.classList.remove("hidden");
-                updateAudioToggleUI();
-            }
-
-            function stopEntryAudio(immediate) {
-                if (!bgAudio) {
-                    audioToggleBtn.classList.add("hidden");
-                    return;
-                }
-                const audio = bgAudio;
-                bgAudio = null;
-                audioToggleBtn.classList.add("hidden");
-                if (immediate) {
-                    audio.pause();
-                    return;
-                }
-                fadeAudioVolume(
-                    audio,
-                    audio.volume,
-                    0,
-                    AUDIO_FADE_MS,
-                    () => audio.pause(),
-                );
-            }
-
-            window.toggleAudioMute = function () {
-                if (!bgAudio) return;
-                bgAudio.muted = !bgAudio.muted;
-                updateAudioToggleUI();
-            };
-
-            function pauseVideosIn(container) {
-                if (!container) return;
-                container.querySelectorAll("video").forEach((v) => v.pause());
-            }
-
-            const bgDimmer = document.getElementById("bg-dimmer");
-
-            /* ── Keyboard activation for link-styled buttons ── */
-            document.addEventListener("keydown", (e) => {
-                if (e.key !== "Enter" && e.key !== " ") return;
-                const target = e.target;
-                if (target.matches('[role="button"]')) {
-                    e.preventDefault();
-                    target.click();
-                }
-            });
-
-            const prefersReducedMotion = window.matchMedia(
-                "(prefers-reduced-motion: reduce)",
-            ).matches;
-
-            /* ── Grain Overlay ── */
-            const grainCanvas = document.getElementById("grain-overlay");
-            const gCtx = grainCanvas.getContext("2d");
-
-            const grainDPR = Math.min(window.devicePixelRatio || 1, 3);
-
-            function resizeGrain() {
-                grainCanvas.width = Math.round(window.innerWidth * grainDPR);
-                grainCanvas.height = Math.round(window.innerHeight * grainDPR);
-                renderGrainFrame();
-            }
-
-            function renderGrainFrame() {
-                const w = grainCanvas.width;
-                const h = grainCanvas.height;
-                const imgData = gCtx.createImageData(w, h);
-                const data = imgData.data;
-                for (let i = 0; i < data.length; i += 4) {
-                    const v = Math.random() * 255;
-                    data[i] = v;
-                    data[i + 1] = v;
-                    data[i + 2] = v;
-                    data[i + 3] = 255;
-                }
-                gCtx.putImageData(imgData, 0, 0);
-            }
-
-            resizeGrain();
-
-            let grainResizeRAF = null;
-            window.addEventListener("resize", () => {
-                if (grainResizeRAF !== null) return;
-                grainResizeRAF = requestAnimationFrame(() => {
-                    grainResizeRAF = null;
-                    resizeGrain();
-                });
-            });
-
-            /* ── Audio Context Initializer ── */
-            let audioCtx = null;
-
-            function initAudio() {
-                if (!audioCtx) {
-                    audioCtx = new (
-                        window.AudioContext || window.webkitAudioContext
-                    )();
-                }
-                if (audioCtx.state === "suspended") {
-                    audioCtx.resume();
-                }
-            }
-
-            document.addEventListener("click", initAudio, { once: true });
-            document.addEventListener("keydown", initAudio, { once: true });
-
-            // Runs the (lazily-imported) three.js background once the
-            // browser has a spare moment, so it never competes with more
-            // important work — nav wiring, content fetches, first paint —
-            // for CPU or network priority.
-            function whenIdle(fn) {
-                if ("requestIdleCallback" in window) {
-                    requestIdleCallback(fn, { timeout: 2000 });
-                } else {
-                    setTimeout(fn, 200);
-                }
-            }
-
-            whenIdle(async function initBackgroundShader() {
-                const THREE_SOURCES = [
-                    "three",
-                    "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-                ];
-                let THREE = null;
-                for (const src of THREE_SOURCES) {
-                    try {
-                        THREE = await import(src);
-                        break;
-                    } catch (e) {
-                        console.warn(
-                            `Couldn't load three.js from ${src}, trying the next source.`,
-                            e,
-                        );
-                    }
-                }
-                if (!THREE) {
-                    console.warn(
-                        "Background shader unavailable (three.js failed to load from every source) — the rest of the site is unaffected.",
-                    );
-                    return;
-                }
-
-                /* ── Dithered Background Shader ── */
-                const container = document.getElementById(
-                    "bg-canvas-container",
-                );
-                const scene = new THREE.Scene();
-                const camera = new THREE.OrthographicCamera(
-                    -1,
-                    1,
-                    1,
-                    -1,
-                    0,
-                    1,
-                );
-                const geometry = new THREE.PlaneGeometry(2, 2);
-
-                const vertexShader = `void main() { gl_Position = vec4(position, 1.0); }`;
-
-            const fragmentShader = `
-      uniform float u_time;
-      uniform vec2 u_resolution;
-
-      float hash(vec2 p) {
-        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mitchell J :: Developer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --cyan: #6fe3ff;
+        --cyan2: #9fdcff;
+        --amber: #ffb45e;
+        --text: #d8f4ff;
+      }
+      @font-face {
+        font-family: "DisplayFont_LandingStats";
+        src: local("GROUT-Display"),
+              url("fonts/GROUT-Display.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "DisplayFont_MenuText";
+        src: local("Emotion-Engine"),
+              url("fonts/Emotion-Engine.woff") format("woff");
+      }
+      @font-face {
+        font-family: "DisplayFont_LandingHeadings";
+        src: local("Voyage-Fant"),
+              url("fonts/voyagefantstraight.woff2") format("woff2");
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        background: #020409;
+        color: var(--text);
+        font-family: "DisplayFont_LandingStats", monospace;
+        overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      #scene {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        display: block;
+        touch-action: none;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        cursor: grab;
+      }
+      #scene.grabbing {
+        cursor: grabbing;
       }
 
-      float noise(vec2 p) {
-        vec2 i = floor(p);
-        vec2 f = fract(p);
-        f = f * f * (3.0 - 2.0 * f);
-        float a = hash(i);
-        float b = hash(i + vec2(1.0, 0.0));
-        float c = hash(i + vec2(0.0, 1.0));
-        float d = hash(i + vec2(1.0, 1.0));
-        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+      .hud {
+        position: fixed;
+        z-index: 40;
+        pointer-events: none;
+        font-size: 15px;
+        line-height: 1.6;
+        letter-spacing: 0.12em;
+        color: var(--cyan2);
+        text-shadow: 0 0 6px rgba(80, 190, 255, 0.55);
+        opacity: 0;
+        transition: opacity 0.9s ease 0.2s;
       }
-
-      float fbm(vec2 p) {
-        float v = 0.0, a = 0.5;
-        for (int i = 0; i < 5; i++) {
-          v += a * noise(p);
-          p *= 2.0;
-          a *= 0.5;
+      body.on .hud {
+        opacity: 1;
+      }
+      #hud-tl {
+        top: 16px;
+        left: 20px;
+      }
+      #hud-tr {
+        top: 16px;
+        right: 20px;
+        text-align: right;
+      }
+      #hud-bl {
+        bottom: 18px;
+        left: 20px;
+        font-size: 13px;
+        color: #6fa8c8;
+      }
+      #hud-br {
+        bottom: 18px;
+        right: 20px;
+        font-size: 13px;
+        color: #6fa8c8;
+        text-align: right;
+      }
+      .dot {
+        color: #7dffb0;
+        animation: blink 1.3s steps(2) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0.15;
         }
-        return v;
+      }
+      #sndbtn,
+      #musbtn {
+        pointer-events: auto;
+        cursor: pointer;
+        color: var(--cyan);
+      }
+      #sndbtn:hover,
+      #musbtn:hover {
+        color: #fff;
+      }
+      #trackname {
+        color: #54809c;
       }
 
-      float warp(vec2 p, float t) {
-        vec2 q = vec2(
-          fbm(p + vec2(0.0, 0.0) + t * 0.08),
-          fbm(p + vec2(5.2, 1.3) + t * 0.06)
+      #sect {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 40;
+        text-align: center;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 1.1s ease 0.15s;
+      }
+      body.intro-done #sect {
+        opacity: 1;
+      }
+      #sect .code {
+        font-size: 14px;
+        color: var(--amber);
+        letter-spacing: 0.5em;
+        text-shadow: 0 0 8px rgba(255, 180, 94, 0.5);
+      }
+      #sect .name {
+        font-size: 40px;
+        letter-spacing: 0.4em;
+        color: #eaf9ff;
+        text-shadow:
+          0 0 14px rgba(120, 220, 255, 0.85),
+          0 0 2px #fff;
+        padding-left: 0.4em;
+      }
+      #sect .name.flash {
+        animation: sectflash 0.45s ease;
+      }
+      @keyframes sectflash {
+        0% {
+          opacity: 0;
+          transform: translateY(7px);
+        }
+        100% {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      #sect .hint {
+        margin-top: 4px;
+        font-size: 13px;
+        letter-spacing: 0.24em;
+        color: #54809c;
+      }
+
+      #tip {
+        position: fixed;
+        left: 50%;
+        bottom: 27%;
+        transform: translateX(-50%);
+        z-index: 44;
+        text-align: center;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+      }
+      body.show-tip #tip {
+        opacity: 1;
+      }
+      #tip .t1 {
+        font-size: 22px;
+        letter-spacing: 0.34em;
+        color: #eaf9ff;
+        text-shadow:
+          0 0 12px rgba(120, 220, 255, 0.9),
+          0 0 2px #fff;
+        animation: tippulse 1.7s ease-in-out infinite;
+      }
+      #tip .t2 {
+        margin-top: 6px;
+        font-size: 14px;
+        letter-spacing: 0.26em;
+        color: #54809c;
+      }
+      @keyframes tippulse {
+        50% {
+          opacity: 0.35;
+        }
+      }
+
+      #controls {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translate(-50%, 14px);
+        z-index: 45;
+        display: flex;
+        gap: 14px;
+        opacity: 0;
+        transition:
+          opacity 0.9s ease 0.4s,
+          transform 0.9s ease 0.4s;
+      }
+      body.intro-done #controls {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+      body.menu-open #controls {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .btn {
+        font-family: "VT323", monospace;
+        font-size: 17px;
+        letter-spacing: 0.28em;
+        color: var(--text);
+        padding: 9px 22px 9px 26px;
+        cursor: pointer;
+        border: 1px solid rgba(120, 220, 255, 0.55);
+        background: linear-gradient(
+          180deg,
+          rgba(28, 78, 140, 0.85),
+          rgba(9, 30, 66, 0.92)
         );
-        vec2 r = vec2(
-          fbm(p + 3.0 * q + vec2(t * 0.05, t * 0.04)),
-          fbm(p + 3.0 * q + vec2(1.7, 9.2) + t * 0.03)
+        clip-path: polygon(
+          12px 0,
+          100% 0,
+          100% calc(100% - 12px),
+          calc(100% - 12px) 100%,
+          0 100%,
+          0 12px
         );
-        return fbm(p + 2.0 * r);
+        text-shadow: 0 0 7px rgba(120, 220, 255, 0.5);
+        transition:
+          background 0.15s,
+          color 0.15s,
+          filter 0.15s;
+      }
+      .btn:hover {
+        background: linear-gradient(
+          180deg,
+          rgba(64, 146, 224, 0.9),
+          rgba(18, 58, 118, 0.95)
+        );
+        color: #fff;
+        filter: drop-shadow(0 0 8px rgba(100, 210, 255, 0.55));
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn:focus-visible {
+        outline: 1px solid var(--amber);
+        outline-offset: 3px;
+      }
+      .btn.primary {
+        border-color: rgba(255, 180, 94, 0.7);
+        color: #ffe0b0;
+        background: linear-gradient(
+          180deg,
+          rgba(120, 70, 20, 0.8),
+          rgba(58, 32, 8, 0.9)
+        );
+        text-shadow: 0 0 8px rgba(255, 180, 94, 0.6);
+      }
+      .btn.primary:hover {
+        filter: drop-shadow(0 0 9px rgba(255, 180, 94, 0.55));
+        color: #fff;
       }
 
-      float bayer4x4(vec2 coord) {
-        int x = int(mod(coord.x, 4.0));
-        int y = int(mod(coord.y, 4.0));
-        int index = x + y * 4;
-        if (index == 0) return 0.0;
-        if (index == 1) return 0.5;
-        if (index == 2) return 0.125;
-        if (index == 3) return 0.625;
-        if (index == 4) return 0.75;
-        if (index == 5) return 0.25;
-        if (index == 6) return 0.875;
-        if (index == 7) return 0.375;
-        if (index == 8) return 0.1875;
-        if (index == 9) return 0.6875;
-        if (index == 10) return 0.0625;
-        if (index == 11) return 0.5625;
-        if (index == 12) return 0.9375;
-        if (index == 13) return 0.4375;
-        if (index == 14) return 0.8125;
-        if (index == 15) return 0.3125;
-        return 0.0;
+      .panel-video-wrap {
+        padding: 1rem 0;
+        max-width: 720px;
       }
 
-      void main() {
-        vec2 uv = gl_FragCoord.xy / u_resolution;
-        float t = u_time;
-        vec2 p = uv * 2.5;
-        float water = warp(p, t);
-        water += sin(uv.x * 6.0 + t * 0.4) * 0.04;
-        water += sin(uv.y * 5.0 - t * 0.3) * 0.04;
-        water += sin((uv.x + uv.y) * 4.0 + t * 0.2) * 0.03;
-        water = smoothstep(0.25, 0.75, water);
-        
-        water = water * 0.4 + 0.1;
-        
-        float threshold = bayer4x4(gl_FragCoord.xy);
-        float dithered = water + (threshold - 0.5) * 0.12;
-        float levels = 5.0;
-        float quantized = floor(dithered * (levels - 1.0) + 0.5) / (levels - 1.0);
-        quantized = clamp(quantized, 0.0, 1.0);
-        
-        gl_FragColor = vec4(vec3(quantized * 0.55), 1.0);
+      .panel-video {
+        width: 100%;
+        border: 1px solid rgba(111, 227, 255, 0.3);
+        border-radius: 2px;
+        background: #000;
+        outline: none;
       }
-    `;
 
-            const material = new THREE.ShaderMaterial({
-                vertexShader: vertexShader,
-                fragmentShader: fragmentShader,
-                uniforms: {
-                    u_time: { value: 0.0 },
-                    u_resolution: {
-                        value: new THREE.Vector2(
-                            window.innerWidth,
-                            window.innerHeight,
-                        ),
-                    },
-                },
+      .panel-video:focus {
+        border-color: var(--cyan);
+        box-shadow: 0 0 12px rgba(111, 227, 255, 0.25);
+      }
+
+      .video-unmute-btn {
+        position: absolute;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        font-family: 'VT323', monospace;
+        font-size: 16px;
+        letter-spacing: 0.12em;
+        color: var(--cyan);
+        background: rgba(4, 10, 28, 0.85);
+        border: 1px solid var(--cyan);
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 0 10px rgba(111, 227, 255, 0.3);
+      }
+      .video-unmute-btn:hover {
+        background: var(--cyan);
+        color: #020409;
+      }
+
+      #panel {
+        position: fixed;
+        font-family: "DisplayFont_MenuText";
+        letter-spacing: 0.16em;
+        left: 50%;
+        top: 50%;
+        z-index: 50;
+        width: min(620px, calc(100vw - 32px));
+        height: min(76vh, 720px);
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(
+          165deg,
+          rgba(10, 28, 58, 0.93),
+          rgba(4, 10, 28, 0.96)
+        );
+        border: 1px solid rgba(120, 220, 255, 0.42);
+        clip-path: polygon(
+          0 20px,
+          20px 0,
+          100% 0,
+          100% calc(100% - 20px),
+          calc(100% - 20px) 100%,
+          0 100%
+        );
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.955);
+        pointer-events: none;
+        transition:
+          opacity 0.22s ease,
+          transform 0.26s cubic-bezier(0.2, 0.9, 0.25, 1);
+      }
+      #panel::before {
+        content: "";
+        position: absolute;
+        inset: 7px;
+        pointer-events: none;
+        border: 1px solid rgba(120, 220, 255, 0.16);
+        clip-path: polygon(
+          0 16px,
+          16px 0,
+          100% 0,
+          100% calc(100% - 16px),
+          calc(100% - 16px) 100%,
+          0 100%
+        );
+      }
+      #panel.open {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        pointer-events: auto;
+      }
+      #p-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 13px 18px;
+        background: linear-gradient(
+          90deg,
+          rgba(70, 170, 255, 0.3),
+          rgba(70, 170, 255, 0.04)
+        );
+        border-bottom: 1px solid rgba(120, 220, 255, 0.35);
+      }
+      #p-title {
+        font-size: 24px;
+        letter-spacing: 0.26em;
+        color: #fff;
+        text-shadow: 0 0 12px rgba(120, 220, 255, 0.8);
+      }
+      #p-code {
+        margin-left: auto;
+      }
+      #p-close {
+        font-family: "VT323", monospace;
+        font-size: 15px;
+        letter-spacing: 0.18em;
+        color: var(--cyan);
+        background: rgba(20, 60, 110, 0.6);
+        border: 1px solid rgba(120, 220, 255, 0.5);
+        padding: 4px 10px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      #p-close:hover {
+        color: #fff;
+        background: rgba(60, 140, 220, 0.7);
+      }
+      #p-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 20px 24px;
+        font-size: 17px;
+        line-height: 1.45;
+        scrollbar-width: thin;
+        scrollbar-color: #2b7ea8 transparent;
+      }
+      #p-body::-webkit-scrollbar {
+        width: 8px;
+      }
+      #p-body::-webkit-scrollbar-thumb {
+        background: linear-gradient(#2b7ea8, #6fe3ff);
+        border: 2px solid #06122a;
+      }
+      #p-body::-webkit-scrollbar-track {
+        background: rgba(10, 30, 60, 0.4);
+      }
+      #intro {
+        color: #bfe9ff;
+        min-height: 2.6em;
+        margin-bottom: 12px;
+      }
+      #intro .cursor {
+        animation: blink 1s steps(2) infinite;
+        color: var(--cyan);
+      }
+      .row {
+        display: flex;
+        gap: 14px;
+        padding: 7px 12px;
+        margin: 2px 0;
+        border-left: 2px solid transparent;
+        opacity: 0;
+        animation: rowin 0.35s ease forwards;
+      }
+      @keyframes rowin {
+        to {
+          opacity: 1;
+        }
+      }
+      .row:hover {
+        background: rgba(90, 200, 255, 0.1);
+        border-left-color: var(--amber);
+      }
+      .row .k {
+        color: #7fb8d8;
+        letter-spacing: 0.1em;
+        min-width: 132px;
+      }
+      .row .v {
+        color: #eaf7ff;
+        text-decoration: none;
+      }
+      .row.link {
+        cursor: pointer;
+      }
+      .row.link .v::after {
+        content: " ▸";
+        color: var(--amber);
+      }
+      .row.link:hover .v {
+        color: #fff;
+        text-shadow: 0 0 8px rgba(160, 230, 255, 0.7);
+      }
+      .hd {
+        font-size: 17px;
+        letter-spacing: 0.3em;
+        color: var(--amber);
+        margin: 16px 0 8px;
+        padding-bottom: 4px;
+        border-bottom: 1px dashed rgba(255, 180, 94, 0.35);
+        opacity: 0;
+        animation: rowin 0.35s ease forwards;
+      }
+      .para {
+        color: #9fcbe8;
+        font-size: 15px;
+        margin: 10px 4px;
+        opacity: 0;
+        animation: rowin 0.35s ease forwards;
+      }
+      .bar-row {
+        display: block;
+      }
+      .bar-row .lbl {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+        letter-spacing: 0.1em;
+      }
+      .bar-row .lbl span:last-child {
+        color: var(--amber);
+      }
+      .bar {
+        position: relative;
+        height: 10px;
+        background: rgba(18, 46, 88, 0.7);
+        border: 1px solid rgba(120, 220, 255, 0.35);
+        overflow: hidden;
+      }
+      .bar i {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        background: linear-gradient(90deg, #2f9dd8, #8ff0ff);
+        box-shadow: 0 0 10px rgba(110, 227, 255, 0.8);
+        transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .bar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+          60deg,
+          transparent 0 6px,
+          rgba(2, 12, 28, 0.4) 6px 8px
+        );
+      }
+      .entry {
+        display: block;
+      }
+      .entry .t {
+        font-size: 20px;
+        letter-spacing: 0.16em;
+        color: #fff;
+      }
+      .entry .m {
+        font-size: 14px;
+        color: var(--amber);
+        letter-spacing: 0.2em;
+        margin: 2px 0 4px;
+      }
+      .entry .d {
+        color: #bfe0f2;
+        font-size: 16px;
+      }
+      .tag {
+        display: inline-block;
+        border: 1px solid rgba(120, 220, 255, 0.4);
+        padding: 0 8px;
+        margin: 6px 6px 0 0;
+        font-size: 14px;
+        letter-spacing: 0.14em;
+        color: var(--cyan2);
+      }
+
+      #err {
+        position: fixed;
+        inset: 0;
+        z-index: 99;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: #020409;
+        color: var(--cyan);
+        font-size: 17px;
+        letter-spacing: 0.12em;
+        text-align: center;
+        padding: 40px;
+        line-height: 2;
+        cursor: pointer;
+      }
+
+      @media (max-width: 760px) {
+        #hud-tr,
+        #hud-bl {
+          display: none;
+        }
+        #sect {
+          bottom: 80px;
+        }
+        #sect .name {
+          font-size: 28px;
+        }
+
+        .btn {
+          padding: 7px 12px 7px 15px;
+          font-size: 14px;
+          letter-spacing: 0.14em;
+        }
+        #panel {
+          width: calc(100vw - 16px);
+          height: min(72vh, 640px);
+        }
+        #p-title {
+          font-size: 18px;
+          letter-spacing: 0.16em;
+        }
+        #tip {
+          bottom: 24%;
+        }
+        #tip .t1 {
+          font-size: 16px;
+          letter-spacing: 0.24em;
+        }
+        #tip .t2 {
+          font-size: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+
+    <div class="hud" id="hud-tl">
+      <!-- OP: <span id="opname">—</span>  -->
+      SYS <span class="dot">●</span> ONLINE
+    </div>
+    <div class="hud" id="hud-tr">
+      <span id="clock">--:--:--</span><br />
+    </div>
+    <!-- <div class="hud" id="hud-bl">
+      CORE TEMP <span id="rt">—</span> MK<br />PLASMA DENS
+      <span id="rd">—</span> m⁻³<br />SOLENID FIELD <span id="rf">—</span> T
+    </div> -->
+    <div class="hud" id="hud-br">
+      <span id="musbtn">MUSIC:ON</span> ·
+      <span id="sndbtn">SND:ON</span><br />
+      <!-- <span id="trackname">TRACK: —</span> -->
+    </div>
+
+    <div id="sect">
+      <!-- <div class="code" id="sect-code">FILE-01</div> -->
+      <div class="name" id="sect-name">OPERATOR</div>
+      <div class="hint">DRAG TO SPIN ◈ CLICK NODE TO OPEN</div>
+    </div>
+
+    <div id="tip">
+      <div class="t1">▸ DRAG TO SPIN THE COLUMN ◂</div>
+      <div class="t2">CLICK A NODE TO OPEN ITS MENU</div>
+    </div>
+
+    <div id="panel">
+      <div id="p-head">
+        <span id="p-title"></span><span id="p-code"></span
+        ><button id="p-close">✕ CLOSE</button>
+      </div>
+      <div id="p-body"></div>
+    </div>
+
+    <div id="err">SYSTEM FAULT</div>
+
+    <script type="importmap">
+      {"imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" }}
+    </script>
+
+    <script type="module">
+      "use strict";
+      const OPERATOR = { name: "", id: "" };
+      const MUSIC_FILE   = "assets/audio/music.mp3";
+      const MUSIC_VOLUME = 0.2;
+      const REACT = {
+        particleSpeed: 7.0, // highs → particle rise speed
+        trunkPulse: 6.0, // transients → trunk light wave speed
+        capGlow: 3.5, // transients → beam brightness flash
+        reticlePulse: 3.0, // highs → reticle wobble
+        orbitSpeed: 5.0, // overall → arc spin speed
+        nodeFlash: 2.5, // transients → node opacity flash
+        bloom: 0.7, // transients → bloom strength boost (new)
+        particleGlow: 2.0, // transients → particle brightness boost (new)
+      };
+
+      const SECTIONS = [
+        { id: "about",     name: "ABOUT",      icon: "person" },
+        { id: "contact",   name: "CONTACT",    icon: "signal" },
+        //{ id: "project02", name: "PROJECT 02", icon: "target" },
+        { id: "project01", name: "PROJECT 01", icon: "target" }, ];
+
+      const DATA = {
+        about: {
+          title: "ABOUT",
+          rows: [
+            { t: "hd", v: "About" },
+            { t: "pa", v: 'Aspiring Game Developer & Graphics Programmer' },
+            { t: "hd", v: "Skills" },
+            { t: "kv", k: "LANG",  v: "C++ · C# · Python · HLSL · GLSL · OpenGL · HTML/CSS" },
+            { t: "kv", k: "TOOLS", v: "Unreal Engin · Unity Engine · Blender"               },
+            { t: "kv", k: "OTHER", v: "Git · ImGui · GLFW"                                  }, 
+            { t: "kv", k: "PERSONAL SITE", v: "CLICK HERE.", href: "personal.html"          }, ], },
+        project01: {
+          title: "PROJECT 01",
+          rows: [
+            {
+              t: "en",
+              title: "BOAT GAME",
+              meta: "2025",
+              desc: `Y2K Inspired Boat Racing Game Concept.
+                      A time-trial racing game where your fasted time per level is recorded on the leaderboards. Pass through checkpoints over multiple laps. 
+                      Your fasted time for each level would be recorded in a leaderboard. The boat controls are precise and physically accurate.
+                      <br><br>
+                      The course design is inspired by Venice, and mingles with Y2K aesthetics.The music is one of the most important factors for this 
+                      game concept and features heavily, heavily affecting visuals.
+                      <br><br>
+                      Racing games are generally car-centric and the idea to use boats instead allows for more of an identity for the game. 
+                      With music being a big part of the identity, it is built into the game. The pitch of each song is tied to the players speed. 
+                      There are also pickups in the form of letters, a nod to gondeliers who carried freight cargo down the canals. 
+                      Picking up letters increases boat top speed, but are placed away checkpoints, creating a decision for the player.`,
+              tags: ["Unity"],
+            }, {
+              type: "video",
+              title: "",
+              src: "assets/video/BOATGAME.mp4",
+              muted: false, 
+              loop: false,
+              autoplay: false
+            }, ], },
+        // project02: {
+        //   title: "SMALLER PROJECTS",
+        //   rows: [
+        //     {
+        //       t: "en",
+        //       title: "SPACE GAME",
+        //       meta: "2026",
+        //       desc: "Space Game Concept. ",
+        //       tags: ["Unreal 5"],
+        //     }, {
+        //       type: "video",
+        //       title: "",
+        //       src: "assets/video/SBHGAME.mp4",
+        //       muted: false, 
+        //       loop: false,
+        //       autoplay: false
+        //     }, ], },
+        contact: {
+          title: "CONTACT",
+          rows: [
+            { t: "kv", k: "EMAIL",  v: "mitjohno@gmail.com", href: "mailto:mitjohno@gmail.com"  },
+            { t: "kv", k: "GITHUB", v: "GitHub",             href: "https://github.com/0vva0va" }, ], },
+      };
+
+      const $ = (id) => document.getElementById(id);
+      function showErr(msg) {
+        const e = $("err");
+        e.innerHTML     = (msg || "SYSTEM FAULT") + "<br>▸ CLICK TO REBOOT ◂";
+        e.style.display = "flex";
+        e.onclick       = () => location.reload();
+      }
+
+      let THREE, EffectComposer, RenderPass, UnrealBloomPass, OutputPass;
+      try {
+        THREE = await import("three");
+        ({ EffectComposer }  = await import("three/addons/postprocessing/EffectComposer.js"));
+        ({ RenderPass }      = await import("three/addons/postprocessing/RenderPass.js"));
+        ({ UnrealBloomPass } = await import("three/addons/postprocessing/UnrealBloomPass.js"));
+        ({ OutputPass }      = await import("three/addons/postprocessing/OutputPass.js"));
+      } 
+      catch (e) {
+        showErr("WEBGL / THREE.JS FAILED TO LOAD<br>AN INTERNET CONNECTION IS REQUIRED FOR THE 3D CORE (CDN)",);
+        throw e;
+      }
+
+      try {
+        main();
+      } 
+      catch (e) {
+        showErr("RENDER CORE FAULT");
+        throw e;
+      }
+
+      function main() {
+        const N = SECTIONS.length,
+          DELTA = (Math.PI * 2) / N;
+        const trunkR = 110,
+              trunkH = 520;
+        const iconRingR = 150,
+               nodeSize = 88,
+                HEX_OFF = (nodeSize * 32) / 256;
+
+        const TARGET_LINES = 480;
+        let w = innerWidth,
+            h = innerHeight,
+            S = 1,
+           IW = 640,
+           IH = 480;
+        function calcInternal() {
+          S  = Math.max(1, Math.round(h / TARGET_LINES));
+          IW = Math.max(160, Math.round(w / S));
+          IH = Math.max(120, Math.round(h / S));
+        }
+        calcInternal();
+
+        const BLOOM = { strength: 0.18, radius: 0.4, threshold: 0.45 };
+        const DRAG_TURNS_PER_FULLSWIPE = 0.8;
+        const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const SWAY    = REDUCED ? 0 : 1;
+        const INTRO_DUR  = 3.0;
+        const INTRO_POS  = { x: 0, y: 950, z: 90 };
+        const INTRO_LOOK = { x: 0, y: 240, z: 0 };
+        let introDone = REDUCED,
+               introT = 0;
+
+        const cv = $("scene");
+        const renderer = new THREE.WebGLRenderer({
+          canvas: cv,
+          antialias: false,
+          powerPreference: "high-performance",
+        });
+        renderer.setPixelRatio(1);
+        renderer.setSize(IW, IH, false);
+        renderer.setClearColor(0x020409, 1);
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.12;
+
+        cv.addEventListener(
+          "webglcontextlost",
+          (e) => {
+            e.preventDefault();
+            showErr("GPU CONTEXT LOST");
+          },
+          false,
+        );
+        cv.addEventListener(
+          "webglcontextrestored",
+          () => location.reload(),
+          false,
+        );
+
+        const scene  = new THREE.Scene();
+        const FOV    = 48;
+        const camera = new THREE.PerspectiveCamera(FOV, IW / IH, 2, 6000);
+        const CAM    = new THREE.Vector3(0, 34, 620);
+        camera.position.copy(CAM);
+        camera.up.set(0, 1, 0);
+
+        const composer = new EffectComposer(renderer);
+        composer.setPixelRatio(1);
+        composer.setSize(IW, IH);
+        composer.addPass(new RenderPass(scene, camera));
+        const bloomPass = new UnrealBloomPass(
+          new THREE.Vector2(IW >> 1, IH >> 1),
+          BLOOM.strength,
+          BLOOM.radius,
+          BLOOM.threshold,
+        );
+        composer.addPass(bloomPass);
+        composer.addPass(new OutputPass());
+
+        function glowTexture() {
+          const c  = document.createElement("canvas");
+          c.width  = c.height = 128;
+          const g  = c.getContext("2d");
+          const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+          gr.addColorStop(0, "rgba(255,255,255,1)");
+          gr.addColorStop(0.35, "rgba(255,255,255,.5)");
+          gr.addColorStop(1, "rgba(255,255,255,0)");
+          g.fillStyle = gr;
+          g.fillRect(0, 0, 128, 128);
+          return new THREE.CanvasTexture(c);
+        }
+        const texGlow = glowTexture();
+
+        function drawGlyph(g, type, s) {
+          g.lineWidth = Math.max(1.2, s * 0.16);
+          g.lineCap = "round";
+          g.lineJoin = "round";
+          g.beginPath();
+          if (type === "person") {
+            g.arc(0, -s * 0.42, s * 0.3, 0, 7);
+            g.stroke();
+            g.beginPath();
+            g.arc(0, s * 0.75, s * 0.62, Math.PI * 1.15, Math.PI * 1.85);
+            g.stroke();
+          } 
+          else if (type === "target") {
+            g.arc(0, 0, s * 0.55, 0, 7);
+            g.stroke();
+            g.beginPath();
+            g.moveTo(0, -s * 0.95);
+            g.lineTo(0, -s * 0.62);
+            g.moveTo(0, s * 0.95);
+            g.lineTo(0, s * 0.62);
+            g.moveTo(-s * 0.95, 0);
+            g.lineTo(-s * 0.62, 0);
+            g.moveTo(s * 0.95, 0);
+            g.lineTo(s * 0.62, 0);
+            g.stroke();
+            g.beginPath();
+            g.arc(0, 0, s * 0.12, 0, 7);
+            g.fill();
+          } 
+          else if (type === "chevron") {
+            for (let k = 0; k < 3; k++) {
+              const y = -s * 0.45 + k * s * 0.45;
+              g.moveTo(-s * 0.55, y + s * 0.3);
+              g.lineTo(0, y - s * 0.15);
+              g.lineTo(s * 0.55, y + s * 0.3);
+            }
+            g.stroke();
+          } 
+          else if (type === "doc") {
+            g.rect(-s * 0.42, -s * 0.55, s * 0.84, s * 1.1);
+            g.stroke();
+            g.beginPath();
+            for (let k = 0; k < 3; k++) {
+              const y = -s * 0.25 + k * s * 0.25;
+              g.moveTo(-s * 0.24, y);
+              g.lineTo(s * 0.24, y);
+            }
+            g.stroke();
+          } 
+          else if (type === "signal") {
+            g.arc(0, s * 0.5, s * 0.1, 0, 7);
+            g.fill();
+            g.beginPath();
+            for (const r of [0.35, 0.62, 0.88])
+              g.arc(0, s * 0.5, s * r, -Math.PI * 0.82, -Math.PI * 0.18);
+            g.stroke();
+          } 
+          else if (type === "link") {
+            g.arc(-s * 0.28, 0, s * 0.34, 0, 7);
+            g.stroke();
+            g.beginPath();
+            g.arc(s * 0.28, 0, s * 0.34, 0, 7);
+            g.stroke();
+          }
+        }
+
+        function hexPathOn(g, x, y, r) {
+          g.beginPath();
+          for (let k = 0; k < 6; k++) {
+            const a  = (k * Math.PI) / 3 + Math.PI / 6;
+            const px = x + Math.cos(a) * r,
+                  py = y + Math.sin(a) * r;
+            k ? g.lineTo(px, py) : g.moveTo(px, py);
+          }
+          g.closePath();
+        }
+
+        function makeNodeTexture(sec) {
+          const c  = document.createElement("canvas");
+          c.width  = c.height = 256;
+          const g  = c.getContext("2d");
+          const cx = 128,
+                cy = 96,
+                hr = 84;
+          g.shadowColor = "rgba(120,220,255,.95)";
+          g.shadowBlur = 15;
+          hexPathOn(g, cx, cy, hr);
+          g.fillStyle = "rgba(6,18,42,.85)";
+          g.fill();
+          g.strokeStyle = "rgba(150,230,255,.95)";
+          g.lineWidth = 3;
+          g.stroke();
+          g.shadowBlur = 0;
+          hexPathOn(g, cx, cy, hr - 8);
+          g.strokeStyle = "rgba(120,220,255,.28)";
+          g.lineWidth = 1.5;
+          g.stroke();
+          g.save();
+          g.translate(cx, cy);
+          g.strokeStyle = g.fillStyle = "rgba(235,250,255,.96)";
+          g.shadowColor = "rgba(140,225,255,.9)";
+          g.shadowBlur = 10;
+          drawGlyph(g, sec.icon, hr * 0.42);
+          g.restore();
+          g.font = "34px VT323, monospace";
+          g.textAlign = "center";
+          g.textBaseline = "middle";
+          g.shadowColor = "rgba(120,220,255,.8)";
+          g.shadowBlur = 12;
+          g.fillStyle = "rgba(200,240,255,.95)";
+          g.font = '28px DisplayFont_LandingHeadings, monospace';
+          g.fillText(sec.name, 128, 226);
+          const tex = new THREE.CanvasTexture(c);
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.generateMipmaps = false;
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          return tex;
+        }
+
+        function makeReticleTexture() {
+          const c = document.createElement("canvas");
+          c.width = c.height = 256;
+          const g = c.getContext("2d");
+          g.strokeStyle = "rgba(255,190,110,1)";
+          g.shadowColor = "rgba(255,180,94,.9)";
+          g.shadowBlur  = 12;
+          g.lineWidth   = 4;
+          g.setLineDash([18, 14]);
+          g.beginPath();
+          g.arc(128, 128, 96, 0, 7);
+          g.stroke();
+          g.setLineDash([]);
+          for (let k = 0; k < 4; k++) {
+            const a = (k * Math.PI) / 2 + Math.PI / 4;
+            g.beginPath();
+            g.moveTo(128 + Math.cos(a) * 106, 128 + Math.sin(a) * 106);
+            g.lineTo(128 + Math.cos(a) * 122, 128 + Math.sin(a) * 122);
+            g.stroke();
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.generateMipmaps = false;
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          return tex;
+        }
+
+        const trunkGroup = new THREE.Group();
+        scene.add(trunkGroup);
+
+        const trunkMat = new THREE.ShaderMaterial({
+          uniforms: {
+            uTime: { value: 0 },
+            uPulse: { value: 0 },
+            uDim: { value: 1 },
+          },
+          vertexShader: `
+            varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+            void main(){
+              vUv=uv;
+              vN=normalize(normalMatrix*normal);
+              vec4 mv=modelViewMatrix*vec4(position,1.0);
+              vV=-mv.xyz;
+              gl_Position=projectionMatrix*mv;
+            }`,
+          fragmentShader: `
+            uniform float uTime; uniform float uPulse; uniform float uDim;
+            varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+            float line(float x){ float d=abs(fract(x)-0.5); return smoothstep(0.38,0.5,d); }
+            void main(){
+              vec3 nv=normalize(vN), vv=normalize(vV);
+              float lit=0.45+0.55*clamp(dot(nv,vv),0.,1.);
+              float seams=line(vUv.x*18.0);
+              float bands=line(vUv.y*28.0);
+              float ribs =line(vUv.y*6.0);
+              float pulse=0.65+0.35*sin(vUv.y*12.566 - uPulse);
+              float fres =pow(1.0-abs(dot(nv,vv)),1.6);
+              float menuBand=exp(-pow((vUv.y-0.5)*11.0,2.0));
+              vec3 base=vec3(0.023,0.05,0.10)*(0.7+0.3*vUv.y);
+              vec3 cyan=vec3(0.35,0.80,1.0);
+              vec3 amber=vec3(1.0,0.62,0.28);
+              vec3 glow= cyan*((seams*0.5+bands*0.32)*pulse+ribs*0.85)
+                       + amber*menuBand*0.45
+                       + cyan*fres*0.25;
+              gl_FragColor=vec4((base+glow*uDim)*lit,1.0);
+            }`,
+        });
+        trunkGroup.add(
+          new THREE.Mesh(
+            new THREE.CylinderGeometry(trunkR, trunkR, trunkH, 72, 36, true),
+            trunkMat,
+          ),
+        );
+
+        const capMat = new THREE.ShaderMaterial({
+          uniforms: { uTime: { value: 0 }, uDim: { value: 1 } },
+          vertexShader: 
+           `varying vec2 vUv; 
+            void main(){ 
+              vUv=uv; 
+              gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); 
+            }`,
+          fragmentShader: `
+            uniform float uDim; varying vec2 vUv;
+            float line(float x){ float d=abs(fract(x)-0.5); return smoothstep(0.38,0.5,d); }
+            void main(){
+              vec2 q=vUv-0.5; float r=length(q)*2.0;
+              float rings=line(r*9.0);
+              float core=smoothstep(0.30,0.0,r);
+              vec3 base=vec3(0.02,0.045,0.09);
+              vec3 col=base + vec3(0.35,0.8,1.0)*(rings*0.7+core*1.3)*uDim;
+              gl_FragColor=vec4(col,1.0);
+            }`,
+        });
+        const capT = new THREE.Mesh(
+          new THREE.CircleGeometry(trunkR, 72),
+          capMat,
+        );
+        capT.rotation.x = -Math.PI / 2;
+        capT.position.y = trunkH / 2;
+        trunkGroup.add(capT);
+        const capB = new THREE.Mesh(
+          new THREE.CircleGeometry(trunkR, 72),
+          capMat,
+        );
+        capB.rotation.x = Math.PI / 2;
+        capB.position.y = -trunkH / 2;
+        trunkGroup.add(capB);
+
+        const rimMat = new THREE.MeshBasicMaterial({
+          color: 0x6fd2ff,
+          transparent: true,
+          opacity: 0.55,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        for (const y of [trunkH / 2, -trunkH / 2]) {
+          const rim = new THREE.Mesh(
+            new THREE.TorusGeometry(trunkR + 2, 1.3, 8, 128),
+            rimMat,
+          );
+          rim.rotation.x = Math.PI / 2;
+          rim.position.y = y;
+          trunkGroup.add(rim);
+        }
+
+        const rail = new THREE.Mesh(
+          new THREE.TorusGeometry(iconRingR, 0.9, 8, 128),
+          new THREE.MeshBasicMaterial({
+            color: 0x6fd2ff,
+            transparent: true,
+            opacity: 0.3,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+          }),
+        );
+        rail.rotation.x = Math.PI / 2;
+        trunkGroup.add(rail);
+
+        const nodeSprites = [];
+        for (let i = 0; i < N; i++) {
+          const phi = i * DELTA;
+          const s0 = trunkR + 2,
+            s1 = iconRingR - 12,
+            mid = (s0 + s1) / 2,
+            len = s1 - s0;
+          const strut = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.9, 0.9, len, 6),
+            new THREE.MeshBasicMaterial({
+              color: 0x6fd2ff,
+              transparent: true,
+              opacity: 0.4,
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+            }),
+          );
+          strut.rotation.z = Math.PI / 2;
+          strut.rotation.y = -phi;
+          strut.position.set(Math.cos(phi) * mid, 0, Math.sin(phi) * mid);
+          trunkGroup.add(strut);
+          const spr = new THREE.Sprite(
+            new THREE.SpriteMaterial({
+              map: makeNodeTexture(SECTIONS[i]),
+              transparent: true,
+              depthWrite: false,
+            }),
+          );
+          spr.position.set(
+            Math.cos(phi) * iconRingR,
+            0,
+            Math.sin(phi) * iconRingR,
+          );
+          spr.scale.set(nodeSize, nodeSize, 1);
+          trunkGroup.add(spr);
+          nodeSprites.push(spr);
+        }
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready
+            .then(() => {
+              try {
+                for (let i = 0; i < N; i++) {
+                  const old = nodeSprites[i].material.map;
+                  nodeSprites[i].material.map = makeNodeTexture(SECTIONS[i]);
+                  nodeSprites[i].material.needsUpdate = true;
+                  if (old) old.dispose();
+                }
+              } catch (e) {}
+            })
+            .catch(() => {});
+        }
+
+        const reticle = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: makeReticleTexture(),
+            transparent: true,
+            depthTest: false,
+            depthWrite: false,
+          }),
+        );
+        reticle.renderOrder = 10;
+        reticle.position.set(0, HEX_OFF, iconRingR);
+        reticle.scale.setScalar(nodeSize * 1.3);
+        scene.add(reticle);
+
+        const beam1 = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: texGlow,
+            color: 0x6fd2ff,
+            transparent: true,
+            opacity: 0.26,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+          }),
+        );
+        beam1.scale.set(80, 1250, 1);
+        scene.add(beam1);
+        const beam2 = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: texGlow,
+            color: 0xeaffff,
+            transparent: true,
+            opacity: 0.42,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+          }),
+        );
+        beam2.scale.set(26, 1250, 1);
+        scene.add(beam2);
+        const capGlowT = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: texGlow,
+            color: 0x9fdfff,
+            transparent: true,
+            opacity: 0.4,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+          }),
+        );
+        capGlowT.position.set(0, trunkH / 2 + 6, 0);
+        capGlowT.scale.setScalar(160);
+        scene.add(capGlowT);
+        const capGlowB = capGlowT.clone();
+        capGlowB.position.set(0, -trunkH / 2 - 6, 0);
+        capGlowB.material = capGlowT.material.clone();
+        capGlowB.material.opacity = 0.3;
+        scene.add(capGlowB);
+
+        function arcRing(radius, y, speed, tilt) {
+          const grp = new THREE.Group();
+          const mat = new THREE.MeshBasicMaterial({
+            color: 0x6fd2ff,
+            transparent: true,
+            opacity: 0.4,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+          });
+          for (let k = 0; k < 3; k++) {
+            const arc = new THREE.Mesh(
+              new THREE.TorusGeometry(radius, 1.4, 8, 32, 1.7),
+              mat,
+            );
+            arc.rotation.z = (k * Math.PI * 2) / 3;
+            grp.add(arc);
+          }
+          grp.rotation.x = Math.PI / 2 + tilt;
+          grp.position.y = y;
+          grp.userData.speed = speed;
+          scene.add(grp);
+          return grp;
+        }
+        const orbit1 = arcRing(172, 168, 0.28, 0.1);
+        const orbit2 = arcRing(156, -186, -0.19, -0.08);
+
+        const NP = 420;
+        const pGeo = new THREE.BufferGeometry();
+        pGeo.setAttribute(
+          "position",
+          new THREE.BufferAttribute(new Float32Array(NP * 3), 3),
+        );
+        const aA = new Float32Array(NP),
+          aR = new Float32Array(NP),
+          aY = new Float32Array(NP),
+          aSp = new Float32Array(NP),
+          aSz = new Float32Array(NP),
+          aW = new Float32Array(NP);
+        for (let i = 0; i < NP; i++) {
+          aA[i] = Math.random() * Math.PI * 2;
+          aR[i] = trunkR + 8 + Math.random() * 70;
+          aY[i] = Math.random() * 640;
+          aSp[i] = 22 + Math.random() * 52;
+          aSz[i] = 2.5 + Math.random() * 3.5;
+          aW[i] = Math.random() < 0.14 ? 1 : 0;
+        }
+        pGeo.setAttribute("aA", new THREE.BufferAttribute(aA, 1));
+        pGeo.setAttribute("aR", new THREE.BufferAttribute(aR, 1));
+        pGeo.setAttribute("aY", new THREE.BufferAttribute(aY, 1));
+        pGeo.setAttribute("aSp", new THREE.BufferAttribute(aSp, 1));
+        pGeo.setAttribute("aSz", new THREE.BufferAttribute(aSz, 1));
+        pGeo.setAttribute("aW", new THREE.BufferAttribute(aW, 1));
+
+        const pMat = new THREE.ShaderMaterial({
+          uniforms: {
+            uTime:  { value: 0 },
+            uFlow:  { value: 0 },
+            uPx:    { value: 1 },
+            uDim:   { value: 1 },
+            uBoost: { value: 1 },
+          },
+          vertexShader: `
+            attribute float aA; attribute float aR; attribute float aY;
+            attribute float aSp; attribute float aSz; attribute float aW;
+            uniform float uTime; uniform float uFlow; uniform float uPx;
+            varying float vW; varying float vA;
+            void main(){
+              float y=mod(aY + uFlow*aSp, 640.0) - 320.0;
+              float ang=aA + uTime*(0.15 + 0.12*aW);
+              vec3 p=vec3(cos(ang)*aR, y, sin(ang)*aR);
+              vec4 mv=modelViewMatrix*vec4(p,1.0);
+              gl_PointSize=aSz*uPx/max(1.0,-mv.z);
+              vW=aW;
+              vA=smoothstep(-320.0,-230.0,y)*smoothstep(320.0,230.0,y);
+              gl_Position=projectionMatrix*mv;
+            }`,
+          fragmentShader: `
+            varying float vW; varying float vA;
+            uniform float uDim; uniform float uBoost;
+            void main(){
+              float d=length(gl_PointCoord-0.5);
+              float a=smoothstep(0.5,0.06,d)*vA*uDim;
+              vec3 col=mix(vec3(0.35,0.8,1.0),vec3(1.0,0.62,0.3),vW);
+              gl_FragColor=vec4(col*a*uBoost, a*uBoost);
+            }`,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        });
+        const points = new THREE.Points(pGeo, pMat);
+        points.frustumCulled = false;
+        scene.add(points);
+
+        (function () {
+          const y = -310,
+            mat1 = new THREE.LineBasicMaterial({
+              color: 0x6fd2ff,
+              transparent: true,
+              opacity: 0.07,
             });
+          for (const rad of [190, 290, 410, 560, 900]) {
+            const pts = new Float32Array(97 * 3);
+            for (let k = 0; k <= 96; k++) {
+              const a = (k * Math.PI * 2) / 96;
+              pts[k * 3] = Math.cos(a) * rad;
+              pts[k * 3 + 1] = y;
+              pts[k * 3 + 2] = Math.sin(a) * rad;
+            }
+            const g = new THREE.BufferGeometry();
+            g.setAttribute("position", new THREE.BufferAttribute(pts, 3));
+            scene.add(new THREE.Line(g, mat1));
+          }
+          const tp = new Float32Array(24 * 6);
+          for (let k = 0; k < 24; k++) {
+            const a = (k * Math.PI) / 12;
+            tp[k * 6] = Math.cos(a) * 560;
+            tp[k * 6 + 1] = y;
+            tp[k * 6 + 2] = Math.sin(a) * 560;
+            tp[k * 6 + 3] = Math.cos(a) * 590;
+            tp[k * 6 + 4] = y;
+            tp[k * 6 + 5] = Math.sin(a) * 590;
+          }
+          const tg = new THREE.BufferGeometry();
+          tg.setAttribute("position", new THREE.BufferAttribute(tp, 3));
+          scene.add(
+            new THREE.LineSegments(
+              tg,
+              new THREE.LineBasicMaterial({
+                color: 0x6fd2ff,
+                transparent: true,
+                opacity: 0.12,
+              }),
+            ),
+          );
+        })();
+        (function () {
+          const sp = new Float32Array(500 * 3);
+          for (let i = 0; i < 500; i++) {
+            const r = 1600 + Math.random() * 1400,
+              th = Math.random() * Math.PI * 2,
+              ph = Math.acos(2 * Math.random() - 1);
+            sp[i * 3] = r * Math.sin(ph) * Math.cos(th);
+            sp[i * 3 + 1] = r * Math.cos(ph) * 0.7;
+            sp[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th);
+          }
+          const g = new THREE.BufferGeometry();
+          g.setAttribute("position", new THREE.BufferAttribute(sp, 3));
+          scene.add(
+            new THREE.Points(
+              g,
+              new THREE.PointsMaterial({
+                size: 6,
+                map: texGlow,
+                color: 0x9fd4ff,
+                transparent: true,
+                opacity: 0.6,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true,
+              }),
+            ),
+          );
+        })();
 
-            const mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
+        let AC   = null,
+        master   = null,
+        sfxBus   = null,
+        humBus   = null,
+        analyser = null,
+        freqData = null;
 
-            const renderer = new THREE.WebGLRenderer({ antialias: false });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            container.appendChild(renderer.domElement);
+        let audioFailed = false,
+                musicOn = true,
+                  sfxOn = true,
+                  humOn = false,
+             musicWired = false;
 
-            const clock = new THREE.Clock();
-            let sceneRAF = null;
+        const bgm   = new Audio(MUSIC_FILE);
+        bgm.loop    = true;
+        bgm.volume  = MUSIC_VOLUME;
+        bgm.preload = "auto";
 
-            function animate() {
-                sceneRAF = requestAnimationFrame(animate);
-                material.uniforms.u_time.value = clock.getElapsedTime();
-                renderer.render(scene, camera);
+        const elMus = $("musbtn");
+
+        function setupAudio() {
+          if (AC || audioFailed) return;
+          try {
+            AC = new (window.AudioContext || window.webkitAudioContext)();
+            master = AC.createGain();
+            master.gain.value = 0.9;
+            master.connect(AC.destination);
+            sfxBus = AC.createGain();
+            sfxBus.gain.value = sfxOn ? 1 : 0;
+            sfxBus.connect(master);
+            humBus = AC.createGain();
+            humBus.gain.value = musicOn ? 0.5 : 0;
+            humBus.connect(master);
+            analyser = AC.createAnalyser();
+            analyser.fftSize = 256;
+            analyser.smoothingTimeConstant = 0.1;
+            freqData = new Uint8Array(analyser.frequencyBinCount);
+            startHum();
+          } catch (e) {
+            audioFailed = true;
+          }
+        }
+
+        function wireMusic() {
+          if (!AC || musicWired) return;
+          if (AC.state !== "running") return;
+          try {
+            const src = AC.createMediaElementSource(bgm);
+            src.connect(analyser);
+            analyser.connect(master);
+            musicWired = true;
+          } catch (e) {}
+        }
+
+        function ensureMusic() {
+          setupAudio();
+          if (!musicOn) return;
+          if (AC && AC.state === "suspended") {
+            AC.resume()
+              .then(() => {
+                wireMusic();
+                bgm.play().catch(() => {});
+              })
+              .catch(() => {});
+          } else {
+            wireMusic();
+            bgm.play().catch(() => {});
+          }
+        }
+
+        function startHum() {
+          if (humOn || !AC || !humBus) return;
+          humOn = true;
+          try {
+            const g = AC.createGain();
+            g.gain.value = 0.08;
+            const lp = AC.createBiquadFilter();
+            lp.type = "lowpass";
+            lp.frequency.value = 200;
+            lp.Q.value = 0.5;
+            const o1 = AC.createOscillator();
+            o1.type = "sawtooth";
+            o1.frequency.value = 46;
+            const o2 = AC.createOscillator();
+            o2.type = "sine";
+            o2.frequency.value = 92.5;
+            const g2 = AC.createGain();
+            g2.gain.value = 0.4;
+            o1.connect(lp);
+            o2.connect(g2);
+            g2.connect(lp);
+            lp.connect(g);
+            g.connect(humBus);
+            const lfo = AC.createOscillator();
+            lfo.frequency.value = 0.09;
+            const lg = AC.createGain();
+            lg.gain.value = 0.015;
+            lfo.connect(lg);
+            lg.connect(g.gain);
+            o1.start();
+            o2.start();
+            lfo.start();
+          } catch (e) {}
+        }
+
+        ensureMusic();
+        {
+          let tries = 0;
+          const t = setInterval(() => {
+            ensureMusic();
+            if (++tries >= 30 || !musicOn || !bgm.paused) clearInterval(t);
+          }, 500);
+        }
+        addEventListener("pointerdown", ensureMusic);
+        addEventListener("keydown", ensureMusic);
+
+        function tone(f0, f1, dur, type, vol, delay = 0) {
+          if (!sfxOn || !AC || !sfxBus) return;
+          try {
+            const t0 = AC.currentTime + delay,
+              o = AC.createOscillator(),
+              g = AC.createGain();
+            o.type = type;
+            o.frequency.setValueAtTime(f0, t0);
+            if (f1)
+              o.frequency.exponentialRampToValueAtTime(
+                Math.max(f1, 1),
+                t0 + dur,
+              );
+            g.gain.setValueAtTime(0, t0);
+            g.gain.linearRampToValueAtTime(vol, t0 + 0.008);
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+            o.connect(g);
+            g.connect(sfxBus);
+            o.start(t0);
+            o.stop(t0 + dur + 0.03);
+          } catch (e) {}
+        }
+        const sBlip = () => tone(1150, 900, 0.05, "square", 0.22);
+        const sTick = () => tone(1500, 1400, 0.02, "square", 0.05);
+        const sMove = () => {
+          tone(300, 140, 0.25, "sawtooth", 0.16);
+          tone(620, 300, 0.2, "triangle", 0.09, 0.02);
+        };
+        const sOpen = () => {
+          tone(523, 1046, 0.12, "square", 0.18);
+          tone(784, 1568, 0.14, "square", 0.14, 0.07);
+        };
+        const sClose = () => tone(880, 290, 0.16, "square", 0.16);
+        const sRatchet = () => tone(700, 520, 0.04, "square", 0.12);
+
+        $("musbtn").addEventListener("click", () => {
+          musicOn = !musicOn;
+          elMus.textContent = musicOn ? "MUSIC:ON" : "MUSIC:OFF";
+          try {
+            if (humBus && AC)
+              humBus.gain.setTargetAtTime(
+                musicOn ? 0.5 : 0,
+                AC.currentTime,
+                0.25,
+              );
+          } catch (e) {}
+          if (musicOn) ensureMusic();
+          else bgm.pause();
+        });
+        $("sndbtn").addEventListener("click", () => {
+          sfxOn = !sfxOn;
+          $("sndbtn").textContent = sfxOn ? "SND:ON" : "SND:OFF";
+          try {
+            if (sfxBus) sfxBus.gain.value = sfxOn ? 1 : 0;
+          } catch (e) {}
+          if (sfxOn) sBlip();
+        });
+
+        function lsGet(k) {
+          try {
+            return localStorage.getItem(k);
+          } catch (e) {
+            return null;
+          }
+        }
+        function lsSet(k, v) {
+          try {
+            localStorage.setItem(k, v);
+          } catch (e) {}
+        }
+        let tipActive = false,
+          tipTimer = 0;
+        function maybeShowTip() {
+          if (lsGet("helios_tip_seen")) return;
+          tipActive = true;
+          document.body.classList.add("show-tip");
+          tipTimer = setTimeout(() => dismissTip(false), 20000);
+        }
+        function dismissTip(persist) {
+          if (!tipActive) return;
+          tipActive = false;
+          clearTimeout(tipTimer);
+          document.body.classList.remove("show-tip");
+          if (persist) lsSet("helios_tip_seen", "1");
+        }
+
+        let rotA = -Math.PI / 2,
+          tw = null,
+          activeIdx = 0,
+          hoverIdx = -1;
+        let isOpen = false,
+          openSeq = 0,
+          time = 0,
+          dim = 1,
+          camZ = CAM.z;
+        let swayMix = 0;
+        let mouseX = 0,
+          mouseY = 0,
+          lastRatchet = 0;
+        const tmpV = new THREE.Vector3(),
+          tmpW = new THREE.Vector3(),
+          lookT = new THREE.Vector3();
+        const iconScr = Array.from({ length: N }, () => ({
+          i: 0,
+          x: 0,
+          y: 0,
+          r: 0,
+          hidden: true,
+        }));
+        let iconCount = 0;
+        let pf = (IH * 0.5) / Math.tan(THREE.MathUtils.degToRad(FOV * 0.5));
+
+        let pulseT = 0,
+          flowT = 0;
+
+        const bands = { high: 0, all: 0, hit: 0, avgAll: 0 };
+        function sampleBands() {
+          if (!analyser || !freqData || !musicOn || bgm.paused || !musicWired) {
+            bands.high = bands.all = bands.hit = 0;
+            return;
+          }
+          try {
+            analyser.getByteFrequencyData(freqData);
+          } catch (e) {
+            return;
+          }
+          const n = freqData.length;
+
+          let h = 0;
+          for (let i = 48; i < n; i++) h += freqData[i];
+          h /= (n - 48) * 255;
+
+          let a = 0;
+          for (let i = 0; i < n; i++) a += freqData[i];
+          a /= n * 255;
+
+          bands.avgAll += (a - bands.avgAll) * 0.02;
+          const spike = Math.max(0, a - bands.avgAll);
+          bands.hit = Math.min(1, spike * 4.0);
+
+          const upH = 0.9,
+            dnH = 0.3;
+          const upA = 0.8,
+            dnA = 0.25;
+          bands.high += (h - bands.high) * (h > bands.high ? upH : dnH);
+          bands.all += (a - bands.all) * (a > bands.all ? upA : dnA);
+        }
+
+        function activeFromRot() {
+          return ((Math.round((rotA + Math.PI / 2) / DELTA) % N) + N) % N;
+        }
+        function rotateTo(i, durOverride) {
+          if (isOpen || !introDone) return;
+          dismissTip(true);
+          const base = i * DELTA - Math.PI / 2;
+          const target =
+            base + Math.PI * 2 * Math.round((rotA - base) / (Math.PI * 2));
+          const d =
+            durOverride !== undefined
+              ? durOverride
+              : Math.min(1200, 620 + Math.abs(target - rotA) * 60);
+          tw = {
+            a0: rotA,
+            a1: target,
+            t0: performance.now(),
+            dur: Math.max(180, d),
+          };
+          sMove();
+        }
+        function onActive() {
+          const s = SECTIONS[activeIdx];
+          const el = $("sect-name");
+          el.textContent = s.name;
+          el.classList.remove("flash");
+          void el.offsetWidth;
+          el.classList.add("flash");
+        }
+
+        function easeInOutCubic(k) {
+          return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        }
+        function finishIntro() {
+          if (introDone) return;
+          introDone = true;
+          document.body.classList.add("intro-done");
+          maybeShowTip();
+        }
+
+        const panel = $("panel"),
+          pBody = $("p-body");
+        let typer = null;
+        function startType(el, text, done) {
+          stopType();
+          let i = 0;
+          el.textContent = "";
+          typer = {
+            el,
+            text,
+            done,
+            iv: setInterval(() => {
+              i++;
+              el.textContent = text.slice(0, i);
+              if (i % 3 === 0) sTick();
+              if (i >= text.length) {
+                const d = typer.done;
+                stopType();
+                d && d();
+              }
+            }, 13),
+          };
+        }
+        function stopType() {
+          if (typer) {
+            clearInterval(typer.iv);
+            typer = null;
+          }
+        }
+        function skipType() {
+          if (!typer) return;
+          const { el, text, done } = typer;
+          stopType();
+          el.textContent = text;
+          done && done();
+        }
+        
+        // ── SITE AUDIO DUCKING FOR VIDEO ───────────────────────────────
+        let videoDuckedAudio = false;
+
+        function duckSiteAudio() {
+          videoDuckedAudio = true;
+          if (musicOn && !bgm.paused) {
+            bgm.pause();
+            bgm.dataset.wasPlaying = "true";
+          }
+          if (sfxOn && sfxBus) {
+            sfxBus.gain.value = 0;
+          }
+          if (humOn && humBus && AC) {
+            humBus.gain.setTargetAtTime(0, AC.currentTime, 0.25);
+          }
+        }
+
+        function restoreSiteAudio() {
+          if (!videoDuckedAudio) return;
+          videoDuckedAudio = false;
+          
+          if (bgm.dataset.wasPlaying === "true") {
+            bgm.play().catch(() => {});
+            delete bgm.dataset.wasPlaying;
+          }
+          if (sfxOn && sfxBus) {
+            sfxBus.gain.value = 1;
+          }
+          if (humOn && humBus && AC) {
+            humBus.gain.setTargetAtTime(0.5, AC.currentTime, 0.25);
+          }
+        }
+
+        function makeRow(r) {
+          const el = document.createElement("div");
+          if (r.t === "kv") {
+            el.className = "row" + (r.href ? " link" : "");
+            const k = document.createElement("span");
+            k.className = "k";
+            k.textContent = r.k;
+            const v = document.createElement(r.href ? "a" : "span");
+            v.className = "v";
+            v.textContent = r.v;
+            if (r.href) {
+              v.href = r.href;
+              if (/^http/.test(r.href)) {
+                v.target = "_blank";
+                v.rel = "noopener";
+              }
+            }
+            el.append(k, v);
+          } else if (r.t === "hd") {
+            el.className = "hd";
+            el.textContent = "◈ " + r.v;
+          } else if (r.t === "pa") {
+            el.className = "para";
+            el.textContent = r.v;
+          } else if (r.t === "bar") {
+            el.className = "row bar-row";
+            el.innerHTML = `<div class="lbl"><span>${r.k}</span><span>${r.v}%</span></div><div class="bar"><i></i></div>`;
+            requestAnimationFrame(() =>
+              requestAnimationFrame(() => {
+                el.querySelector("i").style.width = r.v + "%";
+              }),
+            );
+          } 
+          else if (r.t === "en") {
+            el.className = "row entry";
+            el.innerHTML =
+              `<span class="t">${r.title}</span><div class="m">${r.meta}</div><div class="d">${r.desc}</div>` +
+              (r.tags
+                ? `<div>${r.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>`
+                : "");
+          }
+          else if (r.type === "video") {
+            el.className = "panel-video-wrap";
+
+            if (r.title) {
+              const title = document.createElement("div");
+              title.className = "hd";
+              title.textContent = "◈ " + r.title;
+              el.appendChild(title);
             }
 
-            function startScene() {
-                if (sceneRAF === null) {
-                    clock.start();
-                    animate();
+            const stage = document.createElement("div");
+            stage.style.position = "relative";
+            stage.style.lineHeight = "0";
+
+            const video = document.createElement("video");
+            video.className = "panel-video";
+            video.src = r.src;
+            video.controls = true;
+            video.playsInline = true;
+            if (r.poster) video.poster = r.poster;
+            if (r.loop) video.loop = true;
+            
+            const hasSound = r.muted !== true;
+            video.muted = true; 
+            video.volume = 0.15;
+            if (r.autoplay) video.autoplay = true;
+
+            if (hasSound) {
+              const unmuteBtn = document.createElement("button");
+              unmuteBtn.className = "video-unmute-btn";
+              unmuteBtn.textContent = "🔇 TAP FOR SOUND";
+              
+              unmuteBtn.addEventListener("click", () => {
+                video.muted = false;
+                video.play().catch(()=>{});
+                unmuteBtn.style.display = "none";
+                duckSiteAudio();
+              });
+
+              video.addEventListener("volumechange", () => {
+                if (video.muted || video.volume === 0) {
+                  restoreSiteAudio();
+                  unmuteBtn.style.display = "flex";
                 }
-            }
-            function stopScene() {
-                if (sceneRAF !== null) {
-                    cancelAnimationFrame(sceneRAF);
-                    sceneRAF = null;
-                    clock.stop();
-                }
+              });
+
+              video.addEventListener("ended", () => {
+                restoreSiteAudio();
+                unmuteBtn.style.display = "flex";
+              });
+              
+              stage.appendChild(unmuteBtn);
             }
 
-            if (prefersReducedMotion) {
-                // Render a single static frame — no continuous animation.
-                renderer.render(scene, camera);
+            stage.appendChild(video);
+            el.appendChild(stage);
+          }
+          el.addEventListener("mouseenter", sBlip);
+          return el;
+        }
+
+        function openMenu(i) {
+          dismissTip(true);
+          const sec = SECTIONS[i],
+            d = DATA[sec.id],
+            seq = ++openSeq;
+          isOpen = true;
+          document.body.classList.add("menu-open");
+          panel.classList.add("open");
+          $("p-title").textContent = d.title;
+          pBody.scrollTop = 0;
+          pBody.innerHTML = "";
+          
+          sOpen();
+          d.rows.forEach((r, k) =>
+            setTimeout(() => {
+              if (seq !== openSeq) return;
+              pBody.appendChild(makeRow(r));
+              if (k % 2 === 0) sTick();
+            }, k * 95),
+          );
+        }
+        function closeMenu() {
+          if (!isOpen) return;
+          isOpen = false;
+          openSeq++;
+          stopType();
+          document.body.classList.remove("menu-open");
+          panel.classList.remove("open");
+          document.querySelectorAll(".panel-video").forEach(v => {
+            v.pause();
+          });
+          restoreSiteAudio();
+          sClose();
+        }
+        $("p-close").addEventListener("click", closeMenu);
+        pBody.addEventListener("click", skipType);
+
+        function pick(x, y) {
+          let best = -1,
+            bd = 1e9;
+          for (let n = 0; n < iconCount; n++) {
+            const it = iconScr[n];
+            if (it.hidden) continue;
+            const d = Math.hypot(x - it.x, y - it.y);
+            if (d < it.r && d < bd) {
+              bd = d;
+              best = it.i;
+            }
+          }
+          return best;
+        }
+        let dragging = false,
+          dragMoved = 0,
+          lastPX = 0,
+          activePointer = null;
+        cv.addEventListener("pointerdown", (e) => {
+          if (!introDone || isOpen || e.button !== 0 || activePointer !== null)
+            return;
+          activePointer = e.pointerId;
+          dragging = true;
+          dragMoved = 0;
+          lastPX = e.clientX;
+          cv.setPointerCapture(e.pointerId);
+          cv.classList.add("grabbing");
+        });
+        cv.addEventListener("pointermove", (e) => {
+          if (dragging && e.pointerId === activePointer) {
+            const dx = e.clientX - lastPX;
+            lastPX = e.clientX;
+            dragMoved += Math.abs(dx);
+            if (dragMoved > 4) {
+              tw = null;
+              rotA += dx * ((Math.PI * 2 * DRAG_TURNS_PER_FULLSWIPE) / w);
+              dismissTip(true);
+            }
+            return;
+          }
+          mouseX = e.clientX / w - 0.5;
+          mouseY = e.clientY / h - 0.5;
+          if (isOpen) {
+            hoverIdx = -1;
+            return;
+          }
+          const hit = pick(e.clientX, e.clientY);
+          if (hit !== hoverIdx && hit >= 0) sBlip();
+          hoverIdx = hit;
+          cv.style.cursor = hit >= 0 ? "pointer" : "grab";
+        });
+        function endDrag(e) {
+          if (!dragging || e.pointerId !== activePointer) return;
+          dragging = false;
+          activePointer = null;
+          cv.classList.remove("grabbing");
+          if (dragMoved <= 5) {
+            const hit = pick(e.clientX, e.clientY);
+            if (hit >= 0) {
+              hit === activeIdx ? openMenu(hit) : rotateTo(hit);
+            }
+          } else {
+            rotateTo(activeFromRot(), 280);
+          }
+          cv.style.cursor = "grab";
+        }
+        cv.addEventListener("pointerup", endDrag);
+        cv.addEventListener("pointercancel", endDrag);
+
+        let wheelLock = 0;
+        addEventListener(
+          "wheel",
+          (e) => {
+            if (isOpen || !introDone) return;
+            const n = performance.now();
+            if (n - wheelLock < 200 || Math.abs(e.deltaY) < 12) return;
+            wheelLock = n;
+            rotateTo(activeIdx + (e.deltaY > 0 ? 1 : -1));
+          },
+          { passive: true },
+        );
+        function toggleFS() {
+          if (!document.fullscreenElement)
+            document.documentElement.requestFullscreen &&
+              document.documentElement.requestFullscreen();
+          else document.exitFullscreen && document.exitFullscreen();
+        }
+
+        document.addEventListener("keydown", (e) => {
+          if (!introDone) return;
+          if (e.key === "Escape") closeMenu();
+          else if (e.key === "ArrowRight") rotateTo(activeIdx + 1);
+          else if (e.key === "ArrowLeft") rotateTo(activeIdx - 1);
+          else if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            isOpen ? closeMenu() : openMenu(activeIdx);
+          } else if (/^[1-6]$/.test(e.key)) {
+            const i = +e.key - 1;
+            i === activeIdx ? openMenu(i) : rotateTo(i);
+          } else if (e.key === "f" || e.key === "F") toggleFS();
+        });
+
+        const elClock = $("clock"),
+          elRt = $("rt"),
+          elRd = $("rd"),
+          elRf = $("rf");
+        setInterval(() => {
+          const d = new Date(),
+            p = (n) => String(n).padStart(2, "0");
+          elClock.textContent = `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+          const deg = ((((rotA * 180) / Math.PI) % 360) + 360) % 360;
+          elRot.textContent = deg.toFixed(1).padStart(5, "0");
+          const t = time;
+          elRt.textContent = (
+            152.3 +
+            Math.sin(t * 0.3) * 1.2 +
+            Math.sin(t * 1.7) * 0.2
+          ).toFixed(1);
+          elRd.textContent =
+            (
+              1.02 +
+              0.03 * Math.sin(t * 0.21) +
+              0.004 * Math.sin(t * 1.3)
+            ).toFixed(3) + "e20";
+          elRf.textContent = (5.31 + 0.02 * Math.sin(t * 0.4 + 0.5)).toFixed(2);
+        }, 250);
+        onActive();
+
+        addEventListener("resize", () => {
+          w = innerWidth;
+          h = innerHeight;
+          calcInternal();
+          camera.aspect = IW / IH;
+          camera.updateProjectionMatrix();
+          renderer.setSize(IW, IH, false);
+          composer.setSize(IW, IH);
+          pf = (IH * 0.5) / Math.tan(THREE.MathUtils.degToRad(FOV * 0.5));
+        });
+
+        pMat.uniforms.uPx.value = pf;
+        if (REDUCED) {
+          document.body.classList.add("intro-done");
+          setTimeout(maybeShowTip, 400);
+        }
+        let last = performance.now();
+        function frame(now) {
+          const dt = Math.min(0.05, (now - last) / 1000);
+          last = now;
+          time += dt;
+
+          if (tw) {
+            const k = (now - tw.t0) / tw.dur;
+            if (k >= 1) {
+              rotA = tw.a1;
+              tw = null;
             } else {
-                startScene();
-                document.addEventListener("visibilitychange", () => {
-                    if (document.hidden) stopScene();
-                    else startScene();
-                });
+              const e = 1 - Math.pow(1 - k, 3);
+              rotA = tw.a0 + (tw.a1 - tw.a0) * e;
             }
-
-            let resizeRAF = null;
-            window.addEventListener("resize", () => {
-                if (resizeRAF !== null) return;
-                resizeRAF = requestAnimationFrame(() => {
-                    resizeRAF = null;
-                    const w = container.clientWidth;
-                    const h = container.clientHeight;
-                    material.uniforms.u_resolution.value.set(w, h);
-                    renderer.setSize(w, h);
-                    if (prefersReducedMotion) renderer.render(scene, camera);
-                });
-            });
-            });
-
-            const defaultGames = {};
-            let games = defaultGames;
-
-            const gamesList = document.getElementById("games-list");
-            const gamesListUl = document.getElementById("games-list-ul");
-            const gameDetail = document.getElementById("game-detail");
-
-            function buildGamesList() {
-                gamesListUl.innerHTML = "";
-                Object.entries(games).forEach(([id, g]) => {
-                    const li = document.createElement("li");
-                    li.className = "game-item";
-                    li.innerHTML = `
-                        <div class="entry-main">
-                            <a onclick="showGameDetail('${id}')">${g.name}</a>
-                            <div class="game-meta">${renderListMeta(g.year, g.tech)}</div>
-                            <p class="game-excerpt">${g.shortDesc || ""}</p>
-                        </div>
-                        ${renderThumb(g.thumbnail)}
-                    `;
-                    gamesListUl.appendChild(li);
-                });
-                activateThumbVideos(gamesListUl);
+          } else if (!dragging && introDone) {
+            rotA =
+              ((((rotA + Math.PI) % (Math.PI * 2)) + Math.PI * 2) %
+                (Math.PI * 2)) -
+              Math.PI;
+          }
+          const ai = activeFromRot();
+          if (ai !== activeIdx) {
+            activeIdx = ai;
+            onActive();
+            if (now - lastRatchet > 60) {
+              lastRatchet = now;
+              sRatchet();
             }
+          }
 
-            /* ── Article Data ──
-               No hardcoded fallback entries — this section is driven
-               entirely by the markdown setup. Add entries under
-               data/articles/ (a slug per .md file, listed in
-               data/articles/index.json) and they'll load in automatically
-               when this site is served over http:// (e.g. GitHub Pages or
-               `python3 -m http.server`). See loadMarkdownEntries() below
-               for the exact format. */
-            const defaultArticles = {};
-            let articles = defaultArticles;
+          dim += ((isOpen ? 0.55 : 1) - dim) * Math.min(1, dt * 6);
 
-            const articlesList = document.getElementById("articles-list");
-            const articlesListUl = document.getElementById("articles-list-ul");
-            const articleDetail = document.getElementById("article-detail");
+          sampleBands();
+          const high = bands.high,
+            all = bands.all,
+            hit = bands.hit;
+          flowT += dt * (1 + high * REACT.particleSpeed);
+          pulseT += dt * (1.1 + hit * REACT.trunkPulse);
 
-            function buildArticlesList() {
-                articlesListUl.innerHTML = "";
-                Object.entries(articles).forEach(([id, p]) => {
-                    const li = document.createElement("li");
-                    li.className = "article-item";
-                    li.innerHTML = `
-                        <div class="entry-main">
-                            <a onclick="showArticleDetail('${id}')">${p.name}</a>
-                            <div class="article-meta">${renderListMeta(p.year, p.tech)}</div>
-                            <p class="article-excerpt">${p.shortDesc || ""}</p>
-                        </div>
-                        ${renderThumb(p.thumbnail)}
-                    `;
-                    articlesListUl.appendChild(li);
-                });
-                activateThumbVideos(articlesListUl);
+          trunkMat.uniforms.uTime.value = time;
+          trunkMat.uniforms.uPulse.value = pulseT;
+          trunkMat.uniforms.uDim.value = dim;
+          capMat.uniforms.uDim.value = dim;
+          pMat.uniforms.uTime.value = time;
+          pMat.uniforms.uFlow.value = flowT;
+          pMat.uniforms.uDim.value = dim;
+          // Particle brightness boost on transients — makes them punch through bloom
+          pMat.uniforms.uBoost.value =
+            1 + hit * REACT.particleGlow + high * 1.5;
+
+          // Music-reactive bloom: strength spikes on transients so the boosted
+          // particles (and everything bright) bloom harder on every hit
+          bloomPass.strength = BLOOM.strength + hit * REACT.bloom + high * 0.4;
+
+          beam1.material.opacity =
+            dim * (0.26 + hit * REACT.capGlow + high * 0.3);
+          beam2.material.opacity = dim * (0.42 + hit * 0.6 + high * 0.3);
+          capGlowT.material.opacity = dim * (0.4 + hit * 1.2 + high * 0.4);
+          capGlowB.material.opacity = dim * (0.3 + hit * 1.0 + high * 0.3);
+
+          const orbMul = 1 + all * REACT.orbitSpeed;
+          orbit1.rotation.y += dt * orbit1.userData.speed * orbMul;
+          orbit2.rotation.y += dt * orbit2.userData.speed * orbMul;
+
+          for (let i = 0; i < N; i++) {
+            const phi = i * DELTA;
+            const f = (Math.cos(phi - rotA - Math.PI / 2) + 1) / 2;
+            const act = i === activeIdx;
+            nodeSprites[i].position.y =
+              Math.sin(time * 1.8 + i * 1.7) * 3 * SWAY;
+            const target = nodeSize * (act ? 1.22 : 1);
+            const s =
+              nodeSprites[i].scale.x +
+              (target - nodeSprites[i].scale.x) * Math.min(1, dt * 8);
+            nodeSprites[i].scale.set(s, s, 1);
+            nodeSprites[i].material.opacity = Math.min(
+              1,
+              dim * (0.4 + 0.6 * f) +
+                (act ? 0.15 : 0) +
+                (i === hoverIdx ? 0.15 : 0) +
+                hit * REACT.nodeFlash * 0.2,
+            );
+          }
+          if (!isOpen && introDone) {
+            reticle.visible = true;
+            reticle.material.rotation -= dt * 0.7;
+            reticle.material.opacity = 0.95 * dim;
+            const wobble =
+              1 + 0.05 * Math.sin(time * 4) + high * REACT.reticlePulse * 0.15;
+            reticle.scale.setScalar(nodeSize * 1.3 * wobble);
+          } else reticle.visible = false;
+
+          if (!introDone) {
+            introT += dt;
+            const k = Math.min(1, introT / INTRO_DUR);
+            const e = easeInOutCubic(k);
+            const arc = Math.pow(Math.sin(k * Math.PI), 2) * 46;
+            camera.position.set(
+              INTRO_POS.x + (CAM.x - INTRO_POS.x) * e + arc,
+              INTRO_POS.y + (CAM.y - INTRO_POS.y) * e,
+              INTRO_POS.z + (CAM.z - INTRO_POS.z) * e,
+            );
+            lookT.set(
+              INTRO_LOOK.x + (0 - INTRO_LOOK.x) * e,
+              INTRO_LOOK.y + (6 - INTRO_LOOK.y) * e,
+              INTRO_LOOK.z + (0 - INTRO_LOOK.z) * e,
+            );
+            camera.lookAt(lookT);
+            camZ = CAM.z;
+            trunkGroup.rotation.y = rotA - 0.5 * (1 - e);
+            if (k >= 1) {
+              trunkGroup.rotation.y = rotA;
+              finishIntro();
             }
+          } else {
+            trunkGroup.rotation.y = rotA;
+            swayMix +=
+              ((dragging || isOpen ? 0 : 1) - swayMix) * Math.min(1, dt * 4);
+            const sw = SWAY * swayMix;
+            camZ +=
+              ((isOpen && w > 760 ? 760 : CAM.z) - camZ) * Math.min(1, dt * 5);
+            camera.position.set(
+              Math.sin(time * 0.22) * 4 * sw,
+              CAM.y + Math.sin(time * 0.31) * 3 * sw,
+              camZ,
+            );
+            lookT.set(-mouseX * 70 * swayMix, 6 - mouseY * 50 * swayMix, 0);
+            camera.lookAt(lookT);
+          }
 
-            const defaultWritings = {
-                "placeholder": {
-                    title:   "placeholder",
-                    meta:    "placeholder",
-                    body:     ``,
-                    tags:   ["placeholder"],
-                    excerpt: "placeholder",
-                },
-            };
-            let writings = defaultWritings;
-
-            const writingList = document.getElementById("writing-list");
-            const writingListUl = document.getElementById("writing-list-ul");
-            const writingDetail = document.getElementById("writing-detail");
-
-            function buildWritingList() {
-                writingListUl.innerHTML = "";
-                Object.entries(writings).forEach(([id, w]) => {
-                    const li = document.createElement("li");
-                    li.className = "writing-item";
-                    li.innerHTML = `
-          <div class="entry-main">
-              <a onclick="showWritingDetail('${id}')">${w.title}</a>
-              <div class="writing-meta">${w.meta}</div>
-              <p class="writing-excerpt">${w.excerpt || ""}</p>
-          </div>
-          ${renderThumb(w.thumbnail)}
-        `;
-                    writingListUl.appendChild(li);
-                });
-                activateThumbVideos(writingListUl);
+          iconCount = 0;
+          for (let i = 0; i < N; i++) {
+            nodeSprites[i].getWorldPosition(tmpW);
+            tmpV.copy(tmpW).project(camera);
+            if (tmpV.z < 1) {
+              const phi = i * DELTA;
+              const f = (Math.cos(phi - rotA - Math.PI / 2) + 1) / 2;
+              const it = iconScr[iconCount++];
+              it.i = i;
+              it.x = ((tmpV.x + 1) / 2) * w;
+              it.y = ((1 - tmpV.y) / 2) * h;
+              it.r =
+                Math.max(
+                  36,
+                  (nodeSprites[i].scale.x * 0.8 * pf) /
+                    camera.position.distanceTo(tmpW),
+                ) *
+                (h / IH);
+              it.hidden = f < 0.22;
             }
+          }
 
-            /* ── Navigation Logic ── */
-            const views = {
-                home: document.getElementById("home-view"),
-                about: document.getElementById("about-view"),
-                games: document.getElementById("games-view"),
-                articles: document.getElementById("articles-view"),
-                writing: document.getElementById("writing-view"),
-            };
-
-            window.navigateTo = function (viewName) {
-                Object.values(views).forEach((v) =>
-                    v.classList.remove("active"),
-                );
-                views[viewName].classList.add("active");
-
-                if (viewName !== "games") showGamesList();
-                if (viewName !== "articles") showArticlesList();
-                if (viewName !== "writing") showWritingList();
-
-                if (viewName === "home") {
-                    document.body.classList.add("home-active");
-                    bgDimmer.classList.remove("dim");
-                } else {
-                    document.body.classList.remove("home-active");
-                    bgDimmer.classList.add("dim");
-                }
-
-                window.scrollTo(0, 0);
-                history.pushState(
-                    null,
-                    "",
-                    viewName === "home" ? "/" : `#${viewName}`,
-                );
-            };
-
-            /* ── Game Detail ── */
-            window.showGameDetail = function (id) {
-                const g = games[id];
-                if (!g) return;
-                pauseVideosIn(gameDetail);
-                document.getElementById("gd-title").textContent = g.name;
-                document.getElementById("gd-year").textContent = g.year || "";
-                document.getElementById("gd-desc").innerHTML = renderMarkdown(
-                    g.body,
-                );
-                setOptionalSection(
-                    document.getElementById("gd-tech"),
-                    renderTagSpans(g.tech),
-                );
-                setOptionalSection(
-                    document.getElementById("gd-links"),
-                    renderLinks(g.links),
-                );
-                gamesList.classList.add("hidden");
-                document.getElementById("games-top-bar").classList.add("hidden");
-                gameDetail.classList.remove("hidden");
-                gameDetail.scrollTop = 0;
-                if (g.audio) playEntryAudio(g.audio);
-                else stopEntryAudio();
-                history.pushState(null, "", `#game/${id}`);
-            };
-
-            window.showGamesList = function () {
-                pauseVideosIn(gameDetail);
-                gameDetail.classList.add("hidden");
-                gamesList.classList.remove("hidden");
-                stopEntryAudio();
-                const topBar = document.getElementById("games-top-bar");
-                if (topBar) topBar.classList.remove("hidden");
-                if (views.games.classList.contains("active")) {
-                    history.pushState(null, "", "#games");
-                }
-            };
-
-            /* ── Article Detail ── */
-            window.showArticleDetail = function (id) {
-                const p = articles[id];
-                if (!p) return;
-                pauseVideosIn(articleDetail);
-                document.getElementById("ad-title").textContent = p.name;
-                document.getElementById("ad-year").textContent = p.year || "";
-                document.getElementById("ad-desc").innerHTML = renderMarkdown(
-                    p.body,
-                );
-                setOptionalSection(
-                    document.getElementById("ad-tech"),
-                    renderTagSpans(p.tech),
-                );
-                setOptionalSection(
-                    document.getElementById("ad-links"),
-                    renderLinks(p.links),
-                );
-                articlesList.classList.add("hidden");
-                document.getElementById("articles-top-bar").classList.add("hidden");
-                articleDetail.classList.remove("hidden");
-                articleDetail.scrollTop = 0;
-                if (p.audio) playEntryAudio(p.audio);
-                else stopEntryAudio();
-                history.pushState(null, "", `#article/${id}`);
-            };
-
-            window.showArticlesList = function () {
-                pauseVideosIn(articleDetail);
-                articleDetail.classList.add("hidden");
-                articlesList.classList.remove("hidden");
-                stopEntryAudio();
-                const topBar = document.getElementById("articles-top-bar");
-                if (topBar) topBar.classList.remove("hidden");
-                if (views.articles.classList.contains("active")) {
-                    history.pushState(null, "", "#articles");
-                }
-            };
-
-            /* ── Writing Detail ── */
-            window.showWritingDetail = function (id) {
-                const w = writings[id];
-                if (!w) return;
-                pauseVideosIn(writingDetail);
-                document.getElementById("wd-title").textContent = w.title;
-                document.getElementById("wd-meta").textContent = w.meta || "";
-                document.getElementById("wd-body").innerHTML = renderMarkdown(
-                    w.body,
-                );
-                setOptionalSection(
-                    document.getElementById("wd-tags"),
-                    renderTagSpans(w.tags),
-                );
-                setOptionalSection(
-                    document.getElementById("wd-links"),
-                    renderLinks(w.links),
-                );
-                writingList.classList.add("hidden");
-                document.getElementById("writing-top-bar").classList.add("hidden");
-                writingDetail.classList.remove("hidden");
-                writingDetail.scrollTop = 0;
-                if (w.audio) playEntryAudio(w.audio);
-                else stopEntryAudio();
-                history.pushState(null, "", `#writing/${id}`);
-            };
-
-            window.showWritingList = function () {
-                pauseVideosIn(writingDetail);
-                writingDetail.classList.add("hidden");
-                writingList.classList.remove("hidden");
-                stopEntryAudio();
-                const topBar = document.getElementById("writing-top-bar");
-                if (topBar) topBar.classList.remove("hidden");
-                if (views.writing.classList.contains("active")) {
-                    history.pushState(null, "", "#writing");
-                }
-            };
-
-            // Handle browser back/forward
-            window.addEventListener("popstate", () => {
-                const hash = window.location.hash;
-                if (!hash || hash === "#") {
-                    navigateTo("home");
-                } else if (hash.startsWith("#game/")) {
-                    const id = hash.replace("#game/", "");
-                    navigateTo("games");
-                    showGameDetail(id);
-                } else if (hash.startsWith("#article/")) {
-                    const id = hash.replace("#article/", "");
-                    navigateTo("articles");
-                    showArticleDetail(id);
-                } else if (hash.startsWith("#writing/")) {
-                    const id = hash.replace("#writing/", "");
-                    navigateTo("writing");
-                    showWritingDetail(id);
-                } else {
-                    const viewName = hash.replace("#", "");
-                    if (views[viewName]) navigateTo(viewName);
-                }
-            });
-
-            const FRONTMATTER_FIELD_ALIASES = {
-                name: "name",
-                title: "title",
-                year: "year",
-                meta: "meta",
-                shortdesc: "shortDesc",
-                excerpt: "excerpt",
-                thumbnail: "thumbnail",
-                audio: "audio",
-                tech: "tech",
-                tags: "tags",
-            };
-
-            function parseFrontmatter(raw) {
-                const cleaned = raw
-                    .replace(/^\uFEFF/, "")
-                    .replace(/\r\n/g, "\n")
-                    .trim();
-                const match = cleaned.match(
-                    /^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/,
-                );
-                if (!match) return { meta: {}, body: cleaned };
-                const [, fmBlock, body] = match;
-                const meta = {};
-                const links = [];
-                fmBlock.split("\n").forEach((line) => {
-                    if (!line.trim()) return;
-                    const linkMatch = line.match(/^link:\s*(.*)$/i);
-                    if (linkMatch) {
-                        const [label, url] = linkMatch[1]
-                            .split("|")
-                            .map((s) => s.trim());
-                        if (label && url) links.push({ label, url });
-                        return;
-                    }
-                    const kv = line.match(/^([a-zA-Z]+):\s?(.*)$/);
-                    if (!kv) return;
-                    const rawKey = kv[1].trim();
-                    const key =
-                        FRONTMATTER_FIELD_ALIASES[rawKey.toLowerCase()] ||
-                        rawKey;
-                    meta[key] = kv[2].trim();
-                });
-                if (links.length) meta.links = links;
-                if (meta.tech)
-                    meta.tech = meta.tech
-                        .split(",")
-                        .map((s) => s.trim())
-                        .filter(Boolean);
-                if (meta.tags)
-                    meta.tags = meta.tags
-                        .split(",")
-                        .map((s) => s.trim())
-                        .filter(Boolean);
-                // Games/Articles use `name`+`shortDesc`, Writing uses
-                // `title`+`excerpt` — accept either on any entry.
-                if (meta.name && !meta.title) meta.title = meta.name;
-                if (meta.title && !meta.name) meta.name = meta.title;
-                if (meta.shortDesc && !meta.excerpt)
-                    meta.excerpt = meta.shortDesc;
-                if (meta.excerpt && !meta.shortDesc)
-                    meta.shortDesc = meta.excerpt;
-                return { meta, body: body.trim() };
-            }
-
-            async function loadMarkdownEntries(kind) {
-                let slugs;
-                try {
-                    const idxRes = await fetch(`data/${kind}/index.json`);
-                    if (!idxRes.ok) return null;
-                    slugs = await idxRes.json();
-                } catch (e) {
-                    console.info(
-                        `Using built-in ${kind} data — data/${kind}/index.json wasn't reachable (serve this folder over http:// to load it, e.g. \`python3 -m http.server\`).`,
-                    );
-                    return null;
-                }
-
-                const entries = await Promise.all(
-                    slugs.map(async (slug) => {
-                        try {
-                            const res = await fetch(`data/${kind}/${slug}.md`);
-                            if (!res.ok) return null;
-                            const raw = await res.text();
-                            const { meta, body } = parseFrontmatter(raw);
-                            if (!meta.name && !meta.title) {
-                                const fallback = slug
-                                    .replace(/[-_]+/g, " ")
-                                    .replace(/\b\w/g, (c) => c.toUpperCase());
-                                meta.name = fallback;
-                                meta.title = fallback;
-                                console.warn(
-                                    `data/${kind}/${slug}.md has no "name"/"title" field in its frontmatter — using "${fallback}" as a fallback. Check the block between the two "---" lines for a typo.`,
-                                );
-                            }
-                            return [slug, { ...meta, body }];
-                        } catch (e) {
-                            console.warn(
-                                `Skipping data/${kind}/${slug}.md — couldn't load or parse it.`,
-                                e,
-                            );
-                            return null;
-                        }
-                    }),
-                );
-
-                const result = {};
-                for (const entry of entries) {
-                    if (entry) result[entry[0]] = entry[1];
-                }
-                return result;
-            }
-
-            async function loadContentData() {
-                const [loadedGames, loadedArticles, loadedWritings] =
-                    await Promise.all([
-                        loadMarkdownEntries("games"),
-                        loadMarkdownEntries("articles"),
-                        loadMarkdownEntries("writing"),
-                    ]);
-                if (loadedGames) games = loadedGames;
-                if (loadedArticles) articles = loadedArticles;
-                if (loadedWritings) writings = loadedWritings;
-            }
-
-            (async function init() {
-                await loadContentData();
-                buildGamesList();
-                buildArticlesList();
-                buildWritingList();
-
-                const initialHash = window.location.hash;
-                if (!initialHash || initialHash === "#") {
-                    navigateTo("home");
-                } else if (initialHash.startsWith("#game/")) {
-                    const id = initialHash.replace("#game/", "");
-                    navigateTo("games");
-                    showGameDetail(id);
-                } else if (initialHash.startsWith("#article/")) {
-                    const id = initialHash.replace("#article/", "");
-                    navigateTo("articles");
-                    showArticleDetail(id);
-                } else if (initialHash.startsWith("#writing/")) {
-                    const id = initialHash.replace("#writing/", "");
-                    navigateTo("writing");
-                    showWritingDetail(id);
-                } else {
-                    const viewName = initialHash.replace("#", "");
-                    if (views[viewName]) navigateTo(viewName);
-                }
-            })();
-        </script>
-    </body>
+          composer.render();
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+        document.body.classList.add("on");
+      }
+    </script>
+  </body>
 </html>

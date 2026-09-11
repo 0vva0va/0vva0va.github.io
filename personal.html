@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mitchell J</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    background: #121212;
+    color: #d8d8d0;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 20px;
+    position: relative;
+  }
+
+  html {
+    scrollbar-width: none;
+    overflow-y: scroll;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.17;
+    /* background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); */
+    mix-blend-mode: overlay;
+  }
+
+  a { color: #7aa2f7; cursor: pointer; }
+  a:visited { color: #b48ead; }
+  a:active { color: #ff6b6b; }
+
+  #bg-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  #bg-layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #custom-scrollbar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 12px;
+    z-index: 2000;
+    background: #121212;
+  }
+
+  #custom-scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    min-height: 36px;
+    background: #444444;
+    cursor: pointer;
+  }
+
+  #custom-scrollbar-thumb:hover,
+  #custom-scrollbar-thumb.dragging {
+    background: #555555;
+  }
+
+  #page {
+    max-width: 780px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---- banner ---- */
+  #banner {
+    border: 1px solid #444444;
+    background: rgba(18,18,18,0.88);
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  #banner h1 {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 22px;
+    margin: 0 0 4px 0;
+    letter-spacing: 1px;
+    color: #f0f0e8;
+  }
+
+  #banner p {
+    margin: 0;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12px;
+    color: #888888;
+  }
+
+  /* ---- two column layout ---- */
+  #columns {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  #col-left {
+    width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  #col-right {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ---- island box ---- */
+  .island {
+    border: 1px solid #444444;
+    background: rgba(18,18,18,0.88);
+  }
+
+  .island h2 {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 13px;
+    margin: 0;
+    padding: 5px 10px;
+    background: #2a2a2a;
+    color: #f0f0e8;
+    letter-spacing: 1px;
+  }
+
+  .island-body {
+    padding: 10px 12px;
+  }
+
+  .island-body p {
+    margin: 0 0 8px 0;
+  }
+
+  .island-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* nav list */
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-list li {
+    padding: 4px 0;
+    border-bottom: 1px dashed #333333;
+  }
+
+  .nav-list li:last-child {
+    border-bottom: none;
+  }
+
+  .nav-list a {
+    text-decoration: none;
+  }
+
+  .nav-list a:hover {
+    text-decoration: underline;
+  }
+
+  /* journal / project entries */
+  .entry {
+    margin-bottom: 14px;
+  }
+
+  .entry:last-child {
+    margin-bottom: 0;
+  }
+
+  .entry-date {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    color: #888888;
+    margin-bottom: 3px;
+  }
+
+  .entry-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #f0f0e8;
+  }
+
+  .entry-title.large {
+    font-size: 18px;
+  }
+
+  .island-body img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 8px 0;
+  }
+
+  .code-frame {
+    max-width: 100%;
+    margin: 10px 0;
+  }
+
+  pre {
+    margin: 0;
+    padding: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: #1a1a1a;
+    border: 1px solid #333333;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12px;
+    line-height: 1.35;
+    white-space: pre;
+  }
+
+  pre::-webkit-scrollbar {
+    display: none;
+  }
+
+  .code-scrollbar {
+    position: relative;
+    margin: 0 1px;
+    height: 12px;
+    background: #121212;
+    cursor: pointer;
+  }
+
+  .code-scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 12px;
+    min-width: 36px;
+    background: #444444;
+  }
+
+  .code-scrollbar-thumb:hover,
+  .code-scrollbar-thumb.dragging {
+    background: #555555;
+  }
+
+  pre code {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  hr.thin {
+    border: none;
+    border-top: 1px dashed #333333;
+    margin: 12px 0;
+  }
+
+  /* gif slots */
+  .gif-slot {
+    width: 64px;
+    height: 64px;
+    /*border: 1px dashed #555555;
+    background: #1a1a1a;*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 10px;
+    color: #666666;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .gif-slot.small {
+    width: 44px;
+    height: 44px;
+  }
+
+  .gif-slot.float-right {
+    float: right;
+    margin: 0 0 8px 10px;
+  }
+
+  /* page routing */
+  .page-section {
+    display: none;
+  }
+
+  .page-section.active {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  @media (max-width: 600px) {
+    #columns {
+      flex-direction: column;
+    }
+    #col-left {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="bg-layer">
+  <img id="bg-image" src="assets/images/psite_bg.png" style="opacity: 0.4;">
+</div>
+
+<div id="custom-scrollbar" aria-hidden="true">
+  <div id="custom-scrollbar-thumb"></div>
+</div>
+
+<div id="page">
+
+  <!-- <div id="banner">
+    <div>
+      <h1></h1>
+    </div>
+  </div> -->
+
+  <div id="columns">
+
+    <!-- LEFT COLUMN (static across all pages) -->
+    <div id="col-left">
+
+      <div class="island">
+        <h2>ABOUT</h2>
+        <div class="island-body">
+          <p>This is my personal site filled with smaller projects and other things</p>
+        </div>
+      </div>
+
+      <div class="island">
+        <h2>NAVIGATE</h2>
+        <div class="island-body">
+          <ul class="nav-list">
+            <li><a href="#home">home</a></li>
+            <li><a href="#about">about me</a></li>
+            <li><a href="#journal">journal</a></li>
+            <li><a href="#projects">projects</a></li>
+            <li><a href="#contact">contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN (routed pages) -->
+    <div id="col-right">
+
+      <!-- HOME -->
+      <div class="page-section" id="page-home">
+
+        <div class="island">
+          <h2>PROJECTS</h2>
+          <div class="island-body">
+            <ul class="nav-list">
+              <li><a href="#project-fft-ocean">Inverse FFT Ccean Sim</a></li>
+              <li><a href="#project-terrain">FBM Terrain Generation</a></li>
+            </ul>
+            <p style="margin-top:8px;"><a href="#projects">view all projects &rarr;</a></p>
+          </div>
+        </div>
+
+        <div class="island">
+          <h2>JOURNAL</h2>
+          <div class="island-body">
+
+            <div class="entry">
+              <div class="entry-date">07.30.2026</div>
+              <div class="entry-title">first post</div>
+              <p>.....</p>
+              <p><a href="#journal-first">read more &rarr;</a></p>
+            </div>
+
+            <p style="margin-top:8px;"><a href="#journal">view all entries &rarr;</a></p>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ABOUT -->
+      <div class="page-section" id="page-about">
+        <div class="island">
+          <h2>WHO IS JAMIE?</h2>
+          <div class="island-body">
+            <p>Hi, I'm Jamie. This is my little corner of the web where I keep notes on things I'm building, records I'm listening to, and pages I don't want to lose track of.</p>
+            <p>I made this site by hand because I like knowing how every piece of it works. Most of what's here started as a weekend project that got a little out of hand.</p>
+            <p>When I'm not staring at a screen I'm usually taking something apart to see how it works, or trying to put it back together.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- JOURNAL LISTING -->
+      <div class="page-section" id="page-journal">
+        <div class="island">
+          <h2>JOURNAL</h2>
+          <div class="island-body">
+
+            <hr class="thin">
+
+            <div class="entry">
+              <div class="entry-date">07.30.2026</div>
+              <div class="entry-title">first post</div>
+              <p>.....</p>
+              <p><a href="#journal-first">read more &rarr;</a></p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- JOURNAL ENTRY: first post -->
+      <div class="page-section" id="page-journal-first">
+        <div class="island">
+          <h2>JOURNAL ENTRY</h2>
+          <div class="island-body">
+            <div class="entry-date">07.30.2026</div>
+            <div class="entry-title large">first post</div>
+            <p>.....</p>
+            <p><a href="#journal">&larr; back to journal</a></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECTS LISTING -->
+      <div class="page-section" id="page-projects">
+        <div class="island">
+          <h2>PROJECTS</h2>
+          <div class="island-body">
+
+            <div class="entry">
+              <div class="entry-title">inverse FFT ocean sim</div>
+              <p>A physically accurate real-time ocean simulation using inverse fast Fourier transforms and compute shaders.</p>
+              <p><a href="#project-fft-ocean">view project &rarr;</a></p>
+            </div>
+
+            <hr class="thin">
+
+            <div class="entry">
+              <div class="entry-title">FBM terrain generation with noise derivatives</div>
+              <p>Procedural terrain generation using fractal Brownian motion and noise derivatives.</p>
+              <p><a href="#project-terrain">view project &rarr;</a></p>
+            </div>
+
+            <hr class="thin">
+
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECT: inverse FFT ocean -->
+      <div class="page-section" id="page-project-fft-ocean">
+        <div class="island">
+          <h2>PROJECT</h2>
+          <div class="island-body">
+            <div class="entry-date">2025</div>
+            <div class="entry-title large">A Real-Time Ocean Simulation Using Inverse FFT</div>
+            <p>Simulating the ocean accurately can prove a fairly difficult task, especially when considering performance. Traditionally, we can model the ocean in real-time using methods like summing of sine waves.</p>
+            <img src="assets/images/sum_of_sines.png" alt="Sum of Sines">
+            <p>or Gerstner waves.</p>
+            <img src="assets/images/gerstner_waves.png" alt="Gerstner Waves">
+            <p>Instead of these, you can model the surface as a dynamic wave field generated from a Fourier-domain spectrum. This means the water can be basically as close to physically accurate as possible and still perfrom quite well due to the fast Fourier transforms.</p>
+            <p>To do this, we can represent waves statistically through a spectrum. This spectrum shows how wave energy is distributed across different frequencies and directions, meaning it can be used for motion. Instead of simulating each wave independently, you can create a broad wave field from the spectrum and transform it into spatial displacement data. You can effectively gather all the data using FFTs and multiple compute shaders. An example of the displacement data in an arbitrary frame:</p>
+            <img src="assets/images/dsp_tex.jpg" alt="Displacement Textures">
+            <p>To create the wave spectrum you can use wind speed, fetch, direction, depth, and gravity. Specifically, the JONSWAP spectrum is used, which is a method of constructing waves. <a href="https://www.wikiwaves.org/index.php/Ocean-Wave_Spectra#JONSWAP_Spectrum">More Info on JONSWAP</a>. Once the initial spectrum is created, it is evolved over time and passed through horizontal and vertical FFT stages. All these stages give us some heightmaps which are used to displace a mesh in the scene. The final stage assembles displacement and slope maps, which are used in the final render shaders.</p>
+            <p>A few techinal details should be mentioned that help this whole project work properly. The vast majority of the work is done on the GPU using compute shaders, allowing good enough performance for real time uses. There is also a lot of texture channel packing, like the example of the displacement texture.</p>
+            <p><strong>tech:</strong> OpenGL, C++, GLSL</p>
+            <p><a href="https://github.com/0vva0va/Inverse_FFT_Ocean">Source &rarr;</a></p>
+            <p><a href="#projects">&larr; back to projects</a></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECT: FBM terrain -->
+      <div class="page-section" id="page-project-terrain">
+        <div class="island">
+          <h2>PROJECT</h2>
+          <div class="island-body">
+            <div class="entry-date">2025</div>
+            <div class="entry-title large">FBM Terrain Generation with Noise Derivatives</div>
+            <p>Terrain generation is a staple project and it quite useful since its used in so many scenarios. At this point using fractal brownian motion is commonplace. However, from <a href="https://iquilezles.org/articles/morenoise/">this</a> wonderful article by Inigo Quilez, we can read a bit about the noise derivatives.</p>
+            <p>The noise derivatives can be found using this piece of code</p>
+            <div class="code-frame">
+              <pre><code>vec4 noised(in vec3 x) {
+    vec3 p = floor(x);
+    vec3 w = fract(x);
+ 
+    vec3 u  = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
+    vec3 du = 30.0 * w * w * (w * (w - 2.0) + 1.0);
+
+    float a = myRandomMagic(p + vec3(0, 0, 0));
+    float b = myRandomMagic(p + vec3(1, 0, 0));
+    float c = myRandomMagic(p + vec3(0, 1, 0));
+    float d = myRandomMagic(p + vec3(1, 1, 0));
+    float e = myRandomMagic(p + vec3(0, 0, 1));
+    float f = myRandomMagic(p + vec3(1, 0, 1));
+    float g = myRandomMagic(p + vec3(0, 1, 1));
+    float h = myRandomMagic(p + vec3(1, 1, 1));
+
+    float k0 =  a;
+    float k1 =  b - a;
+    float k2 =  c - a;
+    float k3 =  e - a;
+    float k4 =  a - b - c + d;
+    float k5 =  a - c - e + g;
+    float k6 =  a - b - e + f;
+    float k7 = -a + b + c - d + e - f - g + h;
+
+    return vec4(-1.0 + 2.0 * (k0 + k1 * u.x + k2 * u.y + k3 * u.z + k4 * u.x * u.y + k5 * u.y * u.z + k6 * u.z * u.x + k7 * u.x * u.y * u.z),
+                 2.0 * du * vec3(k1 + k4 * u.y + k6 * u.z + k7 * u.y * u.z,
+                                 k2 + k5 * u.z + k4 * u.x + k7 * u.z * u.x,
+                                 k3 + k6 * u.x + k5 * u.y + k7 * u.x * u.y));
+}
+</code></pre>
+              <div class="code-scrollbar"><div class="code-scrollbar-thumb"></div></div>
+            </div>
+            <p>which will return the 3D value noise and its derivatives.</p>
+            <p><strong>tech:</strong> OpenGL, C++, GLSL</p>
+            <p><a href="https://github.com/0vva0va/Procedural_Terrain_Generator">Source &rarr;</a></p>
+            <p><a href="#projects">&larr; back to projects</a></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="page-section" id="page-contact">
+        <div class="island">
+          <h2>CONTACT</h2>
+          <div class="island-body">
+            <p>Best way to reach me is email.</p>
+            <p><a href="mailto:mitjohno@gmail.com">mitjohno@gmail.com</a></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  var scrollbar = document.getElementById('custom-scrollbar');
+  var scrollbarThumb = document.getElementById('custom-scrollbar-thumb');
+  var draggingScrollbar = false;
+  var scrollbarDragOffset = 0;
+
+  function updateScrollbar() {
+    var viewportHeight = window.innerHeight;
+    var contentHeight = document.documentElement.scrollHeight;
+    var trackHeight = scrollbar.clientHeight;
+    var thumbHeight = Math.max(36, trackHeight * viewportHeight / contentHeight);
+    var scrollRange = Math.max(1, contentHeight - viewportHeight);
+    var thumbRange = Math.max(0, trackHeight - thumbHeight);
+    var thumbTop = window.scrollY / scrollRange * thumbRange;
+
+    scrollbarThumb.style.height = thumbHeight + 'px';
+    scrollbarThumb.style.transform = 'translateY(' + thumbTop + 'px)';
+  }
+
+  scrollbar.addEventListener('click', function (event) {
+    if (event.target === scrollbarThumb) {
+      return;
+    }
+    var bounds = scrollbar.getBoundingClientRect();
+    var scrollRange = document.documentElement.scrollHeight - window.innerHeight;
+    var target = (event.clientY - bounds.top) / bounds.height * scrollRange;
+    window.scrollTo(0, target);
+  });
+
+  scrollbar.addEventListener('wheel', function (event) {
+    window.scrollBy(0, event.deltaY);
+    event.preventDefault();
+  }, { passive: false });
+
+  scrollbarThumb.addEventListener('pointerdown', function (event) {
+    draggingScrollbar = true;
+    scrollbarDragOffset = event.clientY - scrollbarThumb.getBoundingClientRect().top;
+    scrollbarThumb.classList.add('dragging');
+    scrollbarThumb.setPointerCapture(event.pointerId);
+  });
+
+  scrollbarThumb.addEventListener('pointermove', function (event) {
+    if (!draggingScrollbar) {
+      return;
+    }
+    var trackHeight = scrollbar.clientHeight;
+    var thumbHeight = scrollbarThumb.offsetHeight;
+    var thumbRange = Math.max(1, trackHeight - thumbHeight);
+    var position = Math.max(0, Math.min(thumbRange, event.clientY - scrollbarDragOffset));
+    var contentHeight = document.documentElement.scrollHeight;
+    var scrollRange = Math.max(0, contentHeight - window.innerHeight);
+    window.scrollTo(0, position / thumbRange * scrollRange);
+  });
+
+  scrollbarThumb.addEventListener('pointerup', function () {
+    draggingScrollbar = false;
+    scrollbarThumb.classList.remove('dragging');
+  });
+
+  window.addEventListener('scroll', updateScrollbar);
+  window.addEventListener('resize', updateScrollbar);
+
+  function updateCodeScrollbars() {
+    var codeBlocks = document.querySelectorAll('pre');
+    for (var i = 0; i < codeBlocks.length; i++) {
+      var codeBlock = codeBlocks[i];
+      var track = codeBlock.parentElement.querySelector('.code-scrollbar');
+      var needsSetup = !track || track.dataset.initialized !== 'true';
+      if (!track) {
+        track = document.createElement('div');
+        track.className = 'code-scrollbar';
+        track.innerHTML = '<div class="code-scrollbar-thumb"></div>';
+        codeBlock.parentElement.appendChild(track);
+        needsSetup = true;
+      }
+      if (needsSetup) {
+        track.dataset.initialized = 'true';
+
+        (function (block, scrollbarTrack) {
+          var thumb = scrollbarTrack.querySelector('.code-scrollbar-thumb');
+          var dragging = false;
+          var dragOffset = 0;
+
+          block.addEventListener('scroll', function () {
+            updateCodeScrollbar(block, scrollbarTrack, thumb);
+          });
+
+          scrollbarTrack.addEventListener('click', function (event) {
+            if (event.target === thumb) {
+              return;
+            }
+            var bounds = scrollbarTrack.getBoundingClientRect();
+            var scrollRange = block.scrollWidth - block.clientWidth;
+            block.scrollLeft = (event.clientX - bounds.left) / bounds.width * scrollRange;
+          });
+
+          scrollbarTrack.addEventListener('wheel', function (event) {
+            block.scrollLeft += event.deltaX || event.deltaY;
+            event.preventDefault();
+          }, { passive: false });
+
+          thumb.addEventListener('pointerdown', function (event) {
+            dragging = true;
+            dragOffset = event.clientX - thumb.getBoundingClientRect().left;
+            thumb.classList.add('dragging');
+            thumb.setPointerCapture(event.pointerId);
+          });
+
+          thumb.addEventListener('pointermove', function (event) {
+            if (!dragging) {
+              return;
+            }
+            var thumbRange = scrollbarTrack.clientWidth - thumb.offsetWidth;
+            var position = Math.max(0, Math.min(thumbRange, event.clientX - scrollbarTrack.getBoundingClientRect().left - dragOffset));
+            var scrollRange = block.scrollWidth - block.clientWidth;
+            block.scrollLeft = position / Math.max(1, thumbRange) * scrollRange;
+          });
+
+          thumb.addEventListener('pointerup', function () {
+            dragging = false;
+            thumb.classList.remove('dragging');
+          });
+
+          thumb.addEventListener('pointercancel', function () {
+            dragging = false;
+            thumb.classList.remove('dragging');
+          });
+        })(codeBlock, track);
+      }
+      updateCodeScrollbar(codeBlock, track, track.querySelector('.code-scrollbar-thumb'));
+    }
+  }
+
+  function updateCodeScrollbar(codeBlock, track, thumb) {
+    var scrollWidth = codeBlock.scrollWidth;
+    var clientWidth = codeBlock.clientWidth;
+    var trackWidth = track.clientWidth;
+    var thumbWidth = Math.max(36, trackWidth * clientWidth / Math.max(clientWidth, scrollWidth));
+    var thumbRange = Math.max(0, trackWidth - thumbWidth);
+    var scrollRange = Math.max(1, scrollWidth - clientWidth);
+    var thumbLeft = codeBlock.scrollLeft / scrollRange * thumbRange;
+
+    track.style.display = scrollWidth > clientWidth ? 'block' : 'none';
+    thumb.style.width = thumbWidth + 'px';
+    thumb.style.transform = 'translateX(' + thumbLeft + 'px)';
+  }
+
+  window.addEventListener('resize', updateCodeScrollbars);
+  if (window.ResizeObserver) {
+    var codeLayoutObserver = new ResizeObserver(updateCodeScrollbars);
+    codeLayoutObserver.observe(document.getElementById('page'));
+  }
+
+  function route() {
+    var id = (location.hash || '#home').slice(1);
+    var target = document.getElementById('page-' + id) || document.getElementById('page-home');
+    var sections = document.querySelectorAll('.page-section');
+    for (var i = 0; i < sections.length; i++) {
+      sections[i].classList.toggle('active', sections[i] === target);
+    }
+    window.scrollTo(0, 0);
+    updateScrollbar();
+    updateCodeScrollbars();
+  }
+  window.addEventListener('hashchange', route);
+  window.addEventListener('DOMContentLoaded', function () {
+    route();
+    updateScrollbar();
+    updateCodeScrollbars();
+    requestAnimationFrame(updateCodeScrollbars);
+  });
+</script>
+
+</body>
+</html>
