@@ -93,13 +93,6 @@
         font-size: 13px;
         color: #6fa8c8;
       }
-      #hud-br {
-        bottom: 18px;
-        right: 20px;
-        font-size: 13px;
-        color: #6fa8c8;
-        text-align: right;
-      }
       .dot {
         color: #7dffb0;
         animation: blink 1.3s steps(2) infinite;
@@ -108,19 +101,6 @@
         50% {
           opacity: 0.15;
         }
-      }
-      #sndbtn,
-      #musbtn {
-        pointer-events: auto;
-        cursor: pointer;
-        color: var(--cyan);
-      }
-      #sndbtn:hover,
-      #musbtn:hover {
-        color: #fff;
-      }
-      #trackname {
-        color: #54809c;
       }
 
       #sect {
@@ -302,31 +282,6 @@
       .panel-video:focus {
         border-color: var(--cyan);
         box-shadow: 0 0 12px rgba(111, 227, 255, 0.25);
-      }
-
-      .video-unmute-btn {
-        position: absolute;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 18px;
-        font-family: 'VT323', monospace;
-        font-size: 16px;
-        letter-spacing: 0.12em;
-        color: var(--cyan);
-        background: rgba(4, 10, 28, 0.85);
-        border: 1px solid var(--cyan);
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 0 10px rgba(111, 227, 255, 0.3);
-      }
-      .video-unmute-btn:hover {
-        background: var(--cyan);
-        color: #020409;
       }
 
       #panel {
@@ -637,11 +592,6 @@
       CORE TEMP <span id="rt">—</span> MK<br />PLASMA DENS
       <span id="rd">—</span> m⁻³<br />SOLENID FIELD <span id="rf">—</span> T
     </div> -->
-    <div class="hud" id="hud-br">
-      <span id="musbtn">MUSIC:ON</span> ·
-      <span id="sndbtn">SND:ON</span><br />
-      <!-- <span id="trackname">TRACK: —</span> -->
-    </div>
 
     <div id="sect">
       <!-- <div class="code" id="sect-code">FILE-01</div> -->
@@ -671,18 +621,6 @@
     <script type="module">
       "use strict";
       const OPERATOR = { name: "", id: "" };
-      const MUSIC_FILE   = "assets/audio/music.mp3";
-      const MUSIC_VOLUME = 0.2;
-      const REACT = {
-        particleSpeed: 7.0, // highs → particle rise speed
-        trunkPulse: 6.0, // transients → trunk light wave speed
-        capGlow: 3.5, // transients → beam brightness flash
-        reticlePulse: 3.0, // highs → reticle wobble
-        orbitSpeed: 5.0, // overall → arc spin speed
-        nodeFlash: 2.5, // transients → node opacity flash
-        bloom: 0.7, // transients → bloom strength boost (new)
-        particleGlow: 2.0, // transients → particle brightness boost (new)
-      };
 
       const SECTIONS = [
         { id: "about",     name: "ABOUT",      icon: "person" },
@@ -698,7 +636,7 @@
             { t: "pa", v: 'Aspiring Game Developer & Graphics Programmer' },
             { t: "hd", v: "Skills" },
             { t: "kv", k: "LANG",  v: "C++ · C# · Python · HLSL · GLSL · OpenGL · HTML/CSS" },
-            { t: "kv", k: "TOOLS", v: "Unreal Engin · Unity Engine · Blender"               },
+            { t: "kv", k: "TOOLS", v: "Unreal Engine · Unity Engine · Blender"              },
             { t: "kv", k: "OTHER", v: "Git · ImGui · GLFW"                                  }, 
             { t: "kv", k: "PERSONAL SITE", v: "CLICK HERE.", href: "personal.html"          }, ], },
         project01: {
@@ -728,23 +666,6 @@
               loop: false,
               autoplay: false
             }, ], },
-        // project02: {
-        //   title: "SMALLER PROJECTS",
-        //   rows: [
-        //     {
-        //       t: "en",
-        //       title: "SPACE GAME",
-        //       meta: "2026",
-        //       desc: "Space Game Concept. ",
-        //       tags: ["Unreal 5"],
-        //     }, {
-        //       type: "video",
-        //       title: "",
-        //       src: "assets/video/SBHGAME.mp4",
-        //       muted: false, 
-        //       loop: false,
-        //       autoplay: false
-        //     }, ], },
         contact: {
           title: "CONTACT",
           rows: [
@@ -1405,180 +1326,6 @@
           );
         })();
 
-        let AC   = null,
-        master   = null,
-        sfxBus   = null,
-        humBus   = null,
-        analyser = null,
-        freqData = null;
-
-        let audioFailed = false,
-                musicOn = true,
-                  sfxOn = true,
-                  humOn = false,
-             musicWired = false;
-
-        const bgm   = new Audio(MUSIC_FILE);
-        bgm.loop    = true;
-        bgm.volume  = MUSIC_VOLUME;
-        bgm.preload = "auto";
-
-        const elMus = $("musbtn");
-
-        function setupAudio() {
-          if (AC || audioFailed) return;
-          try {
-            AC = new (window.AudioContext || window.webkitAudioContext)();
-            master = AC.createGain();
-            master.gain.value = 0.9;
-            master.connect(AC.destination);
-            sfxBus = AC.createGain();
-            sfxBus.gain.value = sfxOn ? 1 : 0;
-            sfxBus.connect(master);
-            humBus = AC.createGain();
-            humBus.gain.value = musicOn ? 0.5 : 0;
-            humBus.connect(master);
-            analyser = AC.createAnalyser();
-            analyser.fftSize = 256;
-            analyser.smoothingTimeConstant = 0.1;
-            freqData = new Uint8Array(analyser.frequencyBinCount);
-            startHum();
-          } catch (e) {
-            audioFailed = true;
-          }
-        }
-
-        function wireMusic() {
-          if (!AC || musicWired) return;
-          if (AC.state !== "running") return;
-          try {
-            const src = AC.createMediaElementSource(bgm);
-            src.connect(analyser);
-            analyser.connect(master);
-            musicWired = true;
-          } catch (e) {}
-        }
-
-        function ensureMusic() {
-          setupAudio();
-          if (!musicOn) return;
-          if (AC && AC.state === "suspended") {
-            AC.resume()
-              .then(() => {
-                wireMusic();
-                bgm.play().catch(() => {});
-              })
-              .catch(() => {});
-          } else {
-            wireMusic();
-            bgm.play().catch(() => {});
-          }
-        }
-
-        function startHum() {
-          if (humOn || !AC || !humBus) return;
-          humOn = true;
-          try {
-            const g = AC.createGain();
-            g.gain.value = 0.08;
-            const lp = AC.createBiquadFilter();
-            lp.type = "lowpass";
-            lp.frequency.value = 200;
-            lp.Q.value = 0.5;
-            const o1 = AC.createOscillator();
-            o1.type = "sawtooth";
-            o1.frequency.value = 46;
-            const o2 = AC.createOscillator();
-            o2.type = "sine";
-            o2.frequency.value = 92.5;
-            const g2 = AC.createGain();
-            g2.gain.value = 0.4;
-            o1.connect(lp);
-            o2.connect(g2);
-            g2.connect(lp);
-            lp.connect(g);
-            g.connect(humBus);
-            const lfo = AC.createOscillator();
-            lfo.frequency.value = 0.09;
-            const lg = AC.createGain();
-            lg.gain.value = 0.015;
-            lfo.connect(lg);
-            lg.connect(g.gain);
-            o1.start();
-            o2.start();
-            lfo.start();
-          } catch (e) {}
-        }
-
-        ensureMusic();
-        {
-          let tries = 0;
-          const t = setInterval(() => {
-            ensureMusic();
-            if (++tries >= 30 || !musicOn || !bgm.paused) clearInterval(t);
-          }, 500);
-        }
-        addEventListener("pointerdown", ensureMusic);
-        addEventListener("keydown", ensureMusic);
-
-        function tone(f0, f1, dur, type, vol, delay = 0) {
-          if (!sfxOn || !AC || !sfxBus) return;
-          try {
-            const t0 = AC.currentTime + delay,
-              o = AC.createOscillator(),
-              g = AC.createGain();
-            o.type = type;
-            o.frequency.setValueAtTime(f0, t0);
-            if (f1)
-              o.frequency.exponentialRampToValueAtTime(
-                Math.max(f1, 1),
-                t0 + dur,
-              );
-            g.gain.setValueAtTime(0, t0);
-            g.gain.linearRampToValueAtTime(vol, t0 + 0.008);
-            g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-            o.connect(g);
-            g.connect(sfxBus);
-            o.start(t0);
-            o.stop(t0 + dur + 0.03);
-          } catch (e) {}
-        }
-        const sBlip = () => tone(1150, 900, 0.05, "square", 0.22);
-        const sTick = () => tone(1500, 1400, 0.02, "square", 0.05);
-        const sMove = () => {
-          tone(300, 140, 0.25, "sawtooth", 0.16);
-          tone(620, 300, 0.2, "triangle", 0.09, 0.02);
-        };
-        const sOpen = () => {
-          tone(523, 1046, 0.12, "square", 0.18);
-          tone(784, 1568, 0.14, "square", 0.14, 0.07);
-        };
-        const sClose = () => tone(880, 290, 0.16, "square", 0.16);
-        const sRatchet = () => tone(700, 520, 0.04, "square", 0.12);
-
-        $("musbtn").addEventListener("click", () => {
-          musicOn = !musicOn;
-          elMus.textContent = musicOn ? "MUSIC:ON" : "MUSIC:OFF";
-          try {
-            if (humBus && AC)
-              humBus.gain.setTargetAtTime(
-                musicOn ? 0.5 : 0,
-                AC.currentTime,
-                0.25,
-              );
-          } catch (e) {}
-          if (musicOn) ensureMusic();
-          else bgm.pause();
-        });
-        $("sndbtn").addEventListener("click", () => {
-          sfxOn = !sfxOn;
-          $("sndbtn").textContent = sfxOn ? "SND:ON" : "SND:OFF";
-          try {
-            if (sfxBus) sfxBus.gain.value = sfxOn ? 1 : 0;
-          } catch (e) {}
-          if (sfxOn) sBlip();
-        });
-
         function lsGet(k) {
           try {
             return localStorage.getItem(k);
@@ -1618,8 +1365,7 @@
           camZ = CAM.z;
         let swayMix = 0;
         let mouseX = 0,
-          mouseY = 0,
-          lastRatchet = 0;
+          mouseY = 0;
         const tmpV = new THREE.Vector3(),
           tmpW = new THREE.Vector3(),
           lookT = new THREE.Vector3();
@@ -1635,39 +1381,6 @@
 
         let pulseT = 0,
           flowT = 0;
-
-        const bands = { high: 0, all: 0, hit: 0, avgAll: 0 };
-        function sampleBands() {
-          if (!analyser || !freqData || !musicOn || bgm.paused || !musicWired) {
-            bands.high = bands.all = bands.hit = 0;
-            return;
-          }
-          try {
-            analyser.getByteFrequencyData(freqData);
-          } catch (e) {
-            return;
-          }
-          const n = freqData.length;
-
-          let h = 0;
-          for (let i = 48; i < n; i++) h += freqData[i];
-          h /= (n - 48) * 255;
-
-          let a = 0;
-          for (let i = 0; i < n; i++) a += freqData[i];
-          a /= n * 255;
-
-          bands.avgAll += (a - bands.avgAll) * 0.02;
-          const spike = Math.max(0, a - bands.avgAll);
-          bands.hit = Math.min(1, spike * 4.0);
-
-          const upH = 0.9,
-            dnH = 0.3;
-          const upA = 0.8,
-            dnA = 0.25;
-          bands.high += (h - bands.high) * (h > bands.high ? upH : dnH);
-          bands.all += (a - bands.all) * (a > bands.all ? upA : dnA);
-        }
 
         function activeFromRot() {
           return ((Math.round((rotA + Math.PI / 2) / DELTA) % N) + N) % N;
@@ -1688,7 +1401,6 @@
             t0: performance.now(),
             dur: Math.max(180, d),
           };
-          sMove();
         }
         function onActive() {
           const s = SECTIONS[activeIdx];
@@ -1723,7 +1435,6 @@
             iv: setInterval(() => {
               i++;
               el.textContent = text.slice(0, i);
-              if (i % 3 === 0) sTick();
               if (i >= text.length) {
                 const d = typer.done;
                 stopType();
@@ -1746,39 +1457,6 @@
           done && done();
         }
         
-        // ── SITE AUDIO DUCKING FOR VIDEO ───────────────────────────────
-        let videoDuckedAudio = false;
-
-        function duckSiteAudio() {
-          videoDuckedAudio = true;
-          if (musicOn && !bgm.paused) {
-            bgm.pause();
-            bgm.dataset.wasPlaying = "true";
-          }
-          if (sfxOn && sfxBus) {
-            sfxBus.gain.value = 0;
-          }
-          if (humOn && humBus && AC) {
-            humBus.gain.setTargetAtTime(0, AC.currentTime, 0.25);
-          }
-        }
-
-        function restoreSiteAudio() {
-          if (!videoDuckedAudio) return;
-          videoDuckedAudio = false;
-          
-          if (bgm.dataset.wasPlaying === "true") {
-            bgm.play().catch(() => {});
-            delete bgm.dataset.wasPlaying;
-          }
-          if (sfxOn && sfxBus) {
-            sfxBus.gain.value = 1;
-          }
-          if (humOn && humBus && AC) {
-            humBus.gain.setTargetAtTime(0.5, AC.currentTime, 0.25);
-          }
-        }
-
         function makeRow(r) {
           const el = document.createElement("div");
           if (r.t === "kv") {
@@ -1830,10 +1508,6 @@
               el.appendChild(title);
             }
 
-            const stage = document.createElement("div");
-            stage.style.position = "relative";
-            stage.style.lineHeight = "0";
-
             const video = document.createElement("video");
             video.className = "panel-video";
             video.src = r.src;
@@ -1841,43 +1515,10 @@
             video.playsInline = true;
             if (r.poster) video.poster = r.poster;
             if (r.loop) video.loop = true;
-            
-            const hasSound = r.muted !== true;
-            video.muted = true; 
-            video.volume = 0.15;
             if (r.autoplay) video.autoplay = true;
 
-            if (hasSound) {
-              const unmuteBtn = document.createElement("button");
-              unmuteBtn.className = "video-unmute-btn";
-              unmuteBtn.textContent = "🔇 TAP FOR SOUND";
-              
-              unmuteBtn.addEventListener("click", () => {
-                video.muted = false;
-                video.play().catch(()=>{});
-                unmuteBtn.style.display = "none";
-                duckSiteAudio();
-              });
-
-              video.addEventListener("volumechange", () => {
-                if (video.muted || video.volume === 0) {
-                  restoreSiteAudio();
-                  unmuteBtn.style.display = "flex";
-                }
-              });
-
-              video.addEventListener("ended", () => {
-                restoreSiteAudio();
-                unmuteBtn.style.display = "flex";
-              });
-              
-              stage.appendChild(unmuteBtn);
-            }
-
-            stage.appendChild(video);
-            el.appendChild(stage);
+            el.appendChild(video);
           }
-          el.addEventListener("mouseenter", sBlip);
           return el;
         }
 
@@ -1893,12 +1534,10 @@
           pBody.scrollTop = 0;
           pBody.innerHTML = "";
           
-          sOpen();
           d.rows.forEach((r, k) =>
             setTimeout(() => {
               if (seq !== openSeq) return;
               pBody.appendChild(makeRow(r));
-              if (k % 2 === 0) sTick();
             }, k * 95),
           );
         }
@@ -1912,8 +1551,6 @@
           document.querySelectorAll(".panel-video").forEach(v => {
             v.pause();
           });
-          restoreSiteAudio();
-          sClose();
         }
         $("p-close").addEventListener("click", closeMenu);
         pBody.addEventListener("click", skipType);
@@ -1965,7 +1602,6 @@
             return;
           }
           const hit = pick(e.clientX, e.clientY);
-          if (hit !== hoverIdx && hit >= 0) sBlip();
           hoverIdx = hit;
           cv.style.cursor = hit >= 0 ? "pointer" : "grab";
         });
@@ -2029,20 +1665,20 @@
             p = (n) => String(n).padStart(2, "0");
           elClock.textContent = `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
           const deg = ((((rotA * 180) / Math.PI) % 360) + 360) % 360;
-          elRot.textContent = deg.toFixed(1).padStart(5, "0");
+          if (elRot) elRot.textContent = deg.toFixed(1).padStart(5, "0");
           const t = time;
-          elRt.textContent = (
+          if (elRt) elRt.textContent = (
             152.3 +
             Math.sin(t * 0.3) * 1.2 +
             Math.sin(t * 1.7) * 0.2
           ).toFixed(1);
-          elRd.textContent =
+          if (elRd) elRd.textContent =
             (
               1.02 +
               0.03 * Math.sin(t * 0.21) +
               0.004 * Math.sin(t * 1.3)
             ).toFixed(3) + "e20";
-          elRf.textContent = (5.31 + 0.02 * Math.sin(t * 0.4 + 0.5)).toFixed(2);
+          if (elRf) elRf.textContent = (5.31 + 0.02 * Math.sin(t * 0.4 + 0.5)).toFixed(2);
         }, 250);
         onActive();
 
@@ -2087,20 +1723,16 @@
           if (ai !== activeIdx) {
             activeIdx = ai;
             onActive();
-            if (now - lastRatchet > 60) {
-              lastRatchet = now;
-              sRatchet();
-            }
           }
 
           dim += ((isOpen ? 0.55 : 1) - dim) * Math.min(1, dt * 6);
 
-          sampleBands();
-          const high = bands.high,
-            all = bands.all,
-            hit = bands.hit;
-          flowT += dt * (1 + high * REACT.particleSpeed);
-          pulseT += dt * (1.1 + hit * REACT.trunkPulse);
+          const high = 0;
+          const all = 0;
+          const hit = 0;
+          
+          flowT += dt;
+          pulseT += dt * 1.1;
 
           trunkMat.uniforms.uTime.value = time;
           trunkMat.uniforms.uPulse.value = pulseT;
@@ -2109,21 +1741,16 @@
           pMat.uniforms.uTime.value = time;
           pMat.uniforms.uFlow.value = flowT;
           pMat.uniforms.uDim.value = dim;
-          // Particle brightness boost on transients — makes them punch through bloom
-          pMat.uniforms.uBoost.value =
-            1 + hit * REACT.particleGlow + high * 1.5;
+          pMat.uniforms.uBoost.value = 1;
 
-          // Music-reactive bloom: strength spikes on transients so the boosted
-          // particles (and everything bright) bloom harder on every hit
-          bloomPass.strength = BLOOM.strength + hit * REACT.bloom + high * 0.4;
+          bloomPass.strength = BLOOM.strength;
 
-          beam1.material.opacity =
-            dim * (0.26 + hit * REACT.capGlow + high * 0.3);
-          beam2.material.opacity = dim * (0.42 + hit * 0.6 + high * 0.3);
-          capGlowT.material.opacity = dim * (0.4 + hit * 1.2 + high * 0.4);
-          capGlowB.material.opacity = dim * (0.3 + hit * 1.0 + high * 0.3);
+          beam1.material.opacity = dim * 0.26;
+          beam2.material.opacity = dim * 0.42;
+          capGlowT.material.opacity = dim * 0.4;
+          capGlowB.material.opacity = dim * 0.3;
 
-          const orbMul = 1 + all * REACT.orbitSpeed;
+          const orbMul = 1;
           orbit1.rotation.y += dt * orbit1.userData.speed * orbMul;
           orbit2.rotation.y += dt * orbit2.userData.speed * orbMul;
 
@@ -2142,16 +1769,14 @@
               1,
               dim * (0.4 + 0.6 * f) +
                 (act ? 0.15 : 0) +
-                (i === hoverIdx ? 0.15 : 0) +
-                hit * REACT.nodeFlash * 0.2,
+                (i === hoverIdx ? 0.15 : 0)
             );
           }
           if (!isOpen && introDone) {
             reticle.visible = true;
             reticle.material.rotation -= dt * 0.7;
             reticle.material.opacity = 0.95 * dim;
-            const wobble =
-              1 + 0.05 * Math.sin(time * 4) + high * REACT.reticlePulse * 0.15;
+            const wobble = 1 + 0.05 * Math.sin(time * 4);
             reticle.scale.setScalar(nodeSize * 1.3 * wobble);
           } else reticle.visible = false;
 
