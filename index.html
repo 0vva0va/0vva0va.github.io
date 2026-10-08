@@ -13,7 +13,6 @@
       :root {
         --cyan: #6fe3ff;
         --cyan2: #9fdcff;
-        --amber: #ffb45e;
         --text: #d8f4ff;
       }
       @font-face {
@@ -70,8 +69,8 @@
         font-size: 15px;
         line-height: 1.6;
         letter-spacing: 0.12em;
-        color: var(--cyan2);
-        text-shadow: 0 0 6px rgba(80, 190, 255, 0.55);
+        color: #88bbff;
+        text-shadow: none;
         opacity: 0;
         transition: opacity 0.9s ease 0.2s;
       }
@@ -94,7 +93,7 @@
         color: #6fa8c8;
       }
       .dot {
-        color: #7dffb0;
+        color: #ffffff;
         animation: blink 1.3s steps(2) infinite;
       }
       @keyframes blink {
@@ -119,9 +118,9 @@
       }
       #sect .code {
         font-size: 14px;
-        color: var(--amber);
+        color: #ffffff;
         letter-spacing: 0.5em;
-        text-shadow: 0 0 8px rgba(255, 180, 94, 0.5);
+        text-shadow: none;
       }
       #sect .name {
         font-size: 40px;
@@ -146,10 +145,10 @@
         }
       }
       #sect .hint {
-        margin-top: 4px;
+        margin-top: 8px;
         font-size: 13px;
         letter-spacing: 0.24em;
-        color: #54809c;
+        color: #557799;
       }
 
       #tip {
@@ -179,7 +178,7 @@
         margin-top: 6px;
         font-size: 14px;
         letter-spacing: 0.26em;
-        color: #54809c;
+        color: #557799;
       }
       @keyframes tippulse {
         50% {
@@ -211,83 +210,65 @@
       .btn {
         font-family: "VT323", monospace;
         font-size: 17px;
-        letter-spacing: 0.28em;
-        color: var(--text);
-        padding: 9px 22px 9px 26px;
+        letter-spacing: 0.2em;
+        color: #d0e8ff;
+        padding: 10px 24px;
         cursor: pointer;
-        border: 1px solid rgba(120, 220, 255, 0.55);
-        background: linear-gradient(
-          180deg,
-          rgba(28, 78, 140, 0.85),
-          rgba(9, 30, 66, 0.92)
-        );
-        clip-path: polygon(
-          12px 0,
-          100% 0,
-          100% calc(100% - 12px),
-          calc(100% - 12px) 100%,
-          0 100%,
-          0 12px
-        );
-        text-shadow: 0 0 7px rgba(120, 220, 255, 0.5);
-        transition:
-          background 0.15s,
-          color 0.15s,
-          filter 0.15s;
+        border: 1px solid rgba(120, 200, 255, 0.3);
+        background: rgba(15, 30, 50, 0.8);
+        border-radius: 4px;
+        text-shadow: none;
+        transition: all 0.2s;
       }
       .btn:hover {
-        background: linear-gradient(
-          180deg,
-          rgba(64, 146, 224, 0.9),
-          rgba(18, 58, 118, 0.95)
-        );
+        background: rgba(30, 60, 100, 0.9);
         color: #fff;
-        filter: drop-shadow(0 0 8px rgba(100, 210, 255, 0.55));
+        border-color: rgba(150, 220, 255, 0.6);
       }
       .btn:active {
         transform: translateY(1px);
       }
       .btn:focus-visible {
-        outline: 1px solid var(--amber);
+        outline: 1px solid #ffffff;
         outline-offset: 3px;
       }
       .btn.primary {
-        border-color: rgba(255, 180, 94, 0.7);
-        color: #ffe0b0;
+        border-color: rgba(200, 230, 255, 0.8);
+        color: #ffffff;
         background: linear-gradient(
           180deg,
-          rgba(120, 70, 20, 0.8),
-          rgba(58, 32, 8, 0.9)
+          rgba(40, 80, 140, 0.9),
+          rgba(20, 40, 80, 0.95)
         );
-        text-shadow: 0 0 8px rgba(255, 180, 94, 0.6);
+        text-shadow: 0 0 8px rgba(150, 200, 255, 0.6);
       }
       .btn.primary:hover {
-        filter: drop-shadow(0 0 9px rgba(255, 180, 94, 0.55));
+        filter: drop-shadow(0 0 9px rgba(150, 200, 255, 0.55));
         color: #fff;
       }
 
       .panel-video-wrap {
-        padding: 1rem 0;
-        max-width: 720px;
+        padding: 1.5rem 0;
+        max-width: 100%;
       }
 
       .panel-video {
         width: 100%;
-        border: 1px solid rgba(111, 227, 255, 0.3);
-        border-radius: 2px;
+        border: 1px solid rgba(120, 200, 255, 0.2);
+        border-radius: 4px;
         background: #000;
         outline: none;
       }
 
       .panel-video:focus {
         border-color: var(--cyan);
-        box-shadow: 0 0 12px rgba(111, 227, 255, 0.25);
+        box-shadow: 0 0 12px rgba(111, 227, 255, 0.15);
       }
 
       #panel {
         position: fixed;
         font-family: "DisplayFont_MenuText";
-        letter-spacing: 0.16em;
+        letter-spacing: 0.12em;
         left: 50%;
         top: 50%;
         z-index: 50;
@@ -295,41 +276,16 @@
         height: min(76vh, 720px);
         display: flex;
         flex-direction: column;
-        background: linear-gradient(
-          165deg,
-          rgba(10, 28, 58, 0.93),
-          rgba(4, 10, 28, 0.96)
-        );
-        border: 1px solid rgba(120, 220, 255, 0.42);
-        clip-path: polygon(
-          0 20px,
-          20px 0,
-          100% 0,
-          100% calc(100% - 20px),
-          calc(100% - 20px) 100%,
-          0 100%
-        );
+        background: rgba(8, 14, 26, 0.95);
+        border: 1px solid rgba(120, 200, 255, 0.2);
+        border-radius: 6px;
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.955);
+        transform: translate(-50%, -50%) scale(0.98);
         pointer-events: none;
         transition:
-          opacity 0.22s ease,
-          transform 0.26s cubic-bezier(0.2, 0.9, 0.25, 1);
-      }
-      #panel::before {
-        content: "";
-        position: absolute;
-        inset: 7px;
-        pointer-events: none;
-        border: 1px solid rgba(120, 220, 255, 0.16);
-        clip-path: polygon(
-          0 16px,
-          16px 0,
-          100% 0,
-          100% calc(100% - 16px),
-          calc(100% - 16px) 100%,
-          0 100%
-        );
+          opacity 0.3s ease,
+          transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       }
       #panel.open {
         opacity: 1;
@@ -340,56 +296,54 @@
         display: flex;
         align-items: center;
         gap: 14px;
-        padding: 13px 18px;
-        background: linear-gradient(
-          90deg,
-          rgba(70, 170, 255, 0.3),
-          rgba(70, 170, 255, 0.04)
-        );
-        border-bottom: 1px solid rgba(120, 220, 255, 0.35);
+        padding: 16px 24px;
+        background: transparent;
+        border-bottom: 1px solid rgba(120, 200, 255, 0.15);
       }
       #p-title {
-        font-size: 24px;
-        letter-spacing: 0.26em;
-        color: #fff;
-        text-shadow: 0 0 12px rgba(120, 220, 255, 0.8);
+        font-size: 22px;
+        letter-spacing: 0.15em;
+        color: #ffffff;
+        text-shadow: none;
       }
       #p-code {
         margin-left: auto;
       }
       #p-close {
         font-family: "VT323", monospace;
-        font-size: 15px;
-        letter-spacing: 0.18em;
-        color: var(--cyan);
-        background: rgba(20, 60, 110, 0.6);
-        border: 1px solid rgba(120, 220, 255, 0.5);
-        padding: 4px 10px;
+        font-size: 16px;
+        letter-spacing: 0.1em;
+        color: #88aacc;
+        background: transparent;
+        border: 1px solid rgba(120, 200, 255, 0.25);
+        padding: 4px 14px;
         cursor: pointer;
-        transition: all 0.15s;
+        transition: all 0.2s;
+        border-radius: 4px;
       }
       #p-close:hover {
         color: #fff;
-        background: rgba(60, 140, 220, 0.7);
+        background: rgba(120, 200, 255, 0.1);
+        border-color: rgba(120, 200, 255, 0.6);
       }
       #p-body {
         flex: 1;
         overflow-y: auto;
-        padding: 18px 20px 24px;
-        font-size: 17px;
-        line-height: 1.45;
+        padding: 20px 28px 32px;
+        font-size: 16px;
+        line-height: 1.5;
         scrollbar-width: thin;
-        scrollbar-color: #2b7ea8 transparent;
+        scrollbar-color: #2b5ea8 transparent;
       }
       #p-body::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
       }
       #p-body::-webkit-scrollbar-thumb {
-        background: linear-gradient(#2b7ea8, #6fe3ff);
-        border: 2px solid #06122a;
+        background: #2b5ea8;
+        border-radius: 3px;
       }
       #p-body::-webkit-scrollbar-track {
-        background: rgba(10, 30, 60, 0.4);
+        background: transparent;
       }
       #intro {
         color: #bfe9ff;
@@ -400,60 +354,95 @@
         animation: blink 1s steps(2) infinite;
         color: var(--cyan);
       }
+
+      /* ---- rows: highlight block removed ---- */
       .row {
         display: flex;
-        gap: 14px;
-        padding: 7px 12px;
+        gap: 16px;
+        padding: 10px 4px;
         margin: 2px 0;
-        border-left: 2px solid transparent;
         opacity: 0;
-        animation: rowin 0.35s ease forwards;
+        animation: rowin 0.4s ease forwards;
       }
       @keyframes rowin {
         to {
           opacity: 1;
         }
       }
-      .row:hover {
-        background: rgba(90, 200, 255, 0.1);
-        border-left-color: var(--amber);
-      }
       .row .k {
-        color: #7fb8d8;
+        color: #6688aa;
         letter-spacing: 0.1em;
-        min-width: 132px;
+        min-width: 120px;
+        font-size: 15px;
       }
       .row .v {
-        color: #eaf7ff;
+        color: #d0e8ff;
         text-decoration: none;
+        transition: color 0.2s;
       }
       .row.link {
         cursor: pointer;
       }
       .row.link .v::after {
-        content: " ▸";
-        color: var(--amber);
+        content: " →";
+        color: #88aacc;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .row.link:hover .v::after {
+        opacity: 1;
       }
       .row.link:hover .v {
-        color: #fff;
-        text-shadow: 0 0 8px rgba(160, 230, 255, 0.7);
+        color: #ffffff;
       }
-      .hd {
+
+      /* ---- compact list item (Projects / Games) ---- */
+      .li {
+        flex-direction: column;
+        gap: 4px;
+      }
+      .li-main {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        width: 100%;
+      }
+      .li-title {
         font-size: 17px;
-        letter-spacing: 0.3em;
-        color: var(--amber);
-        margin: 16px 0 8px;
-        padding-bottom: 4px;
-        border-bottom: 1px dashed rgba(255, 180, 94, 0.35);
+        letter-spacing: 0.12em;
+        color: #ffffff;
+      }
+      .li-meta {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        color: #6688aa;
+        white-space: nowrap;
+      }
+      .li-desc {
+        font-size: 14px;
+        color: #a0b8d0;
+        line-height: 1.5;
+      }
+
+      .hd {
+        font-size: 15px;
+        letter-spacing: 0.2em;
+        color: #88aacc;
+        margin: 24px 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         opacity: 0;
-        animation: rowin 0.35s ease forwards;
+        animation: rowin 0.4s ease forwards;
+        text-transform: uppercase;
       }
       .para {
-        color: #9fcbe8;
+        color: #a0b8d0;
         font-size: 15px;
-        margin: 10px 4px;
+        margin: 12px 4px;
+        line-height: 1.6;
         opacity: 0;
-        animation: rowin 0.35s ease forwards;
+        animation: rowin 0.4s ease forwards;
       }
       .bar-row {
         display: block;
@@ -461,18 +450,20 @@
       .bar-row .lbl {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         letter-spacing: 0.1em;
+        font-size: 14px;
       }
       .bar-row .lbl span:last-child {
-        color: var(--amber);
+        color: #ffffff;
       }
       .bar {
         position: relative;
-        height: 10px;
-        background: rgba(18, 46, 88, 0.7);
-        border: 1px solid rgba(120, 220, 255, 0.35);
+        height: 6px;
+        background: rgba(20, 40, 60, 0.6);
+        border: 1px solid rgba(120, 200, 255, 0.2);
         overflow: hidden;
+        border-radius: 3px;
       }
       .bar i {
         position: absolute;
@@ -480,20 +471,9 @@
         bottom: 0;
         left: 0;
         width: 0;
-        background: linear-gradient(90deg, #2f9dd8, #8ff0ff);
-        box-shadow: 0 0 10px rgba(110, 227, 255, 0.8);
+        background: linear-gradient(90deg, #4488cc, #88ccff);
+        box-shadow: none;
         transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
-      .bar::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: repeating-linear-gradient(
-          60deg,
-          transparent 0 6px,
-          rgba(2, 12, 28, 0.4) 6px 8px
-        );
       }
       .entry {
         display: block;
@@ -505,22 +485,25 @@
       }
       .entry .m {
         font-size: 14px;
-        color: var(--amber);
-        letter-spacing: 0.2em;
-        margin: 2px 0 4px;
+        color: #88aacc;
+        letter-spacing: 0.15em;
+        margin: 2px 0 6px;
       }
       .entry .d {
         color: #bfe0f2;
         font-size: 16px;
+        line-height: 1.5;
       }
       .tag {
         display: inline-block;
-        border: 1px solid rgba(120, 220, 255, 0.4);
-        padding: 0 8px;
-        margin: 6px 6px 0 0;
-        font-size: 14px;
-        letter-spacing: 0.14em;
-        color: var(--cyan2);
+        border: 1px solid rgba(120, 200, 255, 0.3);
+        padding: 3px 10px;
+        margin: 8px 6px 0 0;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        color: #aaccff;
+        border-radius: 4px;
+        background: rgba(20, 40, 60, 0.4);
       }
 
       #err {
@@ -553,7 +536,7 @@
         }
 
         .btn {
-          padding: 7px 12px 7px 15px;
+          padding: 8px 16px;
           font-size: 14px;
           letter-spacing: 0.14em;
         }
@@ -579,22 +562,162 @@
     </style>
   </head>
   <body>
+    <!-- PIXEL SHUTTER REVEAL INTRO -->
+    <script>
+    (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          window.dispatchEvent(new Event('siteIntroDone'));
+          return;
+      }
+
+      var CELL        = 14;
+      var DELAY_MS    = 150;
+      var REVEAL_MS   = 850;
+      var BASE        = '#020409';
+      var ACCENT      = '#6fe3ff';
+
+      var style = document.createElement('style');
+      style.textContent =
+        '.boot-intro{position:fixed;inset:0;z-index:99999;pointer-events:none;}' +
+        '.boot-intro__canvas{display:block;width:100%;height:100%;}';
+
+      var intro = document.createElement('div');
+      intro.className = 'boot-intro';
+      intro.setAttribute('aria-hidden', 'true');
+      intro.innerHTML = '<canvas class="boot-intro__canvas"></canvas>';
+
+      var canvas, ctx, W, H, cells;
+      var startT = null, rafId = null, done = false;
+
+      function build() {
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width  = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        var cols = Math.ceil(W / CELL);
+        var rows = Math.ceil(H / CELL);
+        var halfCols = cols / 2;
+        cells = [];
+
+        for (var y = 0; y < rows; y++) {
+          for (var x = 0; x < cols; x++) {
+            var distFromEdge = x < halfCols ? x : (cols - 1 - x);
+            var normDist = distFromEdge / halfCols; 
+            var jitter = (Math.random() * 0.25) - 0.05; 
+            var revealTime = Math.max(0, Math.min(0.95, normDist * 0.9 + jitter));
+            
+            cells.push({
+              x: x, y: y,
+              reveal: revealTime,
+              stray: Math.random() < 0.04, 
+              tone: Math.random(),
+              accent: Math.random() < 0.1
+            });
+          }
+        }
+      }
+
+      var easeOutC = function (t) { return 1 - Math.pow(1 - t, 3); };
+
+      function finish() {
+        if (done) return;
+        done = true;
+        cancelAnimationFrame(rafId);
+        intro.remove();
+        style.remove();
+        window.dispatchEvent(new Event('siteIntroDone'));
+      }
+
+      function frame(now) {
+        if (startT === null) startT = now;
+        var t = Math.max(0, now - startT - DELAY_MS);
+        
+        ctx.fillStyle = BASE;
+        ctx.fillRect(0, 0, W, H);
+
+        var p = Math.min(1, t / REVEAL_MS);
+        var ep = easeOutC(p); 
+
+        for (var i = 0; i < cells.length; i++) {
+          var c = cells[i];
+          var px = c.x * CELL;
+          var py = c.y * CELL;
+          
+          var effReveal = c.stray ? c.reveal - 0.18 : c.reveal;
+          var diff = ep - effReveal;
+
+          if (diff >= 0) {
+            ctx.clearRect(px, py, CELL, CELL);
+          } else {
+            if (diff > -0.1) {
+              var edgeAlpha = (1 - Math.abs(diff) / 0.1);
+              if (c.accent) {
+                  ctx.fillStyle = 'rgba(111, 227, 255, ' + edgeAlpha + ')';
+              } else {
+                  ctx.fillStyle = 'rgba(111, 227, 255, ' + (edgeAlpha * 0.4) + ')';
+              }
+              ctx.fillRect(px, py, CELL, CELL);
+            } else {
+              if (c.tone < 0.12) {
+                ctx.fillStyle = '#040914';
+                ctx.fillRect(px, py, CELL, CELL);
+              }
+              else if (c.tone > 0.992) {
+                ctx.fillStyle = 'rgba(111, 227, 255, 0.2)';
+                ctx.fillRect(px + CELL*0.3, py + CELL*0.3, CELL*0.4, CELL*0.4);
+              }
+            }
+          }
+        }
+
+        if (p > 0.85) {
+           var flashP = (p - 0.85) / 0.15;
+           var flashAlpha = Math.sin(flashP * Math.PI) * 0.5;
+           ctx.fillStyle = 'rgba(255, 255, 255, ' + flashAlpha + ')';
+           ctx.fillRect(W/2 - CELL*2, 0, CELL*4, H);
+        }
+
+        if (p >= 1 && t > REVEAL_MS + 150) {
+           finish();
+           return;
+        }
+
+        rafId = requestAnimationFrame(frame);
+      }
+
+      function start() {
+        canvas = intro.querySelector('canvas');
+        ctx = canvas.getContext('2d');
+        build();
+        window.addEventListener('resize', function () { if (!done) build(); });
+        setTimeout(finish, DELAY_MS + REVEAL_MS + 1000); 
+        rafId = requestAnimationFrame(frame);
+      }
+
+      function mount() {
+        document.head.appendChild(style);
+        document.body.insertBefore(intro, document.body.firstChild);
+        start();
+      }
+
+      if (document.body) mount();
+      else document.addEventListener('DOMContentLoaded', mount);
+    })();
+    </script>
+
     <canvas id="scene"></canvas>
 
     <div class="hud" id="hud-tl">
-      <!-- OP: <span id="opname">—</span>  -->
       SYS <span class="dot">●</span> ONLINE
     </div>
     <div class="hud" id="hud-tr">
       <span id="clock">--:--:--</span><br />
     </div>
-    <!-- <div class="hud" id="hud-bl">
-      CORE TEMP <span id="rt">—</span> MK<br />PLASMA DENS
-      <span id="rd">—</span> m⁻³<br />SOLENID FIELD <span id="rf">—</span> T
-    </div> -->
 
     <div id="sect">
-      <!-- <div class="code" id="sect-code">FILE-01</div> -->
       <div class="name" id="sect-name">OPERATOR</div>
       <div class="hint">DRAG TO SPIN ◈ CLICK NODE TO OPEN</div>
     </div>
@@ -623,54 +746,48 @@
       const OPERATOR = { name: "", id: "" };
 
       const SECTIONS = [
-        { id: "about",     name: "ABOUT",      icon: "person" },
-        { id: "contact",   name: "CONTACT",    icon: "signal" },
-        //{ id: "project02", name: "PROJECT 02", icon: "target" },
-        { id: "project01", name: "PROJECT 01", icon: "target" }, ];
+        { id: "about",    name: "ABOUT",    icon: "person" },
+        { id: "contact",  name: "CONTACT",  icon: "signal" },
+        { id: "projects", name: "PROJECTS", icon: "doc" },
+        { id: "games",    name: "GAMES",    icon: "cube" },
+      ];
 
       const DATA = {
         about: {
           title: "ABOUT",
           rows: [
             { t: "hd", v: "About" },
-            { t: "pa", v: 'Aspiring Game Developer & Graphics Programmer' },
+            { t: "pa", v: "Game Developer & Graphics Programmer" },
             { t: "hd", v: "Skills" },
             { t: "kv", k: "LANG",  v: "C++ · C# · Python · HLSL · GLSL · OpenGL · HTML/CSS" },
-            { t: "kv", k: "TOOLS", v: "Unreal Engine · Unity Engine · Blender"              },
-            { t: "kv", k: "OTHER", v: "Git · ImGui · GLFW"                                  }, 
-            { t: "kv", k: "PERSONAL SITE", v: "CLICK HERE.", href: "personal.html"          }, ], },
-        project01: {
-          title: "PROJECT 01",
+            { t: "kv", k: "TOOLS", v: "Unreal Engine · Unity Engine · Blender" },
+            { t: "kv", k: "OTHER", v: "Git · ImGui · GLFW" },
+            { t: "kv", k: "PERSONAL SITE", v: "CLICK HERE.", href: "personal.html" },
+          ],
+        },
+        projects: {
+          title: "PROJECTS",
           rows: [
-            {
-              t: "en",
-              title: "BOAT GAME",
-              meta: "2025",
-              desc: `Y2K Inspired Boat Racing Game Concept.
-                      A time-trial racing game where your fasted time per level is recorded on the leaderboards. Pass through checkpoints over multiple laps. 
-                      Your fasted time for each level would be recorded in a leaderboard. The boat controls are precise and physically accurate.
-                      <br><br>
-                      The course design is inspired by Venice, and mingles with Y2K aesthetics.The music is one of the most important factors for this 
-                      game concept and features heavily, heavily affecting visuals.
-                      <br><br>
-                      Racing games are generally car-centric and the idea to use boats instead allows for more of an identity for the game. 
-                      With music being a big part of the identity, it is built into the game. The pitch of each song is tied to the players speed. 
-                      There are also pickups in the form of letters, a nod to gondeliers who carried freight cargo down the canals. 
-                      Picking up letters increases boat top speed, but are placed away checkpoints, creating a decision for the player.`,
-              tags: ["Unity"],
-            }, {
-              type: "video",
-              title: "",
-              src: "assets/video/BOATGAME.mp4",
-              muted: false, 
-              loop: false,
-              autoplay: false
-            }, ], },
+            { t: "li", title: "BOAT GAME",  meta: "2025 · UNITY",       desc: "Y2K-inspired time-trial boat racer set in a Venice-style canal city." },
+            { t: "li", title: "PLACEHOLDER1", meta: "C++ · OPENGL",       desc: "Description1." },
+            { t: "li", title: "PLACEHOLDER2",  meta: "IMGUI",              desc: "Description 2." },
+          ],
+        },
+        games: {
+          title: "GAMES",
+          rows: [
+            { t: "li", title: "BOAT GAME",   meta: "IN DEVELOPMENT", desc: "Arcade time-trial racer with music-driven, physics-based boat handling." },
+            { t: "li", title: "PLACEHOLDER1", meta: "PROTOTYPE",      desc: "Description 1." },
+            { t: "li", title: "PLACEHOLDER2",  meta: "CONCEPT",        desc: "Description 2." },
+          ],
+        },
         contact: {
           title: "CONTACT",
           rows: [
-            { t: "kv", k: "EMAIL",  v: "mitjohno@gmail.com", href: "mailto:mitjohno@gmail.com"  },
-            { t: "kv", k: "GITHUB", v: "GitHub",             href: "https://github.com/0vva0va" }, ], },
+            { t: "kv", k: "EMAIL",  v: "mitjohno@gmail.com", href: "mailto:mitjohno@gmail.com" },
+            { t: "kv", k: "GITHUB", v: "GitHub", href: "https://github.com/0vva0va" },
+          ],
+        },
       };
 
       const $ = (id) => document.getElementById(id);
@@ -728,11 +845,8 @@
         const DRAG_TURNS_PER_FULLSWIPE = 0.8;
         const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
         const SWAY    = REDUCED ? 0 : 1;
-        const INTRO_DUR  = 3.0;
-        const INTRO_POS  = { x: 0, y: 950, z: 90 };
-        const INTRO_LOOK = { x: 0, y: 240, z: 0 };
-        let introDone = REDUCED,
-               introT = 0;
+        
+        let introDone = false; 
 
         const cv = $("scene");
         const renderer = new THREE.WebGLRenderer({
@@ -858,6 +972,20 @@
             g.arc(s * 0.28, 0, s * 0.34, 0, 7);
             g.stroke();
           }
+          else if (type === "cube") {
+            g.moveTo(0, -s * 0.62);
+            g.lineTo(s * 0.56, 0);
+            g.lineTo(0, s * 0.62);
+            g.lineTo(-s * 0.56, 0);
+            g.closePath();
+            g.stroke();
+            g.beginPath();
+            g.moveTo(-s * 0.56, 0);
+            g.lineTo(s * 0.56, 0);
+            g.moveTo(0, -s * 0.62);
+            g.lineTo(0, s * 0.62);
+            g.stroke();
+          }
         }
 
         function hexPathOn(g, x, y, r) {
@@ -918,10 +1046,10 @@
           const c = document.createElement("canvas");
           c.width = c.height = 256;
           const g = c.getContext("2d");
-          g.strokeStyle = "rgba(255,190,110,1)";
-          g.shadowColor = "rgba(255,180,94,.9)";
-          g.shadowBlur  = 12;
-          g.lineWidth   = 4;
+          g.strokeStyle = "rgba(200,230,255,0.9)";
+          g.shadowColor = "rgba(150,200,255,.6)";
+          g.shadowBlur  = 8;
+          g.lineWidth   = 3;
           g.setLineDash([18, 14]);
           g.beginPath();
           g.arc(128, 128, 96, 0, 7);
@@ -973,12 +1101,12 @@
               float pulse=0.65+0.35*sin(vUv.y*12.566 - uPulse);
               float fres =pow(1.0-abs(dot(nv,vv)),1.6);
               float menuBand=exp(-pow((vUv.y-0.5)*11.0,2.0));
-              vec3 base=vec3(0.023,0.05,0.10)*(0.7+0.3*vUv.y);
-              vec3 cyan=vec3(0.35,0.80,1.0);
-              vec3 amber=vec3(1.0,0.62,0.28);
+              vec3 base=vec3(0.03,0.05,0.08)*(0.7+0.3*vUv.y);
+              vec3 cyan=vec3(0.4,0.75,1.0);
+              vec3 highlight=vec3(0.9, 0.95, 1.0);
               vec3 glow= cyan*((seams*0.5+bands*0.32)*pulse+ribs*0.85)
-                       + amber*menuBand*0.45
-                       + cyan*fres*0.25;
+                       + highlight*menuBand*0.4
+                       + cyan*fres*0.3;
               gl_FragColor=vec4((base+glow*uDim)*lit,1.0);
             }`,
         });
@@ -1004,8 +1132,8 @@
               vec2 q=vUv-0.5; float r=length(q)*2.0;
               float rings=line(r*9.0);
               float core=smoothstep(0.30,0.0,r);
-              vec3 base=vec3(0.02,0.045,0.09);
-              vec3 col=base + vec3(0.35,0.8,1.0)*(rings*0.7+core*1.3)*uDim;
+              vec3 base=vec3(0.02,0.04,0.08);
+              vec3 col=base + vec3(0.4,0.75,1.0)*(rings*0.7+core*1.3)*uDim;
               gl_FragColor=vec4(col,1.0);
             }`,
         });
@@ -1244,7 +1372,7 @@
             void main(){
               float d=length(gl_PointCoord-0.5);
               float a=smoothstep(0.5,0.06,d)*vA*uDim;
-              vec3 col=mix(vec3(0.35,0.8,1.0),vec3(1.0,0.62,0.3),vW);
+              vec3 col=mix(vec3(0.4,0.75,1.0), vec3(1.0, 1.0, 1.0), vW);
               gl_FragColor=vec4(col*a*uBoost, a*uBoost);
             }`,
           transparent: true,
@@ -1411,15 +1539,14 @@
           el.classList.add("flash");
         }
 
-        function easeInOutCubic(k) {
-          return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-        }
         function finishIntro() {
           if (introDone) return;
           introDone = true;
           document.body.classList.add("intro-done");
           maybeShowTip();
         }
+
+        window.addEventListener('siteIntroDone', finishIntro);
 
         const panel = $("panel"),
           pBody = $("p-body");
@@ -1477,7 +1604,7 @@
             el.append(k, v);
           } else if (r.t === "hd") {
             el.className = "hd";
-            el.textContent = "◈ " + r.v;
+            el.textContent = r.v;
           } else if (r.t === "pa") {
             el.className = "para";
             el.textContent = r.v;
@@ -1490,6 +1617,12 @@
               }),
             );
           } 
+          else if (r.t === "li") {
+            el.className = "row li";
+            el.innerHTML =
+              `<div class="li-main"><span class="li-title">${r.title}</span><span class="li-meta">${r.meta}</span></div>` +
+              `<div class="li-desc">${r.desc}</div>`;
+          }
           else if (r.t === "en") {
             el.className = "row entry";
             el.innerHTML =
@@ -1504,7 +1637,7 @@
             if (r.title) {
               const title = document.createElement("div");
               title.className = "hd";
-              title.textContent = "◈ " + r.title;
+              title.textContent = r.title;
               el.appendChild(title);
             }
 
@@ -1727,10 +1860,6 @@
 
           dim += ((isOpen ? 0.55 : 1) - dim) * Math.min(1, dt * 6);
 
-          const high = 0;
-          const all = 0;
-          const hit = 0;
-          
           flowT += dt;
           pulseT += dt * 1.1;
 
@@ -1780,43 +1909,21 @@
             reticle.scale.setScalar(nodeSize * 1.3 * wobble);
           } else reticle.visible = false;
 
-          if (!introDone) {
-            introT += dt;
-            const k = Math.min(1, introT / INTRO_DUR);
-            const e = easeInOutCubic(k);
-            const arc = Math.pow(Math.sin(k * Math.PI), 2) * 46;
-            camera.position.set(
-              INTRO_POS.x + (CAM.x - INTRO_POS.x) * e + arc,
-              INTRO_POS.y + (CAM.y - INTRO_POS.y) * e,
-              INTRO_POS.z + (CAM.z - INTRO_POS.z) * e,
-            );
-            lookT.set(
-              INTRO_LOOK.x + (0 - INTRO_LOOK.x) * e,
-              INTRO_LOOK.y + (6 - INTRO_LOOK.y) * e,
-              INTRO_LOOK.z + (0 - INTRO_LOOK.z) * e,
-            );
-            camera.lookAt(lookT);
-            camZ = CAM.z;
-            trunkGroup.rotation.y = rotA - 0.5 * (1 - e);
-            if (k >= 1) {
-              trunkGroup.rotation.y = rotA;
-              finishIntro();
-            }
-          } else {
-            trunkGroup.rotation.y = rotA;
-            swayMix +=
-              ((dragging || isOpen ? 0 : 1) - swayMix) * Math.min(1, dt * 4);
-            const sw = SWAY * swayMix;
-            camZ +=
-              ((isOpen && w > 760 ? 760 : CAM.z) - camZ) * Math.min(1, dt * 5);
-            camera.position.set(
-              Math.sin(time * 0.22) * 4 * sw,
-              CAM.y + Math.sin(time * 0.31) * 3 * sw,
-              camZ,
-            );
-            lookT.set(-mouseX * 70 * swayMix, 6 - mouseY * 50 * swayMix, 0);
-            camera.lookAt(lookT);
-          }
+          trunkGroup.rotation.y = rotA;
+          trunkGroup.position.y = Math.sin(time * 0.6) * 5.0; 
+          trunkGroup.rotation.z = Math.sin(time * 0.4) * 0.012; 
+          trunkGroup.rotation.x = Math.cos(time * 0.5) * 0.008;
+
+          swayMix += ((dragging || isOpen ? 0 : 1) - swayMix) * Math.min(1, dt * 4);
+          const sw = SWAY * swayMix;
+          camZ += ((isOpen && w > 760 ? 760 : CAM.z) - camZ) * Math.min(1, dt * 5);
+          camera.position.set(
+            Math.sin(time * 0.22) * 4 * sw,
+            CAM.y + Math.sin(time * 0.31) * 3 * sw,
+            camZ,
+          );
+          lookT.set(-mouseX * 70 * swayMix, 6 - mouseY * 50 * swayMix, 0);
+          camera.lookAt(lookT);
 
           iconCount = 0;
           for (let i = 0; i < N; i++) {
