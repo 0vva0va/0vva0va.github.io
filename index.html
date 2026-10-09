@@ -424,6 +424,25 @@
         color: #a0b8d0;
         line-height: 1.5;
       }
+      .li-taglink {
+        display: inline-block;
+        align-self: flex-start;
+        margin-top: 8px;
+        border: 1px solid rgba(120, 200, 255, 0.3);
+        padding: 3px 12px;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        color: #aaccff;
+        border-radius: 4px;
+        background: rgba(20, 40, 60, 0.4);
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .li-taglink:hover {
+        color: #ffffff;
+        border-color: rgba(150, 220, 255, 0.7);
+        background: rgba(40, 80, 130, 0.5);
+      }
 
       .hd {
         font-size: 15px;
@@ -562,7 +581,7 @@
     </style>
   </head>
   <body>
-    <!-- PIXEL SHUTTER REVEAL INTRO -->
+    <!-- FLUID PIXEL DISSOLVE INTRO -->
     <script>
     (function () {
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -570,11 +589,13 @@
           return;
       }
 
-      var CELL        = 14;
-      var DELAY_MS    = 150;
-      var REVEAL_MS   = 850;
-      var BASE        = '#020409';
-      var ACCENT      = '#6fe3ff';
+      /* ---------- tunables ---------- */
+      var CELL      = 12;    // pixel block size
+      var DELAY_MS  = 120;   // pause on black before the reveal begins
+      var REVEAL_MS = 1050;  // total reveal duration
+      var FADE_SPAN = 0.38;  // normalized time each pixel takes to fade out
+      var WAVE_SPAN = 1 - FADE_SPAN; // wave travel window (edges -> center)
+      var BASE      = '#020409';
 
       var style = document.createElement('style');
       style.textContent =
@@ -605,22 +626,19 @@
         for (var y = 0; y < rows; y++) {
           for (var x = 0; x < cols; x++) {
             var distFromEdge = x < halfCols ? x : (cols - 1 - x);
-            var normDist = distFromEdge / halfCols; 
-            var jitter = (Math.random() * 0.25) - 0.05; 
-            var revealTime = Math.max(0, Math.min(0.95, normDist * 0.9 + jitter));
-            
-            cells.push({
-              x: x, y: y,
-              reveal: revealTime,
-              stray: Math.random() < 0.04, 
-              tone: Math.random(),
-              accent: Math.random() < 0.1
-            });
+            var normDist = distFromEdge / halfCols; // 0 at edges -> 1 at center
+            var jitter = (Math.random() - 0.5) * 0.12;
+            var delay = Math.max(0, Math.min(WAVE_SPAN, normDist * WAVE_SPAN + jitter));
+            cells.push({ x: x, y: y, delay: delay });
           }
         }
       }
 
-      var easeOutC = function (t) { return 1 - Math.pow(1 - t, 3); };
+      // Perlin smootherstep: very fluid S-curve
+      function ease(t) {
+        t = Math.max(0, Math.min(1, t));
+        return t * t * t * (t * (t * 6 - 15) + 10);
+      }
 
       function finish() {
         if (done) return;
@@ -634,55 +652,52 @@
       function frame(now) {
         if (startT === null) startT = now;
         var t = Math.max(0, now - startT - DELAY_MS);
-        
+        var p = Math.min(1, t / REVEAL_MS);
+
+        // 1) fully opaque base each frame (clean, no accumulation)
+        ctx.globalCompositeOperation = 'source-over';
         ctx.fillStyle = BASE;
         ctx.fillRect(0, 0, W, H);
 
-        var p = Math.min(1, t / REVEAL_MS);
-        var ep = easeOutC(p); 
-
+        // 2) erase revealed pixels with a smooth per-cell alpha
+        ctx.globalCompositeOperation = 'destination-out';
+        var glowCells = [];
         for (var i = 0; i < cells.length; i++) {
           var c = cells[i];
-          var px = c.x * CELL;
-          var py = c.y * CELL;
-          
-          var effReveal = c.stray ? c.reveal - 0.18 : c.reveal;
-          var diff = ep - effReveal;
-
-          if (diff >= 0) {
-            ctx.clearRect(px, py, CELL, CELL);
+          var local = (p - c.delay) / FADE_SPAN;
+          if (local <= 0) continue;
+          var a = ease(local);
+          if (a >= 1) {
+            ctx.fillStyle = 'rgba(0,0,0,1)';
+            ctx.fillRect(c.x * CELL, c.y * CELL, CELL, CELL);
           } else {
-            if (diff > -0.1) {
-              var edgeAlpha = (1 - Math.abs(diff) / 0.1);
-              if (c.accent) {
-                  ctx.fillStyle = 'rgba(111, 227, 255, ' + edgeAlpha + ')';
-              } else {
-                  ctx.fillStyle = 'rgba(111, 227, 255, ' + (edgeAlpha * 0.4) + ')';
-              }
-              ctx.fillRect(px, py, CELL, CELL);
-            } else {
-              if (c.tone < 0.12) {
-                ctx.fillStyle = '#040914';
-                ctx.fillRect(px, py, CELL, CELL);
-              }
-              else if (c.tone > 0.992) {
-                ctx.fillStyle = 'rgba(111, 227, 255, 0.2)';
-                ctx.fillRect(px + CELL*0.3, py + CELL*0.3, CELL*0.4, CELL*0.4);
-              }
-            }
+            ctx.fillStyle = 'rgba(0,0,0,' + a.toFixed(3) + ')';
+            ctx.fillRect(c.x * CELL, c.y * CELL, CELL, CELL);
+            glowCells.push(c);
           }
         }
 
-        if (p > 0.85) {
-           var flashP = (p - 0.85) / 0.15;
-           var flashAlpha = Math.sin(flashP * Math.PI) * 0.5;
-           ctx.fillStyle = 'rgba(255, 255, 255, ' + flashAlpha + ')';
-           ctx.fillRect(W/2 - CELL*2, 0, CELL*4, H);
+        // 3) traveling glow front across the mid-fade pixels
+        ctx.globalCompositeOperation = 'source-over';
+        for (var g = 0; g < glowCells.length; g++) {
+          var gc = glowCells[g];
+          var gl = (p - gc.delay) / FADE_SPAN;
+          var intensity = Math.sin(Math.PI * Math.max(0, Math.min(1, gl)));
+          ctx.fillStyle = 'rgba(111, 227, 255, ' + (intensity * 0.35).toFixed(3) + ')';
+          ctx.fillRect(gc.x * CELL, gc.y * CELL, CELL, CELL);
         }
 
-        if (p >= 1 && t > REVEAL_MS + 150) {
-           finish();
-           return;
+        // 4) brief seam flash as the wave closes at the center
+        if (p > 0.86) {
+          var flashP = (p - 0.86) / 0.14;
+          var flashAlpha = Math.sin(flashP * Math.PI) * 0.35;
+          ctx.fillStyle = 'rgba(255, 255, 255, ' + flashAlpha.toFixed(3) + ')';
+          ctx.fillRect(W / 2 - CELL * 2, 0, CELL * 4, H);
+        }
+
+        if (p >= 1 && t > REVEAL_MS + 140) {
+          finish();
+          return;
         }
 
         rafId = requestAnimationFrame(frame);
@@ -693,7 +708,7 @@
         ctx = canvas.getContext('2d');
         build();
         window.addEventListener('resize', function () { if (!done) build(); });
-        setTimeout(finish, DELAY_MS + REVEAL_MS + 1000); 
+        setTimeout(finish, DELAY_MS + REVEAL_MS + 900); // fail-safe
         rafId = requestAnimationFrame(frame);
       }
 
@@ -757,28 +772,28 @@
           title: "ABOUT",
           rows: [
             { t: "hd", v: "About" },
-            { t: "pa", v: "Game Developer & Graphics Programmer" },
+            { t: "pa", v: 'Aspiring Game Developer & Graphics Programmer' },
             { t: "hd", v: "Skills" },
             { t: "kv", k: "LANG",  v: "C++ · C# · Python · HLSL · GLSL · OpenGL · HTML/CSS" },
             { t: "kv", k: "TOOLS", v: "Unreal Engine · Unity Engine · Blender" },
             { t: "kv", k: "OTHER", v: "Git · ImGui · GLFW" },
-            { t: "kv", k: "PERSONAL SITE", v: "CLICK HERE.", href: "personal.html" },
+            //{ t: "kv", k: "PERSONAL SITE", v: "CLICK HERE.", href: "personal.html" },
           ],
         },
         projects: {
           title: "PROJECTS",
           rows: [
-            { t: "li", title: "BOAT GAME",  meta: "2025 · UNITY",       desc: "Y2K-inspired time-trial boat racer set in a Venice-style canal city." },
-            { t: "li", title: "PLACEHOLDER1", meta: "C++ · OPENGL",       desc: "Description1." },
-            { t: "li", title: "PLACEHOLDER2",  meta: "IMGUI",              desc: "Description 2." },
+            { t: "li", title: "BOAT GAME",  meta: "2025 · UNITY", desc: "Y2K-inspired time-trial boat racer set in a Venice-style canal city.", href: "#", tag: "MORE" },
+            { t: "li", title: "RENDER LAB", meta: "C++ · OPENGL", desc: "Custom 3D renderer exploring shaders, bloom, and post-processing.",    href: "#", tag: "MORE" },
+            { t: "li", title: "DEV TOOLS",  meta: "IMGUI",        desc: "Editor tooling and real-time debug visualizers.",                     href: "#", tag: "MORE" },
           ],
         },
         games: {
           title: "GAMES",
           rows: [
-            { t: "li", title: "BOAT GAME",   meta: "IN DEVELOPMENT", desc: "Arcade time-trial racer with music-driven, physics-based boat handling." },
-            { t: "li", title: "PLACEHOLDER1", meta: "PROTOTYPE",      desc: "Description 1." },
-            { t: "li", title: "PLACEHOLDER2",  meta: "CONCEPT",        desc: "Description 2." },
+            { t: "li", title: "BOAT GAME",   meta: "IN DEVELOPMENT", desc: "Arcade time-trial racer with music-driven, physics-based boat handling.", href: "#", tag: "MORE" },
+            { t: "li", title: "GAME JAM 01", meta: "PROTOTYPE",      desc: "Experimental prototype built during a 48-hour jam.",                     href: "#", tag: "MORE" },
+            { t: "li", title: "CONCEPT 02",  meta: "CONCEPT",        desc: "Early concept exploration — details coming soon.",                       href: "#", tag: "MORE" },
           ],
         },
         contact: {
@@ -1584,6 +1599,11 @@
           done && done();
         }
         
+        function esc(s) {
+          return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+                          .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
         function makeRow(r) {
           const el = document.createElement("div");
           if (r.t === "kv") {
@@ -1610,7 +1630,7 @@
             el.textContent = r.v;
           } else if (r.t === "bar") {
             el.className = "row bar-row";
-            el.innerHTML = `<div class="lbl"><span>${r.k}</span><span>${r.v}%</span></div><div class="bar"><i></i></div>`;
+            el.innerHTML = `<div class="lbl"><span>${esc(r.k)}</span><span>${esc(r.v)}%</span></div><div class="bar"><i></i></div>`;
             requestAnimationFrame(() =>
               requestAnimationFrame(() => {
                 el.querySelector("i").style.width = r.v + "%";
@@ -1619,16 +1639,20 @@
           } 
           else if (r.t === "li") {
             el.className = "row li";
+            const link = r.href
+              ? `<a class="li-taglink" href="${esc(r.href)}"${/^http/.test(r.href) ? ' target="_blank" rel="noopener"' : ''}>${esc(r.tag || "MORE")} ↗</a>`
+              : "";
             el.innerHTML =
-              `<div class="li-main"><span class="li-title">${r.title}</span><span class="li-meta">${r.meta}</span></div>` +
-              `<div class="li-desc">${r.desc}</div>`;
+              `<div class="li-main"><span class="li-title">${esc(r.title)}</span><span class="li-meta">${esc(r.meta)}</span></div>` +
+              `<div class="li-desc">${esc(r.desc)}</div>` +
+              link;
           }
           else if (r.t === "en") {
             el.className = "row entry";
             el.innerHTML =
-              `<span class="t">${r.title}</span><div class="m">${r.meta}</div><div class="d">${r.desc}</div>` +
+              `<span class="t">${esc(r.title)}</span><div class="m">${esc(r.meta)}</div><div class="d">${r.desc}</div>` +
               (r.tags
-                ? `<div>${r.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>`
+                ? `<div>${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>`
                 : "");
           }
           else if (r.type === "video") {
