@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Mitchell J :: Developer</title>
+    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
@@ -77,30 +78,11 @@
       body.on .hud {
         opacity: 1;
       }
-      #hud-tl {
-        top: 16px;
-        left: 20px;
-      }
-      #hud-tr {
-        top: 16px;
-        right: 20px;
-        text-align: right;
-      }
-      #hud-bl {
-        bottom: 18px;
-        left: 20px;
-        font-size: 13px;
-        color: #6fa8c8;
-      }
-      .dot {
-        color: #ffffff;
-        animation: blink 1.3s steps(2) infinite;
-      }
-      @keyframes blink {
-        50% {
-          opacity: 0.15;
-        }
-      }
+      #hud-tl { top: 16px; left: 20px; }
+      #hud-tr { top: 16px; right: 20px; text-align: right; }
+      #hud-bl { bottom: 18px; left: 20px; font-size: 13px; color: #6fa8c8; }
+      .dot { color: #ffffff; animation: blink 1.3s steps(2) infinite; }
+      @keyframes blink { 50% { opacity: 0.15; } }
 
       #sect {
         position: fixed;
@@ -113,43 +95,21 @@
         opacity: 0;
         transition: opacity 1.1s ease 0.15s;
       }
-      body.intro-done #sect {
-        opacity: 1;
-      }
-      #sect .code {
-        font-size: 14px;
-        color: #ffffff;
-        letter-spacing: 0.5em;
-        text-shadow: none;
-      }
+      body.intro-done #sect { opacity: 1; }
+      #sect .code { font-size: 14px; color: #ffffff; letter-spacing: 0.5em; text-shadow: none; }
       #sect .name {
         font-size: 40px;
         letter-spacing: 0.4em;
         color: #eaf9ff;
-        text-shadow:
-          0 0 14px rgba(120, 220, 255, 0.85),
-          0 0 2px #fff;
+        text-shadow: 0 0 14px rgba(120, 220, 255, 0.85), 0 0 2px #fff;
         padding-left: 0.4em;
       }
-      #sect .name.flash {
-        animation: sectflash 0.45s ease;
-      }
+      #sect .name.flash { animation: sectflash 0.45s ease; }
       @keyframes sectflash {
-        0% {
-          opacity: 0;
-          transform: translateY(7px);
-        }
-        100% {
-          opacity: 1;
-          transform: none;
-        }
+        0% { opacity: 0; transform: translateY(7px); }
+        100% { opacity: 1; transform: none; }
       }
-      #sect .hint {
-        margin-top: 8px;
-        font-size: 13px;
-        letter-spacing: 0.24em;
-        color: #557799;
-      }
+      #sect .hint { margin-top: 8px; font-size: 13px; letter-spacing: 0.24em; color: #557799; }
 
       #tip {
         position: fixed;
@@ -162,29 +122,16 @@
         opacity: 0;
         transition: opacity 0.8s ease;
       }
-      body.show-tip #tip {
-        opacity: 1;
-      }
+      body.show-tip #tip { opacity: 1; }
       #tip .t1 {
         font-size: 22px;
         letter-spacing: 0.34em;
         color: #eaf9ff;
-        text-shadow:
-          0 0 12px rgba(120, 220, 255, 0.9),
-          0 0 2px #fff;
+        text-shadow: 0 0 12px rgba(120, 220, 255, 0.9), 0 0 2px #fff;
         animation: tippulse 1.7s ease-in-out infinite;
       }
-      #tip .t2 {
-        margin-top: 6px;
-        font-size: 14px;
-        letter-spacing: 0.26em;
-        color: #557799;
-      }
-      @keyframes tippulse {
-        50% {
-          opacity: 0.35;
-        }
-      }
+      #tip .t2 { margin-top: 6px; font-size: 14px; letter-spacing: 0.26em; color: #557799; }
+      @keyframes tippulse { 50% { opacity: 0.35; } }
 
       #controls {
         position: fixed;
@@ -195,18 +142,10 @@
         display: flex;
         gap: 14px;
         opacity: 0;
-        transition:
-          opacity 0.9s ease 0.4s,
-          transform 0.9s ease 0.4s;
+        transition: opacity 0.9s ease 0.4s, transform 0.9s ease 0.4s;
       }
-      body.intro-done #controls {
-        opacity: 1;
-        transform: translate(-50%, 0);
-      }
-      body.menu-open #controls {
-        opacity: 0;
-        pointer-events: none;
-      }
+      body.intro-done #controls { opacity: 1; transform: translate(-50%, 0); }
+      body.menu-open #controls { opacity: 0; pointer-events: none; }
       .btn {
         font-family: "VT323", monospace;
         font-size: 17px;
@@ -220,38 +159,18 @@
         text-shadow: none;
         transition: all 0.2s;
       }
-      .btn:hover {
-        background: rgba(30, 60, 100, 0.9);
-        color: #fff;
-        border-color: rgba(150, 220, 255, 0.6);
-      }
-      .btn:active {
-        transform: translateY(1px);
-      }
-      .btn:focus-visible {
-        outline: 1px solid #ffffff;
-        outline-offset: 3px;
-      }
+      .btn:hover { background: rgba(30, 60, 100, 0.9); color: #fff; border-color: rgba(150, 220, 255, 0.6); }
+      .btn:active { transform: translateY(1px); }
+      .btn:focus-visible { outline: 1px solid #ffffff; outline-offset: 3px; }
       .btn.primary {
         border-color: rgba(200, 230, 255, 0.8);
         color: #ffffff;
-        background: linear-gradient(
-          180deg,
-          rgba(40, 80, 140, 0.9),
-          rgba(20, 40, 80, 0.95)
-        );
+        background: linear-gradient(180deg, rgba(40, 80, 140, 0.9), rgba(20, 40, 80, 0.95));
         text-shadow: 0 0 8px rgba(150, 200, 255, 0.6);
       }
-      .btn.primary:hover {
-        filter: drop-shadow(0 0 9px rgba(150, 200, 255, 0.55));
-        color: #fff;
-      }
+      .btn.primary:hover { filter: drop-shadow(0 0 9px rgba(150, 200, 255, 0.55)); color: #fff; }
 
-      .panel-video-wrap {
-        padding: 1.5rem 0;
-        max-width: 100%;
-      }
-
+      .panel-video-wrap { padding: 1.5rem 0; max-width: 100%; }
       .panel-video {
         width: 100%;
         border: 1px solid rgba(120, 200, 255, 0.2);
@@ -259,11 +178,7 @@
         background: #000;
         outline: none;
       }
-
-      .panel-video:focus {
-        border-color: var(--cyan);
-        box-shadow: 0 0 12px rgba(111, 227, 255, 0.15);
-      }
+      .panel-video:focus { border-color: var(--cyan); box-shadow: 0 0 12px rgba(111, 227, 255, 0.15); }
 
       #panel {
         position: fixed;
@@ -282,16 +197,10 @@
         opacity: 0;
         transform: translate(-50%, -50%) scale(0.98);
         pointer-events: none;
-        transition:
-          opacity 0.3s ease,
-          transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1);
+        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1);
         box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       }
-      #panel.open {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-        pointer-events: auto;
-      }
+      #panel.open { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
       #p-head {
         display: flex;
         align-items: center;
@@ -300,15 +209,8 @@
         background: transparent;
         border-bottom: 1px solid rgba(120, 200, 255, 0.15);
       }
-      #p-title {
-        font-size: 22px;
-        letter-spacing: 0.15em;
-        color: #ffffff;
-        text-shadow: none;
-      }
-      #p-code {
-        margin-left: auto;
-      }
+      #p-title { font-size: 22px; letter-spacing: 0.15em; color: #ffffff; text-shadow: none; }
+      #p-code { margin-left: auto; }
       #p-close {
         font-family: "VT323", monospace;
         font-size: 16px;
@@ -321,11 +223,7 @@
         transition: all 0.2s;
         border-radius: 4px;
       }
-      #p-close:hover {
-        color: #fff;
-        background: rgba(120, 200, 255, 0.1);
-        border-color: rgba(120, 200, 255, 0.6);
-      }
+      #p-close:hover { color: #fff; background: rgba(120, 200, 255, 0.1); border-color: rgba(120, 200, 255, 0.6); }
       #p-body {
         flex: 1;
         overflow-y: auto;
@@ -335,27 +233,12 @@
         scrollbar-width: thin;
         scrollbar-color: #2b5ea8 transparent;
       }
-      #p-body::-webkit-scrollbar {
-        width: 6px;
-      }
-      #p-body::-webkit-scrollbar-thumb {
-        background: #2b5ea8;
-        border-radius: 3px;
-      }
-      #p-body::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      #intro {
-        color: #bfe9ff;
-        min-height: 2.6em;
-        margin-bottom: 12px;
-      }
-      #intro .cursor {
-        animation: blink 1s steps(2) infinite;
-        color: var(--cyan);
-      }
+      #p-body::-webkit-scrollbar { width: 6px; }
+      #p-body::-webkit-scrollbar-thumb { background: #2b5ea8; border-radius: 3px; }
+      #p-body::-webkit-scrollbar-track { background: transparent; }
+      #intro { color: #bfe9ff; min-height: 2.6em; margin-bottom: 12px; }
+      #intro .cursor { animation: blink 1s steps(2) infinite; color: var(--cyan); }
 
-      /* ---- rows: highlight block removed ---- */
       .row {
         display: flex;
         gap: 16px;
@@ -364,66 +247,19 @@
         opacity: 0;
         animation: rowin 0.4s ease forwards;
       }
-      @keyframes rowin {
-        to {
-          opacity: 1;
-        }
-      }
-      .row .k {
-        color: #6688aa;
-        letter-spacing: 0.1em;
-        min-width: 120px;
-        font-size: 15px;
-      }
-      .row .v {
-        color: #d0e8ff;
-        text-decoration: none;
-        transition: color 0.2s;
-      }
-      .row.link {
-        cursor: pointer;
-      }
-      .row.link .v::after {
-        content: " →";
-        color: #88aacc;
-        opacity: 0;
-        transition: opacity 0.2s;
-      }
-      .row.link:hover .v::after {
-        opacity: 1;
-      }
-      .row.link:hover .v {
-        color: #ffffff;
-      }
+      @keyframes rowin { to { opacity: 1; } }
+      .row .k { color: #6688aa; letter-spacing: 0.1em; min-width: 120px; font-size: 15px; }
+      .row .v { color: #d0e8ff; text-decoration: none; transition: color 0.2s; }
+      .row.link { cursor: pointer; }
+      .row.link .v::after { content: " →"; color: #88aacc; opacity: 0; transition: opacity 0.2s; }
+      .row.link:hover .v::after { opacity: 1; }
+      .row.link:hover .v { color: #ffffff; }
 
-      /* ---- compact list item (Projects / Games) ---- */
-      .li {
-        flex-direction: column;
-        gap: 4px;
-      }
-      .li-main {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        gap: 12px;
-        width: 100%;
-      }
-      .li-title {
-        font-size: 17px;
-        letter-spacing: 0.12em;
-        color: #ffffff;
-      }
-      .li-meta {
-        font-size: 12px;
-        letter-spacing: 0.12em;
-        color: #6688aa;
-        white-space: nowrap;
-      }
-      .li-desc {
-        font-size: 14px;
-        color: #a0b8d0;
-        line-height: 1.5;
-      }
+      .li { flex-direction: column; gap: 4px; }
+      .li-main { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; width: 100%; }
+      .li-title { font-size: 17px; letter-spacing: 0.12em; color: #ffffff; }
+      .li-meta { font-size: 12px; letter-spacing: 0.12em; color: #6688aa; white-space: nowrap; }
+      .li-desc { font-size: 14px; color: #a0b8d0; line-height: 1.5; }
       .li-taglink {
         display: inline-block;
         align-self: flex-start;
@@ -438,11 +274,10 @@
         text-decoration: none;
         transition: all 0.2s;
       }
-      .li-taglink:hover {
-        color: #ffffff;
-        border-color: rgba(150, 220, 255, 0.7);
-        background: rgba(40, 80, 130, 0.5);
-      }
+      .li-taglink:hover { color: #ffffff; border-color: rgba(150, 220, 255, 0.7); background: rgba(40, 80, 130, 0.5); }
+
+      .torus-wrap { display: block; height: 300px; padding: 0; gap: 0; }
+      .torus-canvas { width: 100%; height: 100%; display: block; }
 
       .hd {
         font-size: 15px;
@@ -455,27 +290,10 @@
         animation: rowin 0.4s ease forwards;
         text-transform: uppercase;
       }
-      .para {
-        color: #a0b8d0;
-        font-size: 15px;
-        margin: 12px 4px;
-        line-height: 1.6;
-        opacity: 0;
-        animation: rowin 0.4s ease forwards;
-      }
-      .bar-row {
-        display: block;
-      }
-      .bar-row .lbl {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 6px;
-        letter-spacing: 0.1em;
-        font-size: 14px;
-      }
-      .bar-row .lbl span:last-child {
-        color: #ffffff;
-      }
+      .para { color: #a0b8d0; font-size: 15px; margin: 12px 4px; line-height: 1.6; opacity: 0; animation: rowin 0.4s ease forwards; }
+      .bar-row { display: block; }
+      .bar-row .lbl { display: flex; justify-content: space-between; margin-bottom: 6px; letter-spacing: 0.1em; font-size: 14px; }
+      .bar-row .lbl span:last-child { color: #ffffff; }
       .bar {
         position: relative;
         height: 6px;
@@ -486,33 +304,16 @@
       }
       .bar i {
         position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
+        top: 0; bottom: 0; left: 0;
         width: 0;
         background: linear-gradient(90deg, #4488cc, #88ccff);
         box-shadow: none;
         transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
-      .entry {
-        display: block;
-      }
-      .entry .t {
-        font-size: 20px;
-        letter-spacing: 0.16em;
-        color: #fff;
-      }
-      .entry .m {
-        font-size: 14px;
-        color: #88aacc;
-        letter-spacing: 0.15em;
-        margin: 2px 0 6px;
-      }
-      .entry .d {
-        color: #bfe0f2;
-        font-size: 16px;
-        line-height: 1.5;
-      }
+      .entry { display: block; }
+      .entry .t { font-size: 20px; letter-spacing: 0.16em; color: #fff; }
+      .entry .m { font-size: 14px; color: #88aacc; letter-spacing: 0.15em; margin: 2px 0 6px; }
+      .entry .d { color: #bfe0f2; font-size: 16px; line-height: 1.5; }
       .tag {
         display: inline-block;
         border: 1px solid rgba(120, 200, 255, 0.3);
@@ -543,40 +344,16 @@
       }
 
       @media (max-width: 760px) {
-        #hud-tr,
-        #hud-bl {
-          display: none;
-        }
-        #sect {
-          bottom: 80px;
-        }
-        #sect .name {
-          font-size: 28px;
-        }
-
-        .btn {
-          padding: 8px 16px;
-          font-size: 14px;
-          letter-spacing: 0.14em;
-        }
-        #panel {
-          width: calc(100vw - 16px);
-          height: min(72vh, 640px);
-        }
-        #p-title {
-          font-size: 18px;
-          letter-spacing: 0.16em;
-        }
-        #tip {
-          bottom: 24%;
-        }
-        #tip .t1 {
-          font-size: 16px;
-          letter-spacing: 0.24em;
-        }
-        #tip .t2 {
-          font-size: 12px;
-        }
+        #hud-tr, #hud-bl { display: none; }
+        #sect { bottom: 80px; }
+        #sect .name { font-size: 28px; }
+        .btn { padding: 8px 16px; font-size: 14px; letter-spacing: 0.14em; }
+        #panel { width: calc(100vw - 16px); height: min(72vh, 640px); }
+        #p-title { font-size: 18px; letter-spacing: 0.16em; }
+        #tip { bottom: 24%; }
+        #tip .t1 { font-size: 16px; letter-spacing: 0.24em; }
+        #tip .t2 { font-size: 12px; }
+        .torus-wrap { height: 240px; }
       }
     </style>
   </head>
@@ -589,12 +366,11 @@
           return;
       }
 
-      /* ---------- tunables ---------- */
-      var CELL      = 12;    // pixel block size
-      var DELAY_MS  = 120;   // pause on black before the reveal begins
-      var REVEAL_MS = 1050;  // total reveal duration
-      var FADE_SPAN = 0.38;  // normalized time each pixel takes to fade out
-      var WAVE_SPAN = 1 - FADE_SPAN; // wave travel window (edges -> center)
+      var CELL      = 12;
+      var DELAY_MS  = 120;
+      var REVEAL_MS = 1050;
+      var FADE_SPAN = 0.38;
+      var WAVE_SPAN = 1 - FADE_SPAN;
       var BASE      = '#020409';
 
       var style = document.createElement('style');
@@ -626,7 +402,7 @@
         for (var y = 0; y < rows; y++) {
           for (var x = 0; x < cols; x++) {
             var distFromEdge = x < halfCols ? x : (cols - 1 - x);
-            var normDist = distFromEdge / halfCols; // 0 at edges -> 1 at center
+            var normDist = distFromEdge / halfCols;
             var jitter = (Math.random() - 0.5) * 0.12;
             var delay = Math.max(0, Math.min(WAVE_SPAN, normDist * WAVE_SPAN + jitter));
             cells.push({ x: x, y: y, delay: delay });
@@ -634,7 +410,6 @@
         }
       }
 
-      // Perlin smootherstep: very fluid S-curve
       function ease(t) {
         t = Math.max(0, Math.min(1, t));
         return t * t * t * (t * (t * 6 - 15) + 10);
@@ -654,12 +429,10 @@
         var t = Math.max(0, now - startT - DELAY_MS);
         var p = Math.min(1, t / REVEAL_MS);
 
-        // 1) fully opaque base each frame (clean, no accumulation)
         ctx.globalCompositeOperation = 'source-over';
         ctx.fillStyle = BASE;
         ctx.fillRect(0, 0, W, H);
 
-        // 2) erase revealed pixels with a smooth per-cell alpha
         ctx.globalCompositeOperation = 'destination-out';
         var glowCells = [];
         for (var i = 0; i < cells.length; i++) {
@@ -677,7 +450,6 @@
           }
         }
 
-        // 3) traveling glow front across the mid-fade pixels
         ctx.globalCompositeOperation = 'source-over';
         for (var g = 0; g < glowCells.length; g++) {
           var gc = glowCells[g];
@@ -687,7 +459,6 @@
           ctx.fillRect(gc.x * CELL, gc.y * CELL, CELL, CELL);
         }
 
-        // 4) brief seam flash as the wave closes at the center
         if (p > 0.86) {
           var flashP = (p - 0.86) / 0.14;
           var flashAlpha = Math.sin(flashP * Math.PI) * 0.35;
@@ -708,7 +479,7 @@
         ctx = canvas.getContext('2d');
         build();
         window.addEventListener('resize', function () { if (!done) build(); });
-        setTimeout(finish, DELAY_MS + REVEAL_MS + 900); // fail-safe
+        setTimeout(finish, DELAY_MS + REVEAL_MS + 900);
         rafId = requestAnimationFrame(frame);
       }
 
@@ -767,33 +538,44 @@
         { id: "games",    name: "GAMES",    icon: "cube" },
       ];
 
+      const SKILLS = ["C++","C#","Python","HLSL","GLSL","OpenGL","HTML/CSS","Unreal Engine","Unity Engine","Blender","Git","ImGui","GLFW"];
+
       const DATA = {
         about: {
           title: "ABOUT",
           rows: [
-            { t: "hd", v: "About" },
-            { t: "pa", v: 'Aspiring Game Developer & Graphics Programmer' },
+            { t: "pa", v: "Game Developer & Graphics Programmer" },
+            { t: "hd", v: "" },
             { t: "hd", v: "Skills" },
-            { t: "kv", k: "LANG",  v: "C++ · C# · Python · HLSL · GLSL · OpenGL · HTML/CSS" },
-            { t: "kv", k: "TOOLS", v: "Unreal Engine · Unity Engine · Blender" },
-            { t: "kv", k: "OTHER", v: "Git · ImGui · GLFW" },
+            { t: "torus", skills: SKILLS },
             //{ t: "kv", k: "PERSONAL SITE", v: "CLICK HERE.", href: "personal.html" },
           ],
         },
         projects: {
           title: "PROJECTS",
           rows: [
-            { t: "li", title: "BOAT GAME",  meta: "2025 · UNITY", desc: "Y2K-inspired time-trial boat racer set in a Venice-style canal city.", href: "#", tag: "MORE" },
-            { t: "li", title: "RENDER LAB", meta: "C++ · OPENGL", desc: "Custom 3D renderer exploring shaders, bloom, and post-processing.",    href: "#", tag: "MORE" },
-            { t: "li", title: "DEV TOOLS",  meta: "IMGUI",        desc: "Editor tooling and real-time debug visualizers.",                     href: "#", tag: "MORE" },
+            { t: "li", title: "ReShade Shader Suite", meta: "COMPLETED", 
+	    desc: "A set of shaders for ReShade",
+	    href: "https://github.com/0vva0va/Reshade_Shaders_Suite", tag: "MORE" },
+
+            { t: "li", title: "Inverse FFT Ocean Simulation", meta: "COMPLETED", 
+	    desc: "Physical accurate ocean simulation",
+	    href: "https://github.com/0vva0va/Inverse_FFT_Ocean", tag: "MORE" },
+
+            { t: "li", title: "Procedrual Terrain Generator", meta: "COMPLETED",
+	    desc: "Terrain generation using FBM and Noise Derivatives",
+	    href: "https://github.com/0vva0va/Procedural_Terrain_Generator", tag: "MORE" },
+            
+	    { t: "li", title: "PCSX2 Aria Edition", meta: "IN PROGRESS",
+	    desc: "A fork of the PCSX2 emulator giving additional post processing effects to improve visuals of emulated games",
+	    href: "https://github.com/0vva0va/PCSX2_AriaEdition", tag: "MORE" },
           ],
         },
         games: {
           title: "GAMES",
           rows: [
-            { t: "li", title: "BOAT GAME",   meta: "IN DEVELOPMENT", desc: "Arcade time-trial racer with music-driven, physics-based boat handling.", href: "#", tag: "MORE" },
-            { t: "li", title: "GAME JAM 01", meta: "PROTOTYPE",      desc: "Experimental prototype built during a 48-hour jam.",                     href: "#", tag: "MORE" },
-            { t: "li", title: "CONCEPT 02",  meta: "CONCEPT",        desc: "Early concept exploration — details coming soon.",                       href: "#", tag: "MORE" },
+            { t: "li", title: "WINTER GAME", meta: "IN PROGRESS", desc: "Survival game with the goal to survive 30 days in a medieval winter season.", href: "#", tag: "MORE" },
+            { t: "li", title: "BOAT GAME",   meta: "PAUSED",      desc: "Arcade time-trial racer with music-driven, physics-based boat handling.",     href: "#", tag: "MORE" },
           ],
         },
         contact: {
@@ -875,19 +657,8 @@
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.12;
 
-        cv.addEventListener(
-          "webglcontextlost",
-          (e) => {
-            e.preventDefault();
-            showErr("GPU CONTEXT LOST");
-          },
-          false,
-        );
-        cv.addEventListener(
-          "webglcontextrestored",
-          () => location.reload(),
-          false,
-        );
+        cv.addEventListener("webglcontextlost", (e) => { e.preventDefault(); showErr("GPU CONTEXT LOST"); }, false);
+        cv.addEventListener("webglcontextrestored", () => location.reload(), false);
 
         const scene  = new THREE.Scene();
         const FOV    = 48;
@@ -939,14 +710,10 @@
             g.arc(0, 0, s * 0.55, 0, 7);
             g.stroke();
             g.beginPath();
-            g.moveTo(0, -s * 0.95);
-            g.lineTo(0, -s * 0.62);
-            g.moveTo(0, s * 0.95);
-            g.lineTo(0, s * 0.62);
-            g.moveTo(-s * 0.95, 0);
-            g.lineTo(-s * 0.62, 0);
-            g.moveTo(s * 0.95, 0);
-            g.lineTo(s * 0.62, 0);
+            g.moveTo(0, -s * 0.95); g.lineTo(0, -s * 0.62);
+            g.moveTo(0, s * 0.95); g.lineTo(0, s * 0.62);
+            g.moveTo(-s * 0.95, 0); g.lineTo(-s * 0.62, 0);
+            g.moveTo(s * 0.95, 0); g.lineTo(s * 0.62, 0);
             g.stroke();
             g.beginPath();
             g.arc(0, 0, s * 0.12, 0, 7);
@@ -995,10 +762,8 @@
             g.closePath();
             g.stroke();
             g.beginPath();
-            g.moveTo(-s * 0.56, 0);
-            g.lineTo(s * 0.56, 0);
-            g.moveTo(0, -s * 0.62);
-            g.lineTo(0, s * 0.62);
+            g.moveTo(-s * 0.56, 0); g.lineTo(s * 0.56, 0);
+            g.moveTo(0, -s * 0.62); g.lineTo(0, s * 0.62);
             g.stroke();
           }
         }
@@ -1018,9 +783,7 @@
           const c  = document.createElement("canvas");
           c.width  = c.height = 256;
           const g  = c.getContext("2d");
-          const cx = 128,
-                cy = 96,
-                hr = 84;
+          const cx = 128, cy = 96, hr = 84;
           g.shadowColor = "rgba(120,220,255,.95)";
           g.shadowBlur = 15;
           hexPathOn(g, cx, cy, hr);
@@ -1089,11 +852,7 @@
         scene.add(trunkGroup);
 
         const trunkMat = new THREE.ShaderMaterial({
-          uniforms: {
-            uTime: { value: 0 },
-            uPulse: { value: 0 },
-            uDim: { value: 1 },
-          },
+          uniforms: { uTime: { value: 0 }, uPulse: { value: 0 }, uDim: { value: 1 } },
           vertexShader: `
             varying vec2 vUv; varying vec3 vN; varying vec3 vV;
             void main(){
@@ -1125,12 +884,7 @@
               gl_FragColor=vec4((base+glow*uDim)*lit,1.0);
             }`,
         });
-        trunkGroup.add(
-          new THREE.Mesh(
-            new THREE.CylinderGeometry(trunkR, trunkR, trunkH, 72, 36, true),
-            trunkMat,
-          ),
-        );
+        trunkGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(trunkR, trunkR, trunkH, 72, 36, true), trunkMat));
 
         const capMat = new THREE.ShaderMaterial({
           uniforms: { uTime: { value: 0 }, uDim: { value: 1 } },
@@ -1152,33 +906,21 @@
               gl_FragColor=vec4(col,1.0);
             }`,
         });
-        const capT = new THREE.Mesh(
-          new THREE.CircleGeometry(trunkR, 72),
-          capMat,
-        );
+        const capT = new THREE.Mesh(new THREE.CircleGeometry(trunkR, 72), capMat);
         capT.rotation.x = -Math.PI / 2;
         capT.position.y = trunkH / 2;
         trunkGroup.add(capT);
-        const capB = new THREE.Mesh(
-          new THREE.CircleGeometry(trunkR, 72),
-          capMat,
-        );
+        const capB = new THREE.Mesh(new THREE.CircleGeometry(trunkR, 72), capMat);
         capB.rotation.x = Math.PI / 2;
         capB.position.y = -trunkH / 2;
         trunkGroup.add(capB);
 
         const rimMat = new THREE.MeshBasicMaterial({
-          color: 0x6fd2ff,
-          transparent: true,
-          opacity: 0.55,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
+          color: 0x6fd2ff, transparent: true, opacity: 0.55,
+          blending: THREE.AdditiveBlending, depthWrite: false,
         });
         for (const y of [trunkH / 2, -trunkH / 2]) {
-          const rim = new THREE.Mesh(
-            new THREE.TorusGeometry(trunkR + 2, 1.3, 8, 128),
-            rimMat,
-          );
+          const rim = new THREE.Mesh(new THREE.TorusGeometry(trunkR + 2, 1.3, 8, 128), rimMat);
           rim.rotation.x = Math.PI / 2;
           rim.position.y = y;
           trunkGroup.add(rim);
@@ -1187,11 +929,8 @@
         const rail = new THREE.Mesh(
           new THREE.TorusGeometry(iconRingR, 0.9, 8, 128),
           new THREE.MeshBasicMaterial({
-            color: 0x6fd2ff,
-            transparent: true,
-            opacity: 0.3,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
+            color: 0x6fd2ff, transparent: true, opacity: 0.3,
+            blending: THREE.AdditiveBlending, depthWrite: false,
           }),
         );
         rail.rotation.x = Math.PI / 2;
@@ -1200,18 +939,13 @@
         const nodeSprites = [];
         for (let i = 0; i < N; i++) {
           const phi = i * DELTA;
-          const s0 = trunkR + 2,
-            s1 = iconRingR - 12,
-            mid = (s0 + s1) / 2,
-            len = s1 - s0;
+          const s0 = trunkR + 2, s1 = iconRingR - 12,
+            mid = (s0 + s1) / 2, len = s1 - s0;
           const strut = new THREE.Mesh(
             new THREE.CylinderGeometry(0.9, 0.9, len, 6),
             new THREE.MeshBasicMaterial({
-              color: 0x6fd2ff,
-              transparent: true,
-              opacity: 0.4,
-              blending: THREE.AdditiveBlending,
-              depthWrite: false,
+              color: 0x6fd2ff, transparent: true, opacity: 0.4,
+              blending: THREE.AdditiveBlending, depthWrite: false,
             }),
           );
           strut.rotation.z = Math.PI / 2;
@@ -1219,17 +953,9 @@
           strut.position.set(Math.cos(phi) * mid, 0, Math.sin(phi) * mid);
           trunkGroup.add(strut);
           const spr = new THREE.Sprite(
-            new THREE.SpriteMaterial({
-              map: makeNodeTexture(SECTIONS[i]),
-              transparent: true,
-              depthWrite: false,
-            }),
+            new THREE.SpriteMaterial({ map: makeNodeTexture(SECTIONS[i]), transparent: true, depthWrite: false }),
           );
-          spr.position.set(
-            Math.cos(phi) * iconRingR,
-            0,
-            Math.sin(phi) * iconRingR,
-          );
+          spr.position.set(Math.cos(phi) * iconRingR, 0, Math.sin(phi) * iconRingR);
           spr.scale.set(nodeSize, nodeSize, 1);
           trunkGroup.add(spr);
           nodeSprites.push(spr);
@@ -1250,52 +976,29 @@
         }
 
         const reticle = new THREE.Sprite(
-          new THREE.SpriteMaterial({
-            map: makeReticleTexture(),
-            transparent: true,
-            depthTest: false,
-            depthWrite: false,
-          }),
+          new THREE.SpriteMaterial({ map: makeReticleTexture(), transparent: true, depthTest: false, depthWrite: false }),
         );
         reticle.renderOrder = 10;
         reticle.position.set(0, HEX_OFF, iconRingR);
         reticle.scale.setScalar(nodeSize * 1.3);
         scene.add(reticle);
 
-        const beam1 = new THREE.Sprite(
-          new THREE.SpriteMaterial({
-            map: texGlow,
-            color: 0x6fd2ff,
-            transparent: true,
-            opacity: 0.26,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending,
-          }),
-        );
+        const beam1 = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: texGlow, color: 0x6fd2ff, transparent: true, opacity: 0.26,
+          depthWrite: false, blending: THREE.AdditiveBlending,
+        }));
         beam1.scale.set(80, 1250, 1);
         scene.add(beam1);
-        const beam2 = new THREE.Sprite(
-          new THREE.SpriteMaterial({
-            map: texGlow,
-            color: 0xeaffff,
-            transparent: true,
-            opacity: 0.42,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending,
-          }),
-        );
+        const beam2 = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: texGlow, color: 0xeaffff, transparent: true, opacity: 0.42,
+          depthWrite: false, blending: THREE.AdditiveBlending,
+        }));
         beam2.scale.set(26, 1250, 1);
         scene.add(beam2);
-        const capGlowT = new THREE.Sprite(
-          new THREE.SpriteMaterial({
-            map: texGlow,
-            color: 0x9fdfff,
-            transparent: true,
-            opacity: 0.4,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending,
-          }),
-        );
+        const capGlowT = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: texGlow, color: 0x9fdfff, transparent: true, opacity: 0.4,
+          depthWrite: false, blending: THREE.AdditiveBlending,
+        }));
         capGlowT.position.set(0, trunkH / 2 + 6, 0);
         capGlowT.scale.setScalar(160);
         scene.add(capGlowT);
@@ -1308,17 +1011,11 @@
         function arcRing(radius, y, speed, tilt) {
           const grp = new THREE.Group();
           const mat = new THREE.MeshBasicMaterial({
-            color: 0x6fd2ff,
-            transparent: true,
-            opacity: 0.4,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
+            color: 0x6fd2ff, transparent: true, opacity: 0.4,
+            blending: THREE.AdditiveBlending, depthWrite: false,
           });
           for (let k = 0; k < 3; k++) {
-            const arc = new THREE.Mesh(
-              new THREE.TorusGeometry(radius, 1.4, 8, 32, 1.7),
-              mat,
-            );
+            const arc = new THREE.Mesh(new THREE.TorusGeometry(radius, 1.4, 8, 32, 1.7), mat);
             arc.rotation.z = (k * Math.PI * 2) / 3;
             grp.add(arc);
           }
@@ -1333,16 +1030,9 @@
 
         const NP = 420;
         const pGeo = new THREE.BufferGeometry();
-        pGeo.setAttribute(
-          "position",
-          new THREE.BufferAttribute(new Float32Array(NP * 3), 3),
-        );
-        const aA = new Float32Array(NP),
-          aR = new Float32Array(NP),
-          aY = new Float32Array(NP),
-          aSp = new Float32Array(NP),
-          aSz = new Float32Array(NP),
-          aW = new Float32Array(NP);
+        pGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(NP * 3), 3));
+        const aA = new Float32Array(NP), aR = new Float32Array(NP), aY = new Float32Array(NP),
+          aSp = new Float32Array(NP), aSz = new Float32Array(NP), aW = new Float32Array(NP);
         for (let i = 0; i < NP; i++) {
           aA[i] = Math.random() * Math.PI * 2;
           aR[i] = trunkR + 8 + Math.random() * 70;
@@ -1359,13 +1049,7 @@
         pGeo.setAttribute("aW", new THREE.BufferAttribute(aW, 1));
 
         const pMat = new THREE.ShaderMaterial({
-          uniforms: {
-            uTime:  { value: 0 },
-            uFlow:  { value: 0 },
-            uPx:    { value: 1 },
-            uDim:   { value: 1 },
-            uBoost: { value: 1 },
-          },
+          uniforms: { uTime: { value: 0 }, uFlow: { value: 0 }, uPx: { value: 1 }, uDim: { value: 1 }, uBoost: { value: 1 } },
           vertexShader: `
             attribute float aA; attribute float aR; attribute float aY;
             attribute float aSp; attribute float aSz; attribute float aW;
@@ -1390,9 +1074,7 @@
               vec3 col=mix(vec3(0.4,0.75,1.0), vec3(1.0, 1.0, 1.0), vW);
               gl_FragColor=vec4(col*a*uBoost, a*uBoost);
             }`,
-          transparent: true,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
+          transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
         });
         const points = new THREE.Points(pGeo, pMat);
         points.frustumCulled = false;
@@ -1400,11 +1082,7 @@
 
         (function () {
           const y = -310,
-            mat1 = new THREE.LineBasicMaterial({
-              color: 0x6fd2ff,
-              transparent: true,
-              opacity: 0.07,
-            });
+            mat1 = new THREE.LineBasicMaterial({ color: 0x6fd2ff, transparent: true, opacity: 0.07 });
           for (const rad of [190, 290, 410, 560, 900]) {
             const pts = new Float32Array(97 * 3);
             for (let k = 0; k <= 96; k++) {
@@ -1429,16 +1107,7 @@
           }
           const tg = new THREE.BufferGeometry();
           tg.setAttribute("position", new THREE.BufferAttribute(tp, 3));
-          scene.add(
-            new THREE.LineSegments(
-              tg,
-              new THREE.LineBasicMaterial({
-                color: 0x6fd2ff,
-                transparent: true,
-                opacity: 0.12,
-              }),
-            ),
-          );
+          scene.add(new THREE.LineSegments(tg, new THREE.LineBasicMaterial({ color: 0x6fd2ff, transparent: true, opacity: 0.12 })));
         })();
         (function () {
           const sp = new Float32Array(500 * 3);
@@ -1452,37 +1121,15 @@
           }
           const g = new THREE.BufferGeometry();
           g.setAttribute("position", new THREE.BufferAttribute(sp, 3));
-          scene.add(
-            new THREE.Points(
-              g,
-              new THREE.PointsMaterial({
-                size: 6,
-                map: texGlow,
-                color: 0x9fd4ff,
-                transparent: true,
-                opacity: 0.6,
-                depthWrite: false,
-                blending: THREE.AdditiveBlending,
-                sizeAttenuation: true,
-              }),
-            ),
-          );
+          scene.add(new THREE.Points(g, new THREE.PointsMaterial({
+            size: 6, map: texGlow, color: 0x9fd4ff, transparent: true, opacity: 0.6,
+            depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
+          })));
         })();
 
-        function lsGet(k) {
-          try {
-            return localStorage.getItem(k);
-          } catch (e) {
-            return null;
-          }
-        }
-        function lsSet(k, v) {
-          try {
-            localStorage.setItem(k, v);
-          } catch (e) {}
-        }
-        let tipActive = false,
-          tipTimer = 0;
+        function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+        function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+        let tipActive = false, tipTimer = 0;
         function maybeShowTip() {
           if (lsGet("helios_tip_seen")) return;
           tipActive = true;
@@ -1497,33 +1144,14 @@
           if (persist) lsSet("helios_tip_seen", "1");
         }
 
-        let rotA = -Math.PI / 2,
-          tw = null,
-          activeIdx = 0,
-          hoverIdx = -1;
-        let isOpen = false,
-          openSeq = 0,
-          time = 0,
-          dim = 1,
-          camZ = CAM.z;
-        let swayMix = 0;
-        let mouseX = 0,
-          mouseY = 0;
-        const tmpV = new THREE.Vector3(),
-          tmpW = new THREE.Vector3(),
-          lookT = new THREE.Vector3();
-        const iconScr = Array.from({ length: N }, () => ({
-          i: 0,
-          x: 0,
-          y: 0,
-          r: 0,
-          hidden: true,
-        }));
+        let rotA = -Math.PI / 2, tw = null, activeIdx = 0, hoverIdx = -1;
+        let isOpen = false, openSeq = 0, time = 0, dim = 1, camZ = CAM.z;
+        let swayMix = 0, mouseX = 0, mouseY = 0;
+        const tmpV = new THREE.Vector3(), tmpW = new THREE.Vector3(), lookT = new THREE.Vector3();
+        const iconScr = Array.from({ length: N }, () => ({ i: 0, x: 0, y: 0, r: 0, hidden: true }));
         let iconCount = 0;
         let pf = (IH * 0.5) / Math.tan(THREE.MathUtils.degToRad(FOV * 0.5));
-
-        let pulseT = 0,
-          flowT = 0;
+        let pulseT = 0, flowT = 0;
 
         function activeFromRot() {
           return ((Math.round((rotA + Math.PI / 2) / DELTA) % N) + N) % N;
@@ -1532,18 +1160,10 @@
           if (isOpen || !introDone) return;
           dismissTip(true);
           const base = i * DELTA - Math.PI / 2;
-          const target =
-            base + Math.PI * 2 * Math.round((rotA - base) / (Math.PI * 2));
-          const d =
-            durOverride !== undefined
-              ? durOverride
-              : Math.min(1200, 620 + Math.abs(target - rotA) * 60);
-          tw = {
-            a0: rotA,
-            a1: target,
-            t0: performance.now(),
-            dur: Math.max(180, d),
-          };
+          const target = base + Math.PI * 2 * Math.round((rotA - base) / (Math.PI * 2));
+          const d = durOverride !== undefined ? durOverride
+            : Math.min(1200, 620 + Math.abs(target - rotA) * 60);
+          tw = { a0: rotA, a1: target, t0: performance.now(), dur: Math.max(180, d) };
         }
         function onActive() {
           const s = SECTIONS[activeIdx];
@@ -1563,34 +1183,19 @@
 
         window.addEventListener('siteIntroDone', finishIntro);
 
-        const panel = $("panel"),
-          pBody = $("p-body");
+        const panel = $("panel"), pBody = $("p-body");
         let typer = null;
         function startType(el, text, done) {
           stopType();
           let i = 0;
           el.textContent = "";
-          typer = {
-            el,
-            text,
-            done,
-            iv: setInterval(() => {
-              i++;
-              el.textContent = text.slice(0, i);
-              if (i >= text.length) {
-                const d = typer.done;
-                stopType();
-                d && d();
-              }
-            }, 13),
-          };
+          typer = { el, text, done, iv: setInterval(() => {
+            i++;
+            el.textContent = text.slice(0, i);
+            if (i >= text.length) { const d = typer.done; stopType(); d && d(); }
+          }, 13) };
         }
-        function stopType() {
-          if (typer) {
-            clearInterval(typer.iv);
-            typer = null;
-          }
-        }
+        function stopType() { if (typer) { clearInterval(typer.iv); typer = null; } }
         function skipType() {
           if (!typer) return;
           const { el, text, done } = typer;
@@ -1602,6 +1207,92 @@
         function esc(s) {
           return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
                           .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        /* ---- skills torus ---- */
+        let torus = null;
+        function stopTorus() {
+          if (torus && torus.raf) cancelAnimationFrame(torus.raf);
+          torus = null;
+        }
+        function startTorus(canvas, skills) {
+          if (!canvas || !canvas.isConnected) return;
+          stopTorus();
+          const ctx = canvas.getContext('2d');
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          let w = canvas.clientWidth, h = canvas.clientHeight;
+          if (!w) w = 560;
+          if (!h) h = 300;
+          canvas.width = Math.round(w * dpr);
+          canvas.height = Math.round(h * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+          const n = skills.length;
+          const R = Math.min(w, h) * 0.30; // major radius
+          const r = Math.min(w, h) * 0.13; // minor radius
+          const pts = [];
+          for (let i = 0; i < n; i++) {
+            const u = (i / n) * Math.PI * 2;
+            const v = u * 2 + i * 0.9;
+            pts.push({ u, v, label: skills[i], phase: Math.random() * Math.PI * 2 });
+          }
+          const ctrl = { canvas, ctx, w, h, pts, R, r, raf: null, last: performance.now(), t: Math.random() * 10 };
+          torus = ctrl;
+
+          function frame(now) {
+            if (!torus || torus !== ctrl) return;
+            const dt = Math.min(0.05, (now - ctrl.last) / 1000);
+            ctrl.last = now;
+            ctrl.t += dt;
+            const t = ctrl.t;
+            const { ctx, w, h, R, r } = ctrl;
+            ctx.clearRect(0, 0, w, h);
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowBlur = 0;
+
+            const rotX = 1.05 + Math.sin(t * 0.35) * 0.18; // tilt
+            const rotY = t * 0.6;                            // spin
+            const cx = w / 2;
+            const cy = h / 2 + Math.sin(t * 0.8) * 5;       // gentle float
+            const fov = 520;
+
+            const items = [];
+            for (const p of ctrl.pts) {
+              const bob = Math.sin(t * 1.5 + p.phase) * 7;
+              const cvv = Math.cos(p.v), sv = Math.sin(p.v);
+              const cu = Math.cos(p.u), su = Math.sin(p.u);
+              let x = (R + r * cvv) * cu;
+              let y = (R + r * cvv) * su;
+              let z = r * sv + bob;
+              // rotate X
+              let y1 = y * Math.cos(rotX) - z * Math.sin(rotX);
+              let z1 = y * Math.sin(rotX) + z * Math.cos(rotX);
+              let x1 = x;
+              // rotate Y
+              let x2 = x1 * Math.cos(rotY) + z1 * Math.sin(rotY);
+              let z2 = -x1 * Math.sin(rotY) + z1 * Math.cos(rotY);
+              let y2 = y1;
+              const scale = fov / (fov + z2);
+              items.push({ label: p.label, sx: cx + x2 * scale, sy: cy + y2 * scale, scale });
+            }
+            items.sort((a, b) => a.scale - b.scale); // back to front
+            for (const it of items) {
+              const nd = Math.max(0, Math.min(1, (it.scale - 0.82) / 0.45));
+              const size = 12 + nd * 10;
+              const alpha = 0.28 + nd * 0.72;
+              const rr = Math.round(70 + (235 - 70) * nd);
+              const gg = Math.round(110 + (248 - 110) * nd);
+              const bb = Math.round(150 + (255 - 150) * nd);
+              ctx.font = Math.round(size) + 'px "VT323", monospace';
+              if (nd > 0.72) { ctx.shadowColor = "rgba(140,225,255,0.8)"; ctx.shadowBlur = 10; }
+              else ctx.shadowBlur = 0;
+              ctx.fillStyle = `rgba(${rr},${gg},${bb},${alpha.toFixed(3)})`;
+              ctx.fillText(it.label, it.sx, it.sy);
+            }
+            ctrl.raf = requestAnimationFrame(frame);
+          }
+          ctrl.raf = requestAnimationFrame(frame);
         }
 
         function makeRow(r) {
@@ -1616,10 +1307,7 @@
             v.textContent = r.v;
             if (r.href) {
               v.href = r.href;
-              if (/^http/.test(r.href)) {
-                v.target = "_blank";
-                v.rel = "noopener";
-              }
+              if (/^http/.test(r.href)) { v.target = "_blank"; v.rel = "noopener"; }
             }
             el.append(k, v);
           } else if (r.t === "hd") {
@@ -1631,11 +1319,9 @@
           } else if (r.t === "bar") {
             el.className = "row bar-row";
             el.innerHTML = `<div class="lbl"><span>${esc(r.k)}</span><span>${esc(r.v)}%</span></div><div class="bar"><i></i></div>`;
-            requestAnimationFrame(() =>
-              requestAnimationFrame(() => {
-                el.querySelector("i").style.width = r.v + "%";
-              }),
-            );
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+              el.querySelector("i").style.width = r.v + "%";
+            }));
           } 
           else if (r.t === "li") {
             el.className = "row li";
@@ -1644,27 +1330,29 @@
               : "";
             el.innerHTML =
               `<div class="li-main"><span class="li-title">${esc(r.title)}</span><span class="li-meta">${esc(r.meta)}</span></div>` +
-              `<div class="li-desc">${esc(r.desc)}</div>` +
-              link;
+              `<div class="li-desc">${esc(r.desc)}</div>` + link;
+          }
+          else if (r.t === "torus") {
+            el.className = "row torus-wrap";
+            const cv2 = document.createElement("canvas");
+            cv2.className = "torus-canvas";
+            el.appendChild(cv2);
+            requestAnimationFrame(() => requestAnimationFrame(() => startTorus(cv2, r.skills)));
           }
           else if (r.t === "en") {
             el.className = "row entry";
             el.innerHTML =
               `<span class="t">${esc(r.title)}</span><div class="m">${esc(r.meta)}</div><div class="d">${r.desc}</div>` +
-              (r.tags
-                ? `<div>${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>`
-                : "");
+              (r.tags ? `<div>${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>` : "");
           }
           else if (r.type === "video") {
             el.className = "panel-video-wrap";
-
             if (r.title) {
               const title = document.createElement("div");
               title.className = "hd";
               title.textContent = r.title;
               el.appendChild(title);
             }
-
             const video = document.createElement("video");
             video.className = "panel-video";
             video.src = r.src;
@@ -1673,7 +1361,6 @@
             if (r.poster) video.poster = r.poster;
             if (r.loop) video.loop = true;
             if (r.autoplay) video.autoplay = true;
-
             el.appendChild(video);
           }
           return el;
@@ -1681,16 +1368,14 @@
 
         function openMenu(i) {
           dismissTip(true);
-          const sec = SECTIONS[i],
-            d = DATA[sec.id],
-            seq = ++openSeq;
+          stopTorus();
+          const sec = SECTIONS[i], d = DATA[sec.id], seq = ++openSeq;
           isOpen = true;
           document.body.classList.add("menu-open");
           panel.classList.add("open");
           $("p-title").textContent = d.title;
           pBody.scrollTop = 0;
           pBody.innerHTML = "";
-          
           d.rows.forEach((r, k) =>
             setTimeout(() => {
               if (seq !== openSeq) return;
@@ -1703,36 +1388,27 @@
           isOpen = false;
           openSeq++;
           stopType();
+          stopTorus();
           document.body.classList.remove("menu-open");
           panel.classList.remove("open");
-          document.querySelectorAll(".panel-video").forEach(v => {
-            v.pause();
-          });
+          document.querySelectorAll(".panel-video").forEach(v => { v.pause(); });
         }
         $("p-close").addEventListener("click", closeMenu);
         pBody.addEventListener("click", skipType);
 
         function pick(x, y) {
-          let best = -1,
-            bd = 1e9;
+          let best = -1, bd = 1e9;
           for (let n = 0; n < iconCount; n++) {
             const it = iconScr[n];
             if (it.hidden) continue;
             const d = Math.hypot(x - it.x, y - it.y);
-            if (d < it.r && d < bd) {
-              bd = d;
-              best = it.i;
-            }
+            if (d < it.r && d < bd) { bd = d; best = it.i; }
           }
           return best;
         }
-        let dragging = false,
-          dragMoved = 0,
-          lastPX = 0,
-          activePointer = null;
+        let dragging = false, dragMoved = 0, lastPX = 0, activePointer = null;
         cv.addEventListener("pointerdown", (e) => {
-          if (!introDone || isOpen || e.button !== 0 || activePointer !== null)
-            return;
+          if (!introDone || isOpen || e.button !== 0 || activePointer !== null) return;
           activePointer = e.pointerId;
           dragging = true;
           dragMoved = 0;
@@ -1754,10 +1430,7 @@
           }
           mouseX = e.clientX / w - 0.5;
           mouseY = e.clientY / h - 0.5;
-          if (isOpen) {
-            hoverIdx = -1;
-            return;
-          }
+          if (isOpen) { hoverIdx = -1; return; }
           const hit = pick(e.clientX, e.clientY);
           hoverIdx = hit;
           cv.style.cursor = hit >= 0 ? "pointer" : "grab";
@@ -1769,9 +1442,7 @@
           cv.classList.remove("grabbing");
           if (dragMoved <= 5) {
             const hit = pick(e.clientX, e.clientY);
-            if (hit >= 0) {
-              hit === activeIdx ? openMenu(hit) : rotateTo(hit);
-            }
+            if (hit >= 0) { hit === activeIdx ? openMenu(hit) : rotateTo(hit); }
           } else {
             rotateTo(activeFromRot(), 280);
           }
@@ -1781,21 +1452,16 @@
         cv.addEventListener("pointercancel", endDrag);
 
         let wheelLock = 0;
-        addEventListener(
-          "wheel",
-          (e) => {
-            if (isOpen || !introDone) return;
-            const n = performance.now();
-            if (n - wheelLock < 200 || Math.abs(e.deltaY) < 12) return;
-            wheelLock = n;
-            rotateTo(activeIdx + (e.deltaY > 0 ? 1 : -1));
-          },
-          { passive: true },
-        );
+        addEventListener("wheel", (e) => {
+          if (isOpen || !introDone) return;
+          const n = performance.now();
+          if (n - wheelLock < 200 || Math.abs(e.deltaY) < 12) return;
+          wheelLock = n;
+          rotateTo(activeIdx + (e.deltaY > 0 ? 1 : -1));
+        }, { passive: true });
         function toggleFS() {
           if (!document.fullscreenElement)
-            document.documentElement.requestFullscreen &&
-              document.documentElement.requestFullscreen();
+            document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
           else document.exitFullscreen && document.exitFullscreen();
         }
 
@@ -1813,29 +1479,10 @@
           } else if (e.key === "f" || e.key === "F") toggleFS();
         });
 
-        const elClock = $("clock"),
-          elRt = $("rt"),
-          elRd = $("rd"),
-          elRf = $("rf");
+        const elClock = $("clock");
         setInterval(() => {
-          const d = new Date(),
-            p = (n) => String(n).padStart(2, "0");
+          const d = new Date(), p = (n) => String(n).padStart(2, "0");
           elClock.textContent = `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
-          const deg = ((((rotA * 180) / Math.PI) % 360) + 360) % 360;
-          if (elRot) elRot.textContent = deg.toFixed(1).padStart(5, "0");
-          const t = time;
-          if (elRt) elRt.textContent = (
-            152.3 +
-            Math.sin(t * 0.3) * 1.2 +
-            Math.sin(t * 1.7) * 0.2
-          ).toFixed(1);
-          if (elRd) elRd.textContent =
-            (
-              1.02 +
-              0.03 * Math.sin(t * 0.21) +
-              0.004 * Math.sin(t * 1.3)
-            ).toFixed(3) + "e20";
-          if (elRf) elRf.textContent = (5.31 + 0.02 * Math.sin(t * 0.4 + 0.5)).toFixed(2);
         }, 250);
         onActive();
 
@@ -1863,24 +1510,16 @@
 
           if (tw) {
             const k = (now - tw.t0) / tw.dur;
-            if (k >= 1) {
-              rotA = tw.a1;
-              tw = null;
-            } else {
+            if (k >= 1) { rotA = tw.a1; tw = null; }
+            else {
               const e = 1 - Math.pow(1 - k, 3);
               rotA = tw.a0 + (tw.a1 - tw.a0) * e;
             }
           } else if (!dragging && introDone) {
-            rotA =
-              ((((rotA + Math.PI) % (Math.PI * 2)) + Math.PI * 2) %
-                (Math.PI * 2)) -
-              Math.PI;
+            rotA = ((((rotA + Math.PI) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) - Math.PI;
           }
           const ai = activeFromRot();
-          if (ai !== activeIdx) {
-            activeIdx = ai;
-            onActive();
-          }
+          if (ai !== activeIdx) { activeIdx = ai; onActive(); }
 
           dim += ((isOpen ? 0.55 : 1) - dim) * Math.min(1, dt * 6);
 
@@ -1903,27 +1542,19 @@
           capGlowT.material.opacity = dim * 0.4;
           capGlowB.material.opacity = dim * 0.3;
 
-          const orbMul = 1;
-          orbit1.rotation.y += dt * orbit1.userData.speed * orbMul;
-          orbit2.rotation.y += dt * orbit2.userData.speed * orbMul;
+          orbit1.rotation.y += dt * orbit1.userData.speed;
+          orbit2.rotation.y += dt * orbit2.userData.speed;
 
           for (let i = 0; i < N; i++) {
             const phi = i * DELTA;
             const f = (Math.cos(phi - rotA - Math.PI / 2) + 1) / 2;
             const act = i === activeIdx;
-            nodeSprites[i].position.y =
-              Math.sin(time * 1.8 + i * 1.7) * 3 * SWAY;
+            nodeSprites[i].position.y = Math.sin(time * 1.8 + i * 1.7) * 3 * SWAY;
             const target = nodeSize * (act ? 1.22 : 1);
-            const s =
-              nodeSprites[i].scale.x +
-              (target - nodeSprites[i].scale.x) * Math.min(1, dt * 8);
+            const s = nodeSprites[i].scale.x + (target - nodeSprites[i].scale.x) * Math.min(1, dt * 8);
             nodeSprites[i].scale.set(s, s, 1);
-            nodeSprites[i].material.opacity = Math.min(
-              1,
-              dim * (0.4 + 0.6 * f) +
-                (act ? 0.15 : 0) +
-                (i === hoverIdx ? 0.15 : 0)
-            );
+            nodeSprites[i].material.opacity = Math.min(1,
+              dim * (0.4 + 0.6 * f) + (act ? 0.15 : 0) + (i === hoverIdx ? 0.15 : 0));
           }
           if (!isOpen && introDone) {
             reticle.visible = true;
@@ -1934,8 +1565,8 @@
           } else reticle.visible = false;
 
           trunkGroup.rotation.y = rotA;
-          trunkGroup.position.y = Math.sin(time * 0.6) * 5.0; 
-          trunkGroup.rotation.z = Math.sin(time * 0.4) * 0.012; 
+          trunkGroup.position.y = Math.sin(time * 0.6) * 5.0;
+          trunkGroup.rotation.z = Math.sin(time * 0.4) * 0.012;
           trunkGroup.rotation.x = Math.cos(time * 0.5) * 0.008;
 
           swayMix += ((dragging || isOpen ? 0 : 1) - swayMix) * Math.min(1, dt * 4);
@@ -1960,13 +1591,7 @@
               it.i = i;
               it.x = ((tmpV.x + 1) / 2) * w;
               it.y = ((1 - tmpV.y) / 2) * h;
-              it.r =
-                Math.max(
-                  36,
-                  (nodeSprites[i].scale.x * 0.8 * pf) /
-                    camera.position.distanceTo(tmpW),
-                ) *
-                (h / IH);
+              it.r = Math.max(36, (nodeSprites[i].scale.x * 0.8 * pf) / camera.position.distanceTo(tmpW)) * (h / IH);
               it.hidden = f < 0.22;
             }
           }
